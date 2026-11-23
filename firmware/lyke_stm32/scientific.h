@@ -9,10 +9,18 @@ enum Symbol {
     PI = 128, EULER, ANS, RECIP, SQUARE, CUBE, FACT, PCT, FRAC, DMS,
     NCR, NPR, ROOT, SQRT, CBRT, LOG10, LN, POW10, EXP,
     SIN, COS, TAN, ASIN, ACOS, ATAN, SINH, COSH, TANH, ASINH, ACOSH, ATANH,
-    POL, REC, VAR_A, VAR_B, VAR_C, VAR_D, VAR_E, VAR_F, VAR_X, VAR_Y, VAR_M, RND, RANDOM
+    POL, REC, VAR_A, VAR_B, VAR_C, VAR_D, VAR_E, VAR_F, VAR_X, VAR_Y, VAR_M, RND, RANDOM,
+    GREEK_DELTA, GREEK_THETA, GREEK_OMEGA
 };
 
 static const double pi = 3.14159265358979323846;
+
+static int variable_index(unsigned token)
+{
+    if (token>=VAR_A && token<=VAR_M) return (int)(token-VAR_A);
+    if (token>=GREEK_DELTA && token<=GREEK_OMEGA) return 9+(int)(token-GREEK_DELTA);
+    return -1;
+}
 
 typedef struct {
     const uint8_t *at;
@@ -141,8 +149,9 @@ static double expr_atom(Expression *expr)
     if (!c)
         return bad(expr, "FALTA UM VALOR");
     ++expr->at;
-    if (c >= VAR_A && c <= VAR_M)
-        return expr->variables[c - VAR_A];
+    int variable = variable_index(c);
+    if (variable >= 0)
+        return expr->variables[variable];
     if (c == PI) return pi;
     if (c == EULER) return 2.71828182845904523536;
     if (c == ANS) return expr->answer;
@@ -240,7 +249,7 @@ static double expr_term(Expression *expr)
         else if (consume(expr, NPR)) value = compare_int(expr, value, expr_sign(expr), true);
         else {
             unsigned c = *expr->at;
-            if (c == '(' || c == PI || c == EULER || c == ANS || (c >= SQRT && c <= RANDOM))
+            if (c == '(' || c == PI || c == EULER || c == ANS || (c >= SQRT && c <= GREEK_OMEGA))
                 value *= expr_sign(expr);
             else
                 break;

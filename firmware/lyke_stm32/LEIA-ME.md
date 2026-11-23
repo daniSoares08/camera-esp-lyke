@@ -1,5 +1,34 @@
 # Firmware Lyke 101078 · STM32G431 e ESP32-CAM clássica
 
+**Estado final: STM32 R11 + ESP Lyke R8**, instalados por Wi-Fi, com 49
+teclas e indicador de bateria confirmados pelo usuário. Divisor corrigido
+para dois 470 kilohms. Detalhes em [Bateria e R11](BATERIA-R11.md).
+Manual final do comprador: [PDF](../../docs/manual/Manual-Lyke.pdf) e
+[Markdown](../../docs/manual/Manual-Lyke.md). Para compilar a revisão atual,
+use `sh firmware/lyke_stm32/build.sh lyke-r11`; a base V2 é a mesma abaixo.
+O restante desta página preserva a instalação e os históricos anteriores.
+
+## Estado atual e instruções da R10 — 23/11/2026
+
+**Instalados e testados: STM32 R10a + ESP Lyke R8.** Base R10 gravada
+por USB com backup/releitura e mapa/preferências preservados. Atualização
+R10→R10a pelo Wi-Fi/UART existente concluída em 12,44 s. Usuário confirmou
+menu, teclas e raiz/frações inteiras na janela disponível do LCD.
+As instruções atuais de compilação, instalação inicial pelo USB, atualização
+pelo Wi-Fi, novo mapa de memória e símbolos estão em
+[Pronto para testar R10](PRONTO-PARA-TESTAR-R10.md).
+
+Sem fios adicionais: PA2 → GPIO13, PA3 ← GPIO14 e GND comum existentes.
+Instalar o novo carregador V2 junto da aplicação uma vez pelo USB; não enviar
+R10/R10a ao carregador antigo. Pacote novo `LYKEG432`, app 64 KiB e staging 48 KiB.
+O mapa/preferências mantêm os endereços originais.
+
+**O conteúdo abaixo é histórico da edição R8/R5.** Seus comandos de versões
+antigas, leitor de quatro linhas, mapa de 56 KiB e ligação provisória de
+migração não são instruções para instalar o conjunto R10/R8.
+
+## Histórico da edição R8/R5
+
 A Lyke usa o LCD GMG12864-06D Ver.2.2 no SPI1 do STM32,
 o teclado original de 19 trilhas com T19 em PC6, o ADC no PA0 e a UART
 115200 8N1 em PA2/PA3 com o ESP32-CAM em GPIO13/GPIO14. A GPIO33 do

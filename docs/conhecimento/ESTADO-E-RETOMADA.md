@@ -2,6 +2,205 @@
 
 ## Próxima retomada
 
+### Encerramento solicitado pelo usuário: R11, bateria e manual final
+
+Em 23/11/2026, o usuário informou 3,84 V no multímetro e corrigiu um
+resistor amarelo-roxo-marrom (470 ohms) para dois amarelo-roxo-amarelo
+(470 kilohms), normalizando a leitura. Não confundir a foto anterior,
+com 4,04 V no LCD, com uma calibração exata após a correção.
+
+- **Instalados STM R11 + ESP Lyke R8 (app0).** R11 enviada pelo portal,
+  Wi-Fi/UART existente, 14,16 s, HTTP 200, reinício e revisão confirmados.
+  Mapa de 49 teclas/`keyboard_ready=true` preservados. Loader V2 inalterado.
+  Manifesto `.build/lyke_stm32/lyke-r11/manifest.json`; registro privado
+  `.private/lyke-cloud/device-stm-r11-wifi.json`.
+- Ícone de bateria imediatamente antes das fotos, x=94..105/y=0..7 do
+  cabeçalho lógico. Quatro níveis aproximados, ! piscando quando baixa,
+  ? em leitura inválida. Janela 126×48 preservada e leitor IA sem ícones.
+  Medição automática cooperativa, a cada 30 s, sem espera no teclado/UART.
+  **Usuário confirmou:** ícone aparece e tensão no menu continua normal.
+  Detalhes/testes em `firmware/lyke_stm32/BATERIA-R11.md`.
+- App 60.592 bytes/CRC32 `ab7062c2`, SHA-256
+  `e317b4ee341e6173b91d54f8ee039d8a43c2b8d39e038fdae3d11ddf98ddeb38`.
+  OTA 44.134 bytes, SHA-256
+  `8ea1847c0dd8af559ac526e21a70718f2fbfbb685c458ca7f033bddfa6c0d54b`.
+  Testes nativos aprovados: ADC cooperativo/timeouts/período/cancelamento,
+  barras/histerese/avisos/limites do LCD e regressões; loader 514+204
+  interrupções simuladas. Nenhuma chamada paga nova à API.
+- Usuário tornou o repositório **público**, confirmado pelo conector GitHub,
+  e pediu atualização dos fontes; somente fontes/documentos sanitizados,
+  sem binários de firmware, credenciais ou backups. O arquivo de fotos no
+  Supabase continua privado. Organização/projeto/serviço não foram alterados.
+- **Manual final edição 2.0**, 36 páginas, STM R11/ESP R8: PDF e Markdown
+  com imagens em `output/pdf/`, ZIP completo; cópia de publicação em
+  `docs/manual/`. Atualizados bateria, notação, gregas, seis linhas de
+  resposta, OTA do STM testada e instruções OpenAI/Claude. Somente OpenAI
+  integrada/testada. Inclui foto da unidade fornecida pelo usuário, com
+  legenda de que é anterior ao ícone R11. Fontes oficiais reconsultadas;
+  36 páginas renderizadas/inspecionadas, links de imagens e ZIP verificados.
+- Usuário pediu atualizar o manual e declarou **“Finalizamos o projeto”**.
+  Escopo atual concluído. Ensaios não executados (por exemplo, queda real
+  de energia durante gravação e aferição de autonomia/circuito de recarga)
+  são limites registrados, não resultados inventados nem trabalho em curso.
+
+### Histórico anterior: instalação STM R10a + ESP Lyke R8
+
+
+Em 23/11/2026, usuário conectou o STM e autorizou a gravação. Entrou em
+DFU por BOOT0/RST. Identificado `0483:df11`, serial `209D35994333`, flash
+interna `64*02Kg` (128 KiB). Backup integral coincidiu com app/loader R8
+conhecidos antes de gravar. O descritor sem zeros à esquerda exigiu corrigir
+somente a validação textual do utilitário USB; teste de ambos os formatos
+e rejeição de alvo/endereço/tamanho diferentes aprovado.
+
+- **Base R10 + loader V2 instalados por USB.** Releitura integral conferida:
+  programa/loader idênticos ao pacote e últimos 6 KiB de mapa/preferências
+  idênticos ao backup. Relatório `.private/stm32_lyke_r10_20261123_144822/result.json`.
+  Usuário reiniciou e confirmou menu/teclas funcionando.
+- **ESP Lyke R8 instalado por OTA em app0**, binário 1.320.496 bytes,
+  SHA-256 `e7fa0fc1b9ea0b66e65a6ad16d267c852666cec5eab7054a151c707041984c22`,
+  digest em execução `1863e2d7a1c57deb9259901435a5121ba097f13e09710f11ef4a6961685546a7`.
+  Revisão/slot/digest conferidos; URL de serviço/acesso configurado preservados.
+  Relatório `.private/lyke-cloud/device-r8-ota.json`.
+- **STM Lyke R10a instalado depois pelo Wi-Fi do ESP e UART existente**,
+  sem usar USB para essa transferência. HTTP 200, `STM32 atualizado e
+  reiniciado`, 12,44 s. CRC app mudou de `3ab001a5` para `33e2549c`;
+  loader confere CRC após escrever antes de informar sucesso. Portal passou
+  de `lyke-r10` a `lyke-r10a`, mantendo 49 teclas e `keyboard_ready=true`.
+  R10a tem mesmas funções, somente identificador diferente para comprovar
+  troca real de aplicação, incluindo cópia do staging para o app.
+- Manifesto atual `.build/lyke_stm32/lyke-r10a/manifest.json`; app 59.932 bytes,
+  SHA-256 `e37c0e2069c804b1cb0a458603c39d2c2807e7ca051fe4d14f558e6c8992e192`.
+  Pacote OTA 43.424 bytes, SHA-256
+  `dd2783e8ffd9677e03b254c4ec8c69de55cd1b6149a8a7ff4806ae7d07994c8c`.
+  Relatório `.private/lyke-cloud/device-stm-r10a-wifi.json`.
+- **Usuário confirmou no aparelho:** menu e teclas; depois raiz `√(9+16)`
+  e soma com tecla de fração cabem inteiras na janela original e funcionam.
+  Mantidos 126×48 pixels úteis/6 linhas, sem usar as duas linhas ocultas.
+  Não confundir com uso dos 128×64 completos. Cabeçalho normal ocupa parte
+  dessa janela; leitor IA preparado usa as seis linhas só para resposta.
+- Testes nativos repetidos para o binário R10a e utilitário ajustado, aprovados.
+  Fontes, manifestos, pacote local e validação técnica atualizados.
+  Instruções em `firmware/lyke_stm32/PRONTO-PARA-TESTAR-R10.md`, resumo em
+  `docs/VALIDACAO-R10-2026-11-23.md`. Pacote continua na pasta
+  `output/firmware/lyke-r10-pronto/` e ZIP correspondente, agora com R10a.
+- **Pendentes:** arranque frio, nova consulta/leitor de seis linhas no
+  conjunto atual, conferência de fotos após OTA, bateria com multímetro e
+  manual PDF/MD. Últimas duas tarefas adiadas pelo usuário. Sem API paga
+  nesta instalação. GitHub não atualizado nesta etapa; binários seguem privados.
+
+### Histórico da preparação: R10 + ESP Lyke R8, antes da gravação
+
+Em 23/11/2026, usuário pediu atualização do STM pelo Wi-Fi do ESP sem
+nova solda e notação matemática melhor. **Deixar preparado; ele conectará
+o STM depois para testar. Nenhum firmware foi gravado nesta etapa.**
+Instalados continuam **STM32 R8 + ESP Lyke R7**. API v2 segue publicada.
+R10 substitui R9 como candidata preparada; não usar as instruções antigas
+de instalar só aplicação R9 na próxima sessão.
+
+- Preparados **STM32 R10 + ESP Lyke R8**. Instruções atuais em
+  `firmware/lyke_stm32/PRONTO-PARA-TESTAR-R10.md`; pacote local privado em
+  `output/firmware/lyke-r10-pronto/` e `output/firmware/Lyke-R10-pronto.zip`.
+- UART existente PA2→GPIO13, PA3←GPIO14 e GND comum. Sem pinos novos.
+  Aplicação entra diretamente no loader; timeout sem transferência retorna
+  ao app válido. Carregador anuncia `LYKE BOOT V2`; ESP recusa o antigo
+  `LYKE BOOT` antes de FLASH, e recusa pacotes antigos `LYKEG431`.
+- **Primeira instalação conjunta pelo USB do STM: loader V2 + app R10.**
+  Não instalar `main.bin` sozinho. Novo app tem 64 KiB em `0x08002000`,
+  staging compactado 48 KiB em `0x08012000`. Loader 8 KiB, meta `0x0801e000`,
+  mapa `0x0801e800`, preferências `0x0801f000/0x0801f800`. Formato `LYKEG432`:
+  DEFLATE por blocos independentes de até 4096 bytes, CRC codificado e plain.
+- `bootstrap_usb.py` sem `--install` apenas valida, sem hardware. Quando
+  conectado: reidentificar chip/DFU/128 KiB/serial, backup integral, gravar
+  `lyke-stm32-dfu.bin` de 124.928 bytes e reler. O pacote limpa staging/meta
+  antigos e para antes dos últimos 6 KiB de mapa/preferências, comparados
+  byte a byte pelo utilitário. Não usar mass erase/option bytes.
+- App compilado 59.932/65.536 bytes, pacote OTA 43.424/49.152 bytes, loader
+  5.104/8.192 bytes. ESP R8 1.320.496/1.572.864 bytes. Hashes definitivos
+  nos manifestos originais e no `release.json` do pacote; não inferir versão
+  instalada pelos arquivos compilados. Binários privados, sem publicação.
+- Frações de entrada/resultado empilhadas, raízes com barra, expoentes,
+  π/Δ/θ/Ω, cursor e rolagem. Fallback linear para altura/layout incompatível.
+  ALPHA,^ → Δ; ALPHA,log → θ; ALPHA,EXP → Ω. Variáveis numéricas novas,
+  RCL/STO suportados; SHIFT,EXP continua π. Leitor de seis linhas e ADC
+  diagnóstico da R9 incluídos. Prévias do código em `output/previews/lyke-r10-telas.png`.
+- Testes nativos aprovados: código real de renderer/interface/loader/ESP,
+  514 interrupções no exemplo + 203 amostras na aplicação completa, corrupção,
+  limites do decoder, 250 mutações com CRC externo recalculado, falta de ACK,
+  loader antigo, autorização, RAM, preservação USB e regressões de bateria/páginas.
+  Relatório `.build/lyke_stm32/native-tests.json`; repetir via
+  `firmware/lyke_stm32/tests/run_native.py`. Não é teste elétrico/DFU real.
+- **Próximo teste físico:** instalar base STM pelo USB com backup; conferir
+  teclas/LCD; atualizar só aplicação ESP R8 pelo portal atual; então testar
+  OTA do STM pelo portal e arranque frio. Sem API paga nesta preparação.
+  Manual/PDF e multímetro da bateria continuam para depois.
+
+### Histórico imediatamente anterior: API v2, ESP R7 e candidata STM R9
+
+**Ajustes de uso físico em andamento (23/11/2026, após o manual):** usuário
+pediu leitor com as seis linhas dedicadas somente à resposta, sem Wi-Fi,
+quadrados ou título; cabeçalho normal preservado fora do leitor. Pediu
+desenvolvimento completo das contas em formato de avaliação, sem diálogo.
+Solicitou deixar a revisão do manual para depois e a medição física da bateria
+por último, pois a calculadora está fechada.
+
+- **Já publicado:** serviço `lyke-solve`, versão pública `2`. Instruções
+  exigem fórmula, substituição, operações intermediárias e todos os itens;
+  sem limite artificial de 500 palavras e sem linhas vazias. `toLCD` remove
+  linhas vazias e evita partir números quando há operador onde quebrar.
+  Onze testes locais aprovados, sem mudança em autenticação, banco ou RLS.
+- Consulta real do usuário com três fotos: `85bc153fbdeca15250cb0c40d70145b7`.
+  A resposta tinha fórmulas, mas omitia várias substituições/desenvolvimentos;
+  99 linhas, 26 vazias. Fotos e respostas originais preservadas.
+- Um novo teste pago autorizado pelo ajuste reutilizou as mesmas fotos:
+  `47ea7e151a984220968f84aedc828d3f`, 9.467 tokens de entrada/4.688 de saída,
+  74,8 s, completo e arquivado. A resposta trouxe os cálculos intermediários
+  e todos os casos, 188 linhas não vazias. Valores principais conferidos
+  com cálculo independente em Python. Imagens/relatórios na pasta privada.
+- **ESP instalado agora: Lyke R7 em app1**, 1.316.144 bytes, SHA-256
+  `f17193a4b88f5839aa3af2521f32db93c2e3dc483b5a2b2e3a981526358a5b01`.
+  Passou antes pela R6. Revisões, slots e digests conferidos após cada OTA.
+  Mapa de 49 teclas/UART e `keyboard_ready=true` preservados. R7 aceita
+  `READ6` com seis linhas compactadas e remove o rodapé de tokens de
+  respostas antigas. `READ`/`READ4` legados mantidos. Relatórios privados:
+  `device-r6-ota.json` e `device-r7-ota.json`.
+- **STM32 permanece R8: R9 compilada, ainda NÃO instalada.** Nova R9 tem
+  leitor em seis linhas, sem cabeçalho, ADC com diagnóstico e entrada direta
+  no carregador residente, evitando depender da retenção do pedido na RAM
+  durante reset. Aplicação 56.364 bytes, CRC `ced5235a`, pacote OTA 56.380
+  bytes, SHA-256 `20a86cf2f0383f6782144db8122675d5ab81fb2628222fb88e0e08522e57c550`.
+  Manifesto em `.build/lyke_stm32/lyke-r9/manifest.json`.
+- A OTA do STM parou ANTES de apagar/gravar: `Tempo esgotado: LYKE BOOT;
+  RX=MAP 49 1`. O STM reiniciou de volta à aplicação; usuário confirmou
+  que MODE ainda abre o menu. Não repetir cegamente. O pedido de boot e
+  o loader original foram conferidos nos fontes/binários históricos; a
+  causa do retorno ao app ainda não foi comprovada no hardware.
+- **Solicitado conectar o USB de dados do STM32** para inspecionar o
+  carregador e instalar a R9 uma vez, preservando mapa/preferências.
+  Até a última consulta não havia dispositivo `0483:df11` nem serial.
+  Reidentificar alvo e ler loader/configuração antes de gravar. Último
+  serial DFU histórico `209D35994333`; confirmar de novo. Depois validar
+  uma OTA real da R9 para comprovar o novo caminho de entrada no loader.
+- Bateria: usuário relata 6,66 V fixos; ainda sem multímetro. PA0/ADC1_IN1
+  foi confirmado no datasheet. A fórmula com divisor 1:1 está coerente;
+  6,66 V é compatível com leitura próxima ao fundo de escala de 3,33 V,
+  mas não prova defeito/ligação. R9 rejeita saturação/faixa incompatível
+  com uma célula, mostra PA0 mV/ADC bruto/VREFINT e usa espera/amostragem
+  maior. Teste puro de conversão e paginação aprovados. Medir BAT+ e
+  PA0 com GND comum no final, conforme pedido; não declarar bateria aferida.
+
+**Manual do comprador preparado em 23/11/2026:** `output/pdf/Manual-Lyke.pdf`
+(36 páginas), versão integral `.md`, pasta `manual-assets/` e pacote
+`Manual-Lyke-Completo.zip`. Gerador em `scripts/manual_lyke/gerar_manual.py`.
+Todas as telas são simulações R8/R5; a frente é desenho didático, e a foto
+comercial é identificada como referência do produto original, sem alegar foto
+da unidade modificada. Inclui tutoriais ilustrados de conta/crédito/chave
+OpenAI e Claude. **Claude não está integrado nem testado:** o servidor atual
+usa OpenAI Responses; trocar somente a chave não funciona. Para uma futura
+edição pronta para venda, substituir/complementar com fotos da unidade final
+e confirmar alimentação/recarga, três fotos e leitura real no LCD.
+Nenhum firmware ou serviço foi alterado nesta tarefa de documentação.
+
 **API e arquivo da Lyke concluídos em 23/11/2026:** ESP **Lyke R5** instalado
 por OTA em **app1, `0x190000`**, com 49 teclas e `keyboard_ready=true` recebidos
 do STM32 R8. Aplicação 1.315.616 bytes, SHA-256

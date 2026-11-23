@@ -17,7 +17,9 @@ SECTIONS
         *(.rodata .rodata.*)
         . = ALIGN(4);
     } > FLASH
-    .ARM.exidx : { *(.ARM.exidx*) } > FLASH
+    /* Pure C firmware has no exception unwinder. In particular, the newlib
+       setjmp metadata must not pull a C++ unwinder into the 8 KiB loader. */
+    /DISCARD/ : { *(.ARM.exidx* .ARM.extab* .eh_frame*) }
     .data :
     {
         . = ALIGN(4);

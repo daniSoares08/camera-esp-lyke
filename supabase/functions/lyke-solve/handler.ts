@@ -33,7 +33,7 @@ export function createHandler(env: Environment, transport: typeof fetch = fetch)
     let activeId = '';
     let finished = false;
     try {
-      if (req.method === 'GET') return reply({ service: 'lyke-solve', model: MODEL, version: '1', private_storage: true });
+      if (req.method === 'GET') return reply({ service: 'lyke-solve', model: MODEL, version: '2', private_storage: true });
       if (req.method !== 'POST') return reply({ error: { code: 'method_not_allowed', message: 'Use POST.' } }, 405);
       if (!env.tokenHash || !env.openaiKey || !env.serviceKey) throw new RequestError(503, 'not_configured', 'Servico ainda nao configurado.');
       const auth = req.headers.get('Authorization') || '';

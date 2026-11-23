@@ -1,4 +1,4 @@
-"""Prepare a credential-free source snapshot for the user's private GitHub repo.
+"""Prepare a credential-free source/document snapshot for GitHub, including public repos.
 
 Original workspace, captures, NVS and firmware binaries are kept locally.
 The publication copy never includes these private artifacts.
@@ -16,7 +16,8 @@ SKIP_PARTS = {'bin', 'build', '__pycache__', 'node_modules', '.git', '.temp', '.
 EXTENSIONS = {'.ino', '.h', '.c', '.cpp', '.py', '.ps1', '.sh', '.ld', '.md', '.json', '.csv',
               '.html', '.svg', '.png', '.jpg', '.jpeg', '.txt', '.cjs', '.js', '.ts', '.toml', '.sql', '.css', '.bat'}
 ROOT_FILES = ('README.md', '.gitignore', '.gitattributes', 'AGENTS.md', 'LEIA-ME-MIGRACAO.md', 'requirements.txt',
-              'Abrir camera.bat', 'Abrir mapeador do teclado.bat', 'Configurar calculadora.bat', 'Instalar ferramentas.ps1')
+              'Abrir camera.bat', 'Abrir mapeador do teclado.bat', 'Configurar calculadora.bat', 'Instalar ferramentas.ps1',
+              'docs/manual/Manual-Lyke.pdf')
 TOKEN_PATTERN = re.compile(r'(?:sk-[A-Za-z0-9_-]{24,}|sbp_[A-Za-z0-9_-]{24,}|sb_secret_[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,})')
 
 
@@ -44,13 +45,25 @@ def main():
     if wifi_file.exists():
         for value in re.findall(r'#define\s+\w*PASSWORD\s+"([^"\r\n]+)"', wifi_file.read_text(encoding='utf-8-sig')):
             private_values.append((value, 'CONFIGURE_LOCAL_WIFI_PASSWORD'))
+    for name in ['device-token.txt','openai-key.txt','supabase-access-token.txt']:
+        local=ROOT/'.private/lyke-cloud'/name
+        if local.exists():private_values.append((local.read_text().strip(),'CONFIGURE_LOCAL_CREDENTIAL'))
+    local=ROOT/'.private/lyke-cloud/edge-secrets.env'
+    if local.exists():
+        for entry in local.read_text().splitlines():
+            key,separator,value=entry.partition('=')
+            if separator and re.search(r'KEY|TOKEN|SECRET|PASSWORD|HMAC',key):
+                private_values.append((value.strip().strip('"\''),'CONFIGURE_LOCAL_CREDENTIAL'))
     copied = []
     redacted = []
     for path in sorted(set(candidates)):
         relative = path.relative_to(ROOT)
         destination = output/relative
         destination.parent.mkdir(parents=True, exist_ok=True)
-        if path.suffix.lower() in {'.png', '.jpg', '.jpeg'}:
+        if path.suffix.lower() in {'.png', '.jpg', '.jpeg', '.pdf'}:
+            data=path.read_bytes()
+            if any(value and value.encode() in data for value,_ in private_values):
+                raise SystemExit(f'Local credential detected in binary document: {relative}')
             shutil.copy2(path, destination)
         else:
             text = path.read_text(encoding='utf-8-sig')

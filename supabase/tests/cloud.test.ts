@@ -42,6 +42,26 @@ test('LCD text keeps math symbols meaningful and wraps every line at 21 ASCII ch
   assert.ok(/^[\x20-\x7e\n]*$/.test(result));
 });
 
+test('LCD pages spend no rows on empty paragraphs while preserving every calculation', () => {
+  const result = toLCD('  \nDADOS\n\nR=220 ohm\n   \nXL=2*pi*35000*.001\n\nXL=219.91 ohm\n');
+  assert.deepEqual(result.split('\n'), ['DADOS', 'R=220 ohm', 'XL=2*pi*35000*.001', 'XL=219.91 ohm']);
+});
+
+test('long equations wrap before an operator instead of bisecting numeric literals', () => {
+  assert.equal(toLCD('|S1|=3.53553*0.0113659'), '|S1|=3.53553\n*0.0113659');
+  assert.equal(toLCD('|I0,2|=3.53553/439.8230'), '|I0,2|=3.53553\n/439.8230');
+});
+
+test('three-photo request requires assessment-ready calculations rather than an answer key', () => {
+  const request = openAIRequest(validateRequest({ photos: [jpeg, jpeg, jpeg] }));
+  assert.equal(request.input[0].content.length, 4);
+  assert.match(request.instructions, /substituicao numerica/);
+  assert.match(request.instructions, /operacoes intermediarias/);
+  assert.match(request.instructions, /todos os campos pedidos/);
+  assert.match(request.instructions, /6 linhas por pagina/);
+  assert.doesNotMatch(request.instructions, /500 palavras|Use uma linha em branco/);
+});
+
 test('unauthorized requests never reach Storage, database or paid OpenAI API', async () => {
   let calls = 0;
   const handler = createHandler(environment, async () => { calls++; throw Error('must not run'); });

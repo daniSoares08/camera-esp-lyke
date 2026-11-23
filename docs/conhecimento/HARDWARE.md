@@ -1,5 +1,21 @@
 # Hardware e pinagens
 
+**Correção final de 23/11/2026:** usuário mediu 3,84 V com multímetro,
+encontrou um resistor de 470 ohms (amarelo-roxo-marrom) e o substituiu
+para ficar com dois de 470 kilohms (amarelo-roxo-amarelo). Informou leitura
+normal após a troca. STM R11 instalado por OTA, com ícone e tensão normal
+confirmados pelo usuário. Não foi alterado o fator do divisor no software.
+A foto anexada foi tirada durante o ajuste, antes do ícone R11; não usar
+seus 4,04 V como uma calibração exata pós-correção. A posição do resistor
+errado não foi conferida pelo agente. Relatos abaixo preservam o histórico.
+
+**Estado verificado em 23/11/2026, após a R10:** STM32 R10a + ESP Lyke R8
+instalados. Sem novos fios/pinos. OTA do STM pelo Wi-Fi do ESP e UART
+PA2→GPIO13/PA3←GPIO14 passou. Usuário confirmou menu, teclas e raiz/frações
+inteiras na janela original do LCD (126×48 pixels, seis linhas visíveis).
+Detalhes em [validação R10](../VALIDACAO-R10-2026-11-23.md). Os relatos
+R8/R5 e de ligações provisórias abaixo são históricos. Bateria não aferida.
+
 ## Montagem Lyke em 22/11/2026
 
 **Atualização de 23/11/2026:** STM32 R8 e ESP R5 operaram juntos, com

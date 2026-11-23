@@ -1,7 +1,10 @@
 #pragma once
 #include "scientific.h"
+#ifndef LYKE_INTERFACE_HOST_TEST
 #include "battery.h"
 #include "settings.h"
+#endif
+#include "battery_gauge.h"
 
 enum View { CALCULATOR, MENU, SETTINGS, SCAN_LIST, SAVED_LIST, PORTAL_VIEW, ANSWER_VIEW, BATTERY_VIEW, STAT_VIEW, SEND_CONFIRM, HELP, CONSTANTS, PROGRAM };
 enum Menu { SEARCH, JOIN, CONFIG, PHOTOS, SEND, ANSWER, GALLERY, REMOVE, CLEAR, UPDATE, WIFI_OFF, BATTERY, CALC_SETUP, STATS, CONSTANT_MENU, PROGRAM_MENU, HELP_MENU, MENU_COUNT };
@@ -19,7 +22,7 @@ static const char *const help_lines[] = { "MODE ABRE MENU", "SHIFT+DIR TIRA FOTO
 static enum View view;
 static unsigned selected, settings_item, angle_mode, display_mode, precision = 6, help_page, constant_index, program_index;
 static unsigned net_count, net_index, net_id[8];
-static char networks[8][COLS + 1], answer_rows[4][COLS + 1];
+static char networks[8][COLS + 1], answer_rows[ROWS][COLS + 1];
 static unsigned answer_page, photo_count, voltage, link_state_at;
 static bool answer_more, wifi, photo_busy, api_busy, answer_wait;
 static bool scan_busy, wifi_saved_busy, portal_ready, last_answer;
@@ -30,7 +33,7 @@ static char note[121];
 enum { EXPR_CAP = 96, HISTORY_CAP = 8 };
 static uint8_t entry[EXPR_CAP], history[HISTORY_CAP][EXPR_CAP];
 static unsigned cursor, length, history_count, history_index;
-static double ans, memory[9], second_value, stack[16];
+static double ans, memory[12], second_value, stack[16];
 static unsigned stack_size, stats_n;
 static double sum_x, sum_y, sum_xx, sum_yy, sum_xy;
 static bool solved, show_second, shift, alpha, hyp, rpn, editing_overwrite, blanked;
@@ -304,18 +307,10 @@ static void display_result(char *text, size_t size)
     show_number(text, size, value);
 }
 
-static const char *token_text(unsigned token)
-{
-    static const char *const names[] = {
-        "\x7f","e","Ans","^-1","^2","^3","!","%","/","DMS"," nCr "," nPr "," root ",
-        "sqrt(","cbrt(","log(","ln(","10^(","exp(","sin(","cos(","tan(","asin(","acos(","atan(",
-        "sinh(","cosh(","tanh(","asinh(","acosh(","atanh(","Pol(","Rec(",
-        "A","B","C","D","E","F","X","Y","M","Rnd(","Ran#"
-    };
-    return token >= PI && token <= RANDOM ? names[token - PI] : "?";
-}
+#include "math_symbols.h"
+#include "math_layout.h"
 
-static void draw_expression(void)
+static void draw_expression_linear(void)
 {
     char text[EXPR_CAP * 6], visible[COLS + 1];
     unsigned used = 0, position = 0;
@@ -339,6 +334,51 @@ static void draw_expression(void)
     }
 }
 
+static void calc_pixel(int x, int y)
+{
+    if (x>=0 && x<126 && y>=8 && y<48)
+        pixels[5-y/8][125-x] |= (uint8_t)(1u << (7-y%8));
+}
+
+static void calc_text_at(const char *text, unsigned top)
+{
+    for (unsigned i=0;i<COLS && text[i];++i) {
+        const uint8_t *glyph=calc_glyph((uint8_t)text[i]);
+        for (unsigned x=0;x<5;++x) for(unsigned y=0;y<7;++y)
+            if (glyph[x]&(1u<<y)) calc_pixel(i*6+x,top+y);
+    }
+}
+
+static void draw_calculation(char *text, unsigned capacity)
+{
+    bool result=solved || (rpn && stack_size), second=(show_second && solved) || (rpn && stack_size>1);
+    bool status=photo_busy || api_busy || note[0] || recording;
+    unsigned available=status?32:40, rh=0;
+    uint8_t value[48];
+    if (result) {
+        display_result(text,capacity);
+        unsigned i=0;
+        for (;text[i] && i<sizeof(value)-1;++i) value[i]=solution_style==1 && text[i]=='/'?FRAC:(uint8_t)text[i];
+        value[i]=0;
+        rh=math_draw(value,i,false,8,available-(second?21:11),NULL);
+        if (!rh) rh=7;
+    }
+    const uint8_t *input=solved && history_count?history[0]:entry;
+    unsigned space=available-(result?rh+3:0)-(second?10:0);
+    unsigned eh=input[0]?math_draw(input,solved?(unsigned)strlen((const char *)input):cursor,!solved,8,space,calc_pixel):0;
+    if (!eh) {draw_expression_linear();eh=8;}
+    if (result) {
+        unsigned top=8+eh+3;
+        if (!math_draw(value,strlen((const char *)value),false,top,rh,calc_pixel)) calc_text_at(text,top);
+        if (second) {
+            if (show_second && solved) {
+                char number[32];show_number(number,sizeof(number),second_value);print_text(text,capacity,"Y=%s",number);
+            } else show_number(text,capacity,stack[stack_size-2]);
+            calc_text_at(text,top+rh+3);
+        }
+    }
+}
+
 static void dot(unsigned x, unsigned y)
 {
     pixels[7-PAGE_FIRST][127-X_FIRST-x] |= (uint8_t)(1u << (7-y));
@@ -357,6 +397,21 @@ static void header(void)
         dot(0,1); dot(4,1); dot(1,0); dot(2,0); dot(3,0);
         dot(1,3); dot(3,3); dot(2,2); dot(2,5);
     }
+    static unsigned level = BATTERY_LEVEL_UNKNOWN;
+    level = battery_level(&battery, level);
+    // x=94..105, y=0..7: entirely inside the existing header, before photos.
+    for (unsigned x=94; x<=104; ++x)
+        for (unsigned y=0; y<=7; ++y)
+            if (x==94 || x==104 || !y || y==7) dot(x,y);
+    for (unsigned y=2; y<=5; ++y) dot(105,y);
+    if (level == BATTERY_LEVEL_UNKNOWN) {
+        dot(98,1); dot(99,1); dot(100,2); dot(99,3); dot(99,5);
+    } else if (battery_low(&battery)) {
+        if ((ticks/500)%2) {dot(99,1);dot(99,2);dot(99,3);dot(99,5);}
+    } else {
+        for (unsigned bar=0; bar<level; ++bar)
+            for (unsigned y=2; y<=5; ++y) dot(96+2*bar,y);
+    }
     for (unsigned slot = 0; slot < 3; ++slot) {
         bool fill = slot < photo_count;
         if (slot == photo_count && photo_busy && (ticks / 240) % 2) continue;
@@ -372,25 +427,14 @@ static void interface_draw(void)
     char text[48];
     for (unsigned row = 0; row < ROWS; ++row) line(row, "", false);
     if (blanked) return;
-    header();
+    if (view != ANSWER_VIEW) header();
     switch (view) {
     case CALCULATOR:
-        draw_expression();
-        if (solved || (rpn && stack_size)) {
-            display_result(text, sizeof(text));
-            line(2, text, false);
-            if (show_second && solved) {
-                char value[32]; show_number(value, sizeof(value), second_value);
-                print_text(text, sizeof(text), "Y=%s", value);
-                line(3, text, false);
-            } else if (rpn && stack_size > 1) {
-                show_number(text, sizeof(text), stack[stack_size-2]); line(3, text, false);
-            }
-        }
-        if (photo_busy) line(4, "CAPTURANDO FOTO", false);
-        else if (api_busy) line(4, "AGUARDANDO IA", false);
-        else if (note[0]) line(4, note, false);
-        else if (recording) line(4, "GRAVANDO PROGRAMA", false);
+        draw_calculation(text,sizeof(text));
+        if (photo_busy) line(5, "CAPTURANDO FOTO", false);
+        else if (api_busy) line(5, "AGUARDANDO IA", false);
+        else if (note[0]) line(5, note, false);
+        else if (recording) line(5, "GRAVANDO PROGRAMA", false);
         break;
     case MENU: {
         unsigned start = selected - selected % 3;
@@ -422,10 +466,8 @@ static void interface_draw(void)
         line(5, portal_ready ? "" : "= TENTAR NOVAMENTE", false);
         break;
     case ANSWER_VIEW:
-        print_text(text, sizeof(text), "RESPOSTA %u%s", answer_page+1, answer_more ? " >" : "");
-        line(1, text, true);
         for (unsigned i = 0; i < sizeof(answer_rows)/sizeof(answer_rows[0]); ++i)
-            line(2+i, answer_rows[i], false);
+            line(i, answer_rows[i], false);
         break;
     case SEND_CONFIRM:
         print_text(text, sizeof(text), "ENVIAR %u FOTO(S)?", photo_count);
@@ -434,9 +476,14 @@ static void interface_draw(void)
         break;
     case BATTERY_VIEW:
         line(1, "BATERIA PA0", true);
-        if (voltage < 300) strcpy(text, "SEM LEITURA");
+        if (battery.status == BATTERY_SATURATED) strcpy(text, "ADC SATURADO");
+        else if (battery.status == BATTERY_RANGE) strcpy(text, "VERIFIQUE DIVISOR");
+        else if (battery.status != BATTERY_OK || voltage < 300) strcpy(text, "SEM LEITURA");
         else print_text(text, sizeof(text), "%u.%02u V APROX.", voltage / 1000, voltage % 1000 / 10);
-        line(2, text, false); line(4, "= MEDIR NOVAMENTE", false);
+        line(2, text, false);
+        print_text(text, sizeof(text), "PA0 %u mV", battery.pin_mv); line(3, text, false);
+        print_text(text, sizeof(text), "ADC %u REF %u", battery.raw, battery.reference); line(4, text, false);
+        line(5, "= MEDIR NOVAMENTE", false);
         break;
     case STAT_VIEW: {
         static const char *const labels[] = { "MEDIA X", "MEDIA Y", "DESVIO X AMOSTRA", "DESVIO X POP.", "SOMA X",
@@ -478,7 +525,7 @@ static void open_page(void)
     memset(answer_rows, 0, sizeof(answer_rows));
     answer_wait = true;
     answer_more = false;
-    print_text(command, sizeof(command), "READ4 %u", answer_page);
+    print_text(command, sizeof(command), "READ6 %u", answer_page);
     request(command);
 }
 
@@ -629,7 +676,9 @@ static unsigned alpha_symbol(enum Key key)
     case KEY_NEG: return VAR_A; case KEY_DMS: return VAR_B; case KEY_HYP: return VAR_C;
     case KEY_SIN: return VAR_D; case KEY_COS: return VAR_E; case KEY_TAN: return VAR_F;
     case KEY_RPAREN: return VAR_X; case KEY_COMMA: return VAR_Y; case KEY_MPLUS: return VAR_M;
-    case KEY_LN: return EULER; default: return 0;
+    case KEY_LN: return EULER;
+    case KEY_POWER: return GREEK_DELTA; case KEY_LOG: return GREEK_THETA;
+    case KEY_EXP: return GREEK_OMEGA; default: return 0;
     }
 }
 
@@ -688,12 +737,12 @@ static void interface_key(enum Key key)
         } else view = MENU;
         return;
     }
-    if (key == KEY_RCL && !alpha_mode) { recall = shifted ? 2 : 1; notice(shifted ? "STO: TECLA A-M" : "RCL: TECLA A-M"); return; }
+    if (key == KEY_RCL && !alpha_mode) { recall = shifted ? 2 : 1; notice(shifted ? "STO: VARIAVEL" : "RCL: VARIAVEL"); return; }
     if (recall || alpha_mode) {
         unsigned sym = alpha_symbol(key), operation = recall;
         recall = 0;
-        if (sym >= VAR_A && sym <= VAR_M && operation == 2) {
-            if (evaluate_entry()) memory[sym - VAR_A] = ans;
+        if (variable_index(sym)>=0 && operation == 2) {
+            if (evaluate_entry()) memory[variable_index(sym)] = ans;
         } else if (sym) edit_insert(sym, false);
         return;
     }
@@ -811,12 +860,14 @@ static bool interface_message(const char *text)
         net_id[net_count] = text[prefix]-'0';
         print_text(networks[net_count], sizeof(networks[net_count]), "%s", text+prefix+2);
         ++net_count;
-    } else if (strncmp(text, "TEXT ", 5) == 0 && text[5] >= '0' && text[5] <= '3' && text[6]==' ') {
+    } else if (strncmp(text, "TEXT ", 5) == 0 && text[5] >= '0' && text[5] < '0' + ROWS && text[6]==' ') {
         print_text(answer_rows[text[5]-'0'], sizeof(answer_rows[0]), "%s", text+7);
     } else if (strcmp(text,"TEXT_END")==0 || strcmp(text,"TEXT_MORE")==0) {
         answer_wait = false;
         answer_more = text[5] == 'M';
-        if (!answer_rows[0][0] && !answer_rows[1][0] && !answer_rows[2][0] && !answer_rows[3][0] && !answer_more)
+        bool empty = true;
+        for (unsigned i = 0; i < ROWS; ++i) if (answer_rows[i][0]) empty = false;
+        if (empty && !answer_more)
             strcpy(answer_rows[0], "FIM DA RESPOSTA");
     } else return false;
     return true;
@@ -824,9 +875,13 @@ static bool interface_message(const char *text)
 
 static bool interface_tick(void)
 {
-    static uint32_t last_ping, last_blink;
+    static uint32_t last_ping, last_blink, last_battery_blink;
     if (mapped < KEY_COUNT) return false;
     uint32_t now = ticks;
+    if (!blanked && view != ANSWER_VIEW && battery_low(&battery) && now-last_battery_blink>=500) {
+        last_battery_blink=now;
+        return true;
+    }
     if (view == PORTAL_VIEW && portal_pending && now - started > 5000) {
         portal_pending = false;
         portal_ready = false;

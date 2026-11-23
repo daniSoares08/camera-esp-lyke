@@ -2,6 +2,44 @@
 
 ## Produto
 
+- Em 23/11/2026, usuário corrigiu divisor para dois 470 kilohms e pediu
+  bateria desenhada à esquerda dos quadrados das fotos. Confirmou a R11
+  instalada, ícone aparecendo e tensão normal. Tornou o GitHub público e
+  autorizou atualizar os fontes/documentação, mantendo credenciais/binários
+  privados. Depois pediu manual PDF e Markdown finais e encerrou o projeto.
+
+- Ainda em 23/11/2026, usuário conectou o STM, autorizou gravar e entrou em
+  DFU. Base R10 instalada por USB; ESP R8 instalada por OTA; STM R10a
+  instalada pelo Wi-Fi/UART para comprovar a atualização efetiva. Usuário
+  confirmou menu/teclas e depois raiz/frações completas dentro da moldura.
+  A janela continua a mesma: 126×48 pixels úteis, duas linhas superiores
+  do LCD fora de uso, seis linhas visíveis; cabeçalho só fora do leitor.
+
+- Em 23/11/2026, solicitado preparar atualização do STM pela UART/Wi-Fi do
+  ESP sem soldar fios adicionais e melhorar a notação da calculadora local:
+  frações empilhadas, raízes com barra, expoentes e símbolos gregos legíveis.
+  O usuário conectará o STM depois para testar. Não gravar nesta preparação.
+  Base preparada R10 exige instalar carregador V2 + app juntos pelo USB uma
+  vez; depois confirmar OTA real usando as ligações existentes.
+  Aceito descartar fotos temporárias do ESP se precisar da memória para
+  atualizar; implementação só as descarta em caso de falta de PSRAM.
+  Manual e diagnóstico físico da bateria continuam adiados.
+
+- Ajustes solicitados durante o teste físico de 23/11/2026: ao ler resposta,
+  usar todas as seis linhas só para conteúdo, sem ícones, número de página
+  ou título. No restante do uso, manter cabeçalho normal. A API deve
+  entregar fórmula, substituição e desenvolvimento necessário para uma
+  resposta aceita em avaliação, sem diálogo nem gabarito isolado. Evitar
+  linhas vazias e limitação artificial de palavras. Revisar o manual só
+  após os ajustes. Diagnóstico físico dos 6,66 V da bateria fica por último:
+  o usuário não quer abrir a carcaça para medir agora.
+
+- Em 23/11/2026, solicitado manual ilustrado em PDF voltado ao comprador
+  iniciante, acompanhado de Markdown completo para aprender com IA.
+  Cobrir todas as funções e guias OpenAI/Claude, deixando explícito que
+  só OpenAI foi testada. Manual gerado em `output/pdf/`, fontes do manual
+  em `scripts/manual_lyke/`. Não apresentar desenho como fotografia real.
+
 - Em 23/11/2026, usuário autorizou configurar OpenAI/API, guardar as fotos
   e criar um repositório privado no GitHub com fontes e esquema. Escolheu
   uma organização Supabase separada chamada CAMERA_ESP. Arquivo de imagens

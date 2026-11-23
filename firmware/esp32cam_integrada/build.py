@@ -48,6 +48,10 @@ def main():
                 shutil.copy2(source, stage/source.name)
         for name in ('api_contract.h', 'vision_body.h'):
             shutil.copy2(shared/name, stage/name)
+        image_format = (ROOT/'firmware/lyke_stm32/image_format.h').read_text()
+        (stage/'image_format.h').write_text(image_format.replace('"vendor/puff.h"', '"puff.h"'))
+        for name in ('puff.c', 'puff.h'):
+            shutil.copy2(ROOT/'firmware/lyke_stm32/vendor'/name, stage/name)
     source = (ROOT/'firmware/camera_usb/serial_camera_usb.ino').read_text(encoding='utf-8-sig')
     source = source.replace('void setup(){', 'void cameraBenchSetup(){').replace('void loop(){', 'void cameraBenchLoop(){')
     source = source.replace('c.fb_count=2;', 'c.fb_count=1;')

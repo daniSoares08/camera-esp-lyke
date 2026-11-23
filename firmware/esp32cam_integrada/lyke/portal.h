@@ -33,9 +33,10 @@ img{max-width:100%;display:block;margin:.5rem 0}a{color:#205443}p{line-height:1.
 <p id="archive"></p>
 <p><a href="/resposta" target="_blank">Abrir última resposta</a></p></section>
 <section><h2>Atualizar firmware</h2>
+<p>Envie o arquivo fornecido para sua calculadora. Mantenha a alimentação até concluir. Se faltar memória, as fotos temporárias podem ser descartadas; o arquivo da nuvem permanece.</p>
 <label>STM32 <input type="file" id="stm" accept=".bin"></label><button id="sendStm">Atualizar STM32</button>
 <label>ESP32-CAM <input type="file" id="esp" accept=".bin"></label><button id="sendEsp">Atualizar ESP32-CAM</button>
-</section><output id="message" aria-live="polite"></output>
+</section><progress id="uploadProgress" max="100" value="0" hidden style="width:100%"></progress><output id="message" aria-live="polite"></output>
 <script>
 const $=id=>document.getElementById(id);
 let token='', updating=false, settingsLoaded=false;
@@ -49,6 +50,7 @@ async function refresh(){
   let info=await (await request('/info')).json();
   token=info.token;
   $('device').textContent='ESP32-CAM '+info.revision+' · '+info.slot+
+    '\nSTM32 '+(info.stm_revision||'(versão legada)')+
     '\nTeclas mapeadas: '+info.mapped_keys+(info.keyboard_ready?' (concluído)':'')+
     ' · Fotos: '+info.photos.length+'/3'+
     '\nPSRAM livre: '+Math.round(info.free_psram/1024)+' KiB';
@@ -73,7 +75,7 @@ async function refresh(){
     $('gallery').append(a,document.createElement('br'));
   });
 }
-async function action(fn){try{await fn();}catch(e){$('message').textContent=e.message;}}
+async function action(fn){if(updating)return;try{await fn();}catch(e){$('message').textContent=e.message;}}
 $('refresh').onclick=()=>action(refresh);
 $('ask').onclick=()=>action(async()=>{$('message').textContent='Resolvendo as fotos. Aguarde...';
   $('message').textContent=await(await request('/api/send','')).text();await refresh();});
@@ -99,16 +101,28 @@ $('networks').onchange=()=>{$('ssid').value=$('networks').value;};
 async function upload(chip){
   if(updating)return;
   const file=$(chip).files[0];if(!file)throw Error('Escolha o arquivo de firmware.');
+  if(chip==='stm'&&(file.name!=='lyke-stm32-ota.bin'||file.size<28||file.size>49152))throw Error('Use o pacote lyke-stm32-ota.bin desta versão, fornecido para sua unidade.');
   const data=new FormData();data.append('firmware',file);
-  updating=true;$('message').textContent='Enviando firmware. O equipamento vai reiniciar ao concluir.';
+  updating=true;$('message').textContent='Enviando arquivo...';
+  $('uploadProgress').hidden=false;$('uploadProgress').value=0;
+  for(const b of document.querySelectorAll('button'))b.disabled=true;
   try{
     if(chip==='esp')await request('/api/ota','');
-    const r=await request(chip==='stm'?'/update/stm32':'/update',data,{'X-Firmware-Size':file.size});
-    $('message').textContent=await r.text();
+    const response=await new Promise((resolve,reject)=>{
+      const xhr=new XMLHttpRequest();xhr.open('POST',chip==='stm'?'/update/stm32':'/update');xhr.timeout=180000;
+      xhr.setRequestHeader('X-Update-Token',token);xhr.setRequestHeader('X-Firmware-Size',String(file.size));
+      xhr.upload.onprogress=e=>{if(e.lengthComputable){const n=Math.round(100*e.loaded/e.total);$('uploadProgress').value=n;
+        $('message').textContent=n<100?'Enviando arquivo: '+n+'%':'Arquivo enviado. Verificando e instalando. Não desligue.';}};
+      xhr.onload=()=>xhr.status===200?resolve(xhr.responseText):reject(Error(xhr.responseText||'Atualização recusada'));
+      xhr.onerror=()=>reject(Error('Conexão interrompida. Confira o aparelho antes de repetir.'));
+      xhr.ontimeout=()=>reject(Error('A confirmação demorou. Não desligue; confira a versão antes de repetir.'));
+      xhr.send(data);
+    });
+    $('message').textContent=response;
   } catch(e) {
     if(chip==='esp')await request('/api/ota/cancel','').catch(()=>{});
     throw e;
-  } finally{updating=false;}
+  } finally{updating=false;for(const b of document.querySelectorAll('button'))b.disabled=false;refresh().catch(()=>{});}
 }
 $('sendStm').onclick=()=>action(()=>upload('stm'));
 $('sendEsp').onclick=()=>action(()=>upload('esp'));
@@ -158,6 +172,7 @@ static void routeInfo() {
   doc["photo_budget"] = PhotoQueue::ramBudget;
   doc["mapped_keys"] = mappedKeys;
   doc["keyboard_ready"] = keyboardReady;
+  doc["stm_revision"] = stmRevision;
   doc["station"] = WiFi.status() == WL_CONNECTED ? WiFi.SSID() : String();
   doc["token"] = sessionToken;
   JsonArray gallery = doc["photos"].to<JsonArray>();
@@ -318,7 +333,16 @@ static void routes() {
           stmUpdate.error.isEmpty() ? "Envio incompleto" : stmUpdate.error);
   }, [] {
     auto& upload = web.upload();
-    if (upload.status == UPLOAD_FILE_START) stmUpdate.start(authorized() && !rebootAt, upload.filename);
+    if (upload.status == UPLOAD_FILE_START) {
+      bool allowed=authorized() && !rebootAt && !ota.receiving && !ota.complete;
+      if (allowed) cameraStop();
+      stmUpdate.start(allowed, upload.filename);
+      // Preserve the queue unless reclaiming its RAM is actually necessary.
+      if (allowed && stmUpdate.error=="PSRAM insuficiente" && photos.count) {
+        photos.clear();pendingRequestId="";sendStatus();
+        stmUpdate.start(allowed, upload.filename);
+      }
+    }
     else if (upload.status == UPLOAD_FILE_WRITE) stmUpdate.write(upload.buf, upload.currentSize);
     else if (upload.status == UPLOAD_FILE_ABORTED) stmUpdate.reset();
   });

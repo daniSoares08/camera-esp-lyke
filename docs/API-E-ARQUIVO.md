@@ -1,5 +1,10 @@
 # API e arquivo privado de fotos — 23/11/2026
 
+**Edição final:** STM R11/ESP R8, manual 2.0 em `docs/manual/`. O usuário
+tornou o repositório público; o arquivo de fotos permanece privado e as
+credenciais continuam fora do Git. Os detalhes abaixo registram a integração
+e os testes, incluindo a revisão v2 do serviço. Somente OpenAI integrada/testada.
+
 ## Serviços configurados
 
 - Conta OpenAI no navegador: saldo de US$ 10 confirmado antes dos testes; duas chamadas reais aprovadas.

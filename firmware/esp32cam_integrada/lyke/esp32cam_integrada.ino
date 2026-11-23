@@ -11,6 +11,7 @@
 #include "photo_queue.h"
 #include "api_contract.h"
 #include "vision_body.h"
+#include "answer_pager.h"
 
 static constexpr char projectName[] = "esp32cam_integrada";
 static constexpr char apName[] = "Calc-Lyke";
@@ -30,6 +31,7 @@ static String scanned[MaxNetworks];
 static unsigned scannedCount;
 static unsigned mappedKeys;
 static bool keyboardReady;
+static String stmRevision;
 static wl_status_t lastWifi = WL_IDLE_STATUS;
 
 static bool local() {
@@ -335,8 +337,6 @@ static String askAI() {
   auto answer = calc::parseApiResponse(parsed, status);
   if (!answer.ok) return String(answer.error.c_str());
   lastAnswer = answer.text.c_str();
-  lastAnswer += "\n\nTokens entrada: " + String(answer.inputTokens);
-  lastAnswer += "\nTokens saida: " + String(answer.outputTokens);
   const String archiveId = parsed["archive"]["request_id"] | "";
   if (archiveId.length()) config.putString("last_req", archiveId);
   if (storageReady) {
@@ -353,30 +353,19 @@ static String askAI() {
   return String();
 }
 
-static void sendAnswerPage(unsigned page, unsigned columns, unsigned rows) {
-  unsigned line = 0, start = 0, limit = (page + 1) * rows;
-  const unsigned length = lastAnswer.length();
-  while (start < length && line < limit) {
-    unsigned end = start, lastSpace = start;
-    while (end < length && lastAnswer[end] != '\n' && end - start < columns) {
-      if (lastAnswer[end] == ' ') lastSpace = end;
-      ++end;
-    }
-    if (end < length && end - start == columns && lastAnswer[end] != ' ' &&
-        lastAnswer[end] != '\n' && lastSpace > start) end = lastSpace;
-    if (line / rows == page)
-      sendLine("TEXT " + String(line % rows) + " " + printable(lastAnswer.substring(start, end), columns));
-    ++line;
-    start = end;
-    while (start < length && lastAnswer[start] == ' ') ++start;
-    if (start < length && lastAnswer[start] == '\n') ++start;
-  }
-  sendLine(start < length ? "TEXT_MORE" : "TEXT_END");
+static void sendAnswerPage(unsigned page, unsigned columns, unsigned rows, bool compact = false) {
+  char output[6][22];
+  bool more = answer_page_rows(lastAnswer.c_str(), lastAnswer.length(), page, columns, rows, compact, output);
+  for (unsigned i = 0; i < rows; ++i)
+    sendLine("TEXT " + String(i) + " " + printable(output[i], columns));
+  sendLine(more ? "TEXT_MORE" : "TEXT_END");
 }
 
 static void runCommand(const String& command) {
   if (command == "STATUS" || command == "LYKE APP V1") {
     sendStatus();
+  } else if (command.startsWith("STM32 ")) {
+    stmRevision = printable(command.substring(6), 31);
   } else if (command.startsWith("MAP ")) {
     mappedKeys = constrain(command.substring(4).toInt(), 0L, 50L);
     int separator = command.indexOf(' ', 4);
@@ -414,6 +403,8 @@ static void runCommand(const String& command) {
       photo = {};
     }
     sendStatus();
+  } else if (command.startsWith("READ6 ")) {
+    sendAnswerPage(constrain(command.substring(6).toInt(), 0L, 999L), 21, 6, true);
   } else if (command.startsWith("READ ") || command.startsWith("READ4 ")) {
     const bool wide = command.startsWith("READ4 ");
     sendAnswerPage(constrain(command.substring(wide ? 6 : 5).toInt(), 0L, 999L),

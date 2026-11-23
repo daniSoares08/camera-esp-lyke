@@ -5,6 +5,7 @@ from pathlib import Path
 import struct
 import sys
 import zlib
+from image_codec import pack_image
 
 
 def verify(data, origin, limit):
@@ -21,21 +22,32 @@ def main():
     loader = (out / "boot.bin").read_bytes()
     app = (out / "main.bin").read_bytes()
     verify(loader, 0x08000000, 0x2000)
-    verify(app, 0x08002000, 0xE000)
+    verify(app, 0x08002000, 0x10000)
     crc = zlib.crc32(app)
     artifacts = {
-        "lyke-stm32-dfu.bin": loader.ljust(0x2000, b"\xff") + app,
-        "lyke-stm32-ota.bin": struct.pack("<8sII", b"LYKEG431", len(app), crc) + app,
+        # Initial USB install also clears obsolete staging/commit metadata,
+        # but stops exactly BEFORE the keyboard and preference pages.
+        "lyke-stm32-dfu.bin": (loader.ljust(0x2000, b"\xff") + app).ljust(0x1E800, b"\xff"),
+        "lyke-stm32-ota.bin": pack_image(app),
     }
     manifest = {
         "target": "STM32G431CBU6",
         "revision": sys.argv[2],
         "boot_origin": "0x08000000",
         "app_origin": "0x08002000",
-        "stage_origin": "0x08010000",
+        "stage_origin": "0x08012000",
+        "package_format": "LYKEG432 / independent 4096-byte raw DEFLATE blocks",
+        "loader_protocol": "LYKE BOOT V2",
+        "app_limit": 65536,
+        "stage_limit": 49152,
         "keymap_origin": "0x0801e800",
         "app_bytes": len(app),
         "app_crc32": f"{crc:08x}",
+        "boot_bytes": len(loader),
+        "boot_sha256": hashlib.sha256(loader).hexdigest(),
+        "app_sha256": hashlib.sha256(app).hexdigest(),
+        "dfu_end_exclusive": "0x0801e800",
+        "preserve_from": "0x0801e800",
         "artifacts": {},
     }
     for name, data in artifacts.items():
@@ -44,7 +56,7 @@ def main():
             "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()
         }
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    print(f"App: {len(app)} / 57344 bytes. DFU and OTA: {out}")
+    print(f"App: {len(app)} / 65536 bytes. Staged: {len(artifacts['lyke-stm32-ota.bin'])} / 49152 bytes. DFU and OTA: {out}")
 
 
 if __name__ == "__main__":

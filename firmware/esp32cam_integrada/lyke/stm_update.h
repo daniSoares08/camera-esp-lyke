@@ -1,28 +1,17 @@
 #pragma once
+#include "image_format.h"
 
 // The web upload is validated in full before resetting the STM32. The STM32
 // separately stages, verifies and commits it before modifying its application.
 class StmUpdate {
-  static constexpr size_t Limit = 56 * 1024;
-  static constexpr size_t Header = 16;
+  static constexpr size_t Limit = LYKE_PACK_LIMIT;
   uint8_t* image = nullptr;
   size_t bytes = 0;
   bool accepted = false;
 
-  static uint32_t word(const uint8_t* p) {
-    return uint32_t(p[0]) | uint32_t(p[1]) << 8 | uint32_t(p[2]) << 16 | uint32_t(p[3]) << 24;
-  }
-  static uint32_t crc32(const uint8_t* p, size_t n) {
-    uint32_t crc = UINT32_MAX;
-    while (n--) {
-      crc ^= *p++;
-      for (unsigned bit = 0; bit < 8; ++bit)
-        crc = (crc >> 1) ^ (0xedb88320u & (0u - (crc & 1u)));
-    }
-    return ~crc;
-  }
   bool waitFor(const char* expected, uint32_t timeout) {
     char text[64];
+    String lastReceived;
     size_t used = 0;
     bool overlong = false;
     const uint32_t start = millis();
@@ -32,7 +21,12 @@ class StmUpdate {
       if (c == '\r') continue;
       if (c == '\n') {
         text[used] = 0;
+        if (!overlong && used) lastReceived = text;
         if (!overlong && strcmp(text, expected) == 0) return true;
+        if (!overlong && strcmp(text, "LYKE BOOT")==0) {
+          error="Carregador STM32 antigo. Instale a base R10 uma vez por USB.";
+          return false;
+        }
         if (!overlong && (strstr(text, "_ERROR") || strstr(text, "BAD_HEADER"))) {
           error = text;
           return false;
@@ -46,21 +40,23 @@ class StmUpdate {
       }
     }
     error = String("Tempo esgotado: ") + expected;
+    if (lastReceived.length()) error += "; RX=" + lastReceived;
+    else error += "; sem bytes UART";
     return false;
   }
   bool install(uint32_t size, uint32_t crc) {
     while (stmSerial.available()) stmSerial.read();
     // The application command also works while mapping.
     stmSerial.print("LYKE-BOOT-V1\n");
-    if (!waitFor("LYKE BOOT", 3200)) return false;
+    if (!waitFor("LYKE BOOT V2", 5000)) return false;
     stmSerial.printf("FLASH %08lx %08lx\n", (unsigned long)size, (unsigned long)crc);
     if (!waitFor("LYKE READY_DATA", 5000)) return false;
     for (size_t offset = 0; offset < size; offset += 256) {
       const size_t n = min(size_t(256), size_t(size) - offset);
-      if (stmSerial.write(image + Header + offset, n) != n || !waitFor("LYKE ACK", 2800))
+      if (stmSerial.write(image + offset, n) != n || !waitFor("LYKE ACK", 2800))
         return false;
     }
-    if (!waitFor("LYKE INSTALLED", 8500)) return false;
+    if (!waitFor("LYKE INSTALLED", 20000)) return false;
     if (!waitFor("LYKE APP V1", 4000)) return false;
     return true;
   }
@@ -79,17 +75,17 @@ public:
       error = "Arquivo esperado: lyke-stm32-ota.bin";
       return;
     }
-    if (ESP.getFreePsram() < Limit + Header + 512 * 1024) {
+    if (ESP.getFreePsram() < Limit + LYKE_PACK_BLOCK + 512 * 1024) {
       error = "PSRAM insuficiente";
       return;
     }
-    image = static_cast<uint8_t*>(heap_caps_malloc(Limit + Header, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
+    image = static_cast<uint8_t*>(heap_caps_malloc(Limit + LYKE_PACK_BLOCK, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
     if (!image) error = "Sem memoria para imagem STM32";
     accepted = image;
   }
   void write(const uint8_t* p, size_t n) {
     if (!accepted) return;
-    if (n > Limit + Header - bytes) {
+    if (n > Limit - bytes) {
       reset();
       error = "Imagem STM32 grande demais";
       return;
@@ -99,21 +95,17 @@ public:
   }
   bool finish() {
     if (!accepted) return false;
-    if (bytes < Header + 512) {
+    if (bytes < LYKE_PACK_HEADER + 4) {
       error = "Imagem STM32 incompleta";
       reset();
       return false;
     }
-    const uint32_t size = word(image + 8), crc = word(image + 12);
-    if (memcmp(image, "LYKEG431", 8) ||
-        size > Limit || size != bytes - Header || word(image + Header) != 0x200057f0 ||
-        !(word(image + Header + 4) & 1) || word(image + Header + 4) < 0x08002009 ||
-        word(image + Header + 4) - 0x08002000 >= size || crc32(image + Header, size) != crc) {
-      error = "Imagem STM32 invalida ou incompleta";
+    if (!image_validate(image, bytes, image+Limit)) {
+      error = "Pacote STM32 v2 invalido ou incompleto";
       reset();
       return false;
     }
-    bool ok = install(size, crc);
+    bool ok = install(bytes, ~image_crc_update(UINT32_MAX, image, bytes));
     reset();
     return ok;
   }

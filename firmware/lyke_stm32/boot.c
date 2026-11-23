@@ -1,64 +1,14 @@
 #include "device.h"
 
 enum { CHUNK = 256 };
-#define META_MAGIC 0x31594c43u
-
-typedef struct {
-    uint32_t size, crc, magic, inverse;
-} Image;
-
 void SystemInit(void) {}
 void __libc_init_array(void) {}
-
-static uint32_t crc32(uint32_t adr, uint32_t size)
-{
-    const volatile uint8_t *source = (const volatile uint8_t *)adr;
-    uint32_t crc = UINT32_MAX;
-    while (size--) {
-        crc ^= *source++;
-        for (unsigned bit = 0; bit < 8; ++bit)
-            crc = (crc >> 1) ^ (0xedb88320u & (0u - (crc & 1u)));
-    }
-    return ~crc;
-}
-
-static bool vector_valid(uint32_t address, uint32_t size)
-{
-    const volatile uint32_t *vector = (const volatile uint32_t *)address;
-    return vector[0] == 0x200057f0u && (vector[1] & 1) &&
-           vector[1] >= LYKE_APP + 9 && vector[1] - LYKE_APP < size;
-}
-
-static bool size_valid(uint32_t size)
-{
-    return size >= 512 && size <= LYKE_MAX_APP;
-}
-
-static bool install(const Image *image)
-{
-    if (image->magic != META_MAGIC || image->inverse != ~META_MAGIC ||
-        !size_valid(image->size) || !vector_valid(LYKE_STAGE, image->size))
-        return false;
-    if (vector_valid(LYKE_APP, image->size) && crc32(LYKE_APP, image->size) == image->crc)
-        return true;
-    if (crc32(LYKE_STAGE, image->size) != image->crc)
-        return false;
-
-    flash_begin();
-    bool ok = true;
-    for (unsigned offset = 0; ok && offset < image->size; offset += LYKE_PAGE)
-        ok = flash_erase(LYKE_APP + offset);
-    for (unsigned offset = 8; ok && offset < image->size; offset += 8) {
-        const uint32_t *p = (const uint32_t *)(LYKE_STAGE + offset);
-        ok = flash_write(LYKE_APP + offset, p[0], p[1]);
-    }
-    // Publish the vectors last. Until then no reset can enter the incomplete app.
-    const uint32_t *vectors = (const uint32_t *)LYKE_STAGE;
-    if (ok)
-        ok = flash_write(LYKE_APP, vectors[0], vectors[1]);
-    flash_end();
-    return ok && crc32(LYKE_APP, image->size) == image->crc;
-}
+// This loader is pure C, with no C++ exception runtime. Newlib's setjmp
+// assembly carries an EHABI personality reference in its metadata; refuse
+// any attempted exception unwind instead of linking a general unwinder.
+// Normal puff error recovery uses setjmp/longjmp's register restore directly.
+int __aeabi_unwind_cpp_pr0(void) { return 9; } // EHABI _URC_FAILURE
+#include "boot_store.h"
 
 static int receive(uint32_t period_ms)
 {
@@ -115,7 +65,8 @@ static bool update(const char *line)
     }
     flash_end();
 
-    ok = ok && vector_valid(LYKE_STAGE, image.size) && crc32(LYKE_STAGE, image.size) == image.crc;
+    ok = ok && crc32(LYKE_STAGE, image.size) == image.crc &&
+        image_validate((const uint8_t *)LYKE_STAGE, image.size, image_scratch);
     if (ok) {
         flash_begin();
         ok = flash_write(LYKE_META, image.size, image.crc) &&
@@ -135,7 +86,7 @@ static bool update(const char *line)
 __attribute__((noreturn, naked)) static void jump(uint32_t stack __attribute__((unused)),
                                                  uint32_t start __attribute__((unused)))
 {
-    __asm volatile ("msr msp, r0\n bx r1");
+    __asm volatile ("cpsie i\n msr msp, r0\n bx r1");
 }
 
 int main(void)
@@ -146,19 +97,17 @@ int main(void)
     bool app_ok = image->magic == META_MAGIC && image->inverse == ~META_MAGIC
         ? install(image) : vector_valid(LYKE_APP, LYKE_MAX_APP);
 
-    if (!requested && app_ok)
-        jump(*(volatile uint32_t *)LYKE_APP, *(volatile uint32_t *)(LYKE_APP + 4));
-
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
     serial_init();
     for (;;) {
-        serial_send("LYKE BOOT");
+        serial_send("LYKE BOOT V2");
         const uint32_t started = DWT->CYCCNT;
         char line[24];
         unsigned length = 0;
         bool overlong = false;
-        while (DWT->CYCCNT - started < 16000u * 1500u) {
+        unsigned window_ms = !requested && app_ok ? 500u : 4000u;
+        while (DWT->CYCCNT - started < 16000u * window_ms) {
             int c = receive(25);
             if (c < 0 || c == '\r') continue;
             if (c != '\n') {
@@ -174,7 +123,9 @@ int main(void)
             length = 0;
             overlong = false;
         }
-        if (app_ok)
-            NVIC_SystemReset();
+        if (app_ok) {
+            // An incomplete transfer leaves the old application untouched.
+            jump(*(volatile uint32_t *)LYKE_APP, *(volatile uint32_t *)(LYKE_APP + 4));
+        }
     }
 }

@@ -2,6 +2,7 @@
 #include "keys.h"
 #include <stdarg.h>
 #include <string.h>
+#include "glyphs.h"
 
 enum { ROWS = 6, COLS = 21, X_FIRST = 2, PAGE_FIRST = 2 };
 _Static_assert(PAGE_FIRST + ROWS == 8 && X_FIRST + COLS * 6 == 128, "LCD viewport reaches bottom and right");
@@ -83,23 +84,7 @@ void USART2_IRQHandler(void)
     }
 }
 
-static void line(unsigned index, const char *label, bool inverse)
-{
-    if (index >= ROWS)
-        return;
-    uint8_t *row = pixels[7 - PAGE_FIRST - index];
-    memset(row, inverse ? 0xff : 0, 128);
-    for (unsigned i = 0; i < COLS && label[i]; ++i) {
-        uint8_t code = (uint8_t)label[i] - 32;
-        static const uint8_t pi[] = { 1, 0x7f, 1, 0x3f, 0x41 };
-        const uint8_t *glyph = (uint8_t)label[i] == 0x7f
-            ? pi : font5x7[code < 95 ? code : '?' - 32];
-        for (unsigned c = 0; c < 5; ++c) {
-            uint8_t column = (uint8_t)(__RBIT((uint32_t)glyph[c]) >> 24);
-            row[127 - (X_FIRST + i * 6 + c)] = inverse ? (uint8_t)~column : column;
-        }
-    }
-}
+#include "text_display.h"
 
 static int key_index(Pair pair)
 {
@@ -229,6 +214,34 @@ static void handle_mapper(Contact contact)
 
 #include "interface.h"
 
+__attribute__((noreturn, naked)) static void loader_jump(
+    uint32_t stack __attribute__((unused)), uint32_t entrypoint __attribute__((unused)))
+{
+    __asm volatile ("msr msp, r0\n bx r1");
+}
+
+static void enter_loader(void)
+{
+    // Enter the resident loader directly. The installed R8 reset handoff
+    // returned to the app on this board, so do not depend on reset retention
+    // of the RAM request word. The loader will reset normally after install.
+    battery_cancel();
+    LYKE_REQUEST = LYKE_BOOT_REQUEST;
+    __disable_irq();
+    SysTick->CTRL = 0;
+    SysTick->VAL = 0;
+    for (unsigned i = 0; i < 8; ++i) {
+        NVIC->ICER[i] = UINT32_MAX;
+        NVIC->ICPR[i] = UINT32_MAX;
+    }
+    SCB->ICSR = SCB_ICSR_PENDSTCLR_Msk | SCB_ICSR_PENDSVCLR_Msk;
+    SCB->VTOR = FLASH_BASE;
+    __DSB();
+    __ISB();
+    const volatile uint32_t *vectors = (const volatile uint32_t *)FLASH_BASE;
+    loader_jump(vectors[0], vectors[1]);
+}
+
 static bool service_serial(void)
 {
     bool redraw = false;
@@ -250,11 +263,11 @@ static bool service_serial(void)
         }
         incoming[incoming_length] = 0;
         if (!incoming_overflow && strcmp(incoming, "LYKE-BOOT-V1") == 0) {
-            LYKE_REQUEST = LYKE_BOOT_REQUEST;
-            NVIC_SystemReset();
+            enter_loader();
         }
         if (!incoming_overflow && strcmp(incoming, "LYKE-HELLO") == 0) {
             serial_send("LYKE APP V1");
+            serial_send("STM32 " LYKE_REVISION);
             report_map();
         }
         if (!incoming_overflow && mapped == KEY_COUNT)
@@ -291,6 +304,7 @@ int main(void)
     advance_over_on();
     load_settings();
     serial_send("LYKE APP V1");
+    serial_send("STM32 " LYKE_REVISION);
     report_map();
     redraw_screen();
     Contact pending = { MULTIPLE, 0, 0 }, stable = pending;
@@ -298,6 +312,10 @@ int main(void)
     uint32_t changed_at = ticks, last_scan = ticks;
     for (;;) {
         bool redraw = service_serial();
+        if (battery_poll()) {
+            voltage = battery.status == BATTERY_OK ? battery.mv : 0;
+            redraw = true;
+        }
         if (ticks - last_scan >= 4) {
             last_scan = ticks;
             Contact reading = keyboard_scan();

@@ -5,8 +5,8 @@
 #include <stdint.h>
 
 #define LYKE_APP 0x08002000u
-#define LYKE_STAGE 0x08010000u
-#define LYKE_MAX_APP (56u * 1024u)
+#define LYKE_STAGE 0x08012000u
+#define LYKE_MAX_APP (64u * 1024u)
 #define LYKE_META 0x0801e000u
 #define LYKE_KEYMAP 0x0801e800u
 #define LYKE_REQUEST (*(volatile uint32_t *)0x200057f0u)
