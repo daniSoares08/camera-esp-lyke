@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>STM32 + ESP32-CAM · Esquema de ligações</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23153b36'/%3E%3Cpath d='M8 9h16v14H8zM5 13h3m-3 6h3m16-6h3m-3 6h3' stroke='%23cef5b0' stroke-width='2' fill='none'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f3ea; --white: #fffef9; --ink: #142c2a; --muted: #506661;
+      --rule: #d9dfd0; --keypad: #167953; --uart: #235bb6; --lcd: #9f490c;
+      --battery: #7142a3; --supply: #b63844; --ground: #526878;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.55 "Segoe UI", system-ui, sans-serif; }
+    a { color: #23594f; }
+    button { font: inherit; cursor: pointer; }
+    button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 3px solid #426ec9; outline-offset: 3px; }
+    .wrap { width: min(1440px, 100%); padding-inline: clamp(14px, 3vw, 48px); margin-inline: auto; }
+    .mast { background: #153b36; color: #f8fff5; }
+    .mast .wrap { min-height: 67px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 9px; font-weight: 750; letter-spacing: .04em; }
+    .brand svg { width: 27px; height: 27px; }
+    nav { display: flex; align-items: center; gap: 21px; flex-wrap: wrap; }
+    nav a { color: inherit; text-decoration: none; font-size: .88rem; }
+    .print { border: 1px solid #82a59a; color: inherit; background: transparent; border-radius: 7px; padding: 6px 12px; }
+    .intro { padding-block: clamp(24px, 4vw, 53px) 24px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(36px, 6vw, 75px); line-height: 1.01; letter-spacing: -.054em; }
+    h1 span { color: #24755c; }
+    .intro p { max-width: 750px; margin-top: 13px; color: var(--muted); font-size: 1.07rem; }
+    .layout { background: var(--white); border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; }
+    .map-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 14px 19px; border-bottom: 1px solid var(--rule); }
+    h2 { font-size: clamp(20px, 3vw, 27px); letter-spacing: -.025em; }
+    .filters { display: flex; flex-wrap: wrap; gap: 5px; }
+    .filter { display: inline-flex; align-items: center; gap: 7px; background: transparent; border: 1px solid transparent; color: var(--ink); border-radius: 7px; padding: 5px 9px; font-size: .83rem; }
+    .filter[aria-pressed="true"] { background: #e9efe3; border-color: #cdd8c8; font-weight: 650; }
+    .dot { width: 8px; height: 8px; background: var(--color); border-radius: 50%; }
+    .map-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(205px, 235px); }
+    .drawing { overflow: auto; background: radial-gradient(#d6ddcc 1px, transparent 1px) 0 0 / 14px 14px, #fafbf3; }
+    #diagram { display: block; width: 100%; min-width: 850px; }
+    .inspector { padding: 19px; border-left: 1px solid var(--rule); background: #f4f7ec; min-height: 154px; }
+    .inspector h3 { font-size: 1.14rem; margin-bottom: 10px; line-height: 1.3; }
+    .inspector p, .caption { color: var(--muted); font-size: .88rem; }
+    #ends { font-weight: 650; color: var(--ink); margin: 0 0 9px; overflow-wrap: anywhere; }
+    .caption { padding: 8px 19px; border-top: 1px solid var(--rule); }
+    .wire { opacity: 1; cursor: pointer; }
+    .wire.dim { opacity: .14; }
+    .wire .ink { stroke: var(--color); stroke-width: 2.7; fill: none; }
+    .wire .halo { stroke: #fafbf3; stroke-width: 7; fill: none; }
+    .wire .hit { stroke: transparent; stroke-width: 15; fill: none; }
+    .wire.selected .ink, .wire:focus-within .ink { stroke-width: 4.4; }
+    .wire.selected { opacity: 1; }
+    .port { cursor: pointer; }
+    .port.selected circle { fill: #fffef9; stroke-width: 3; }
+    .wiring-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 16px; margin-top: 20px; }
+    .card { padding: 17px 19px; }
+    .card h2 { margin-bottom: 7px; }
+    .card p + p { margin-top: 9px; }
+    .stack { display: grid; gap: 16px; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: .9rem; }
+    td, th { border-bottom: 1px solid #e4e8dd; padding: 5px 7px; vertical-align: top; }
+    th { color: var(--muted); font-weight: 700; }
+    tr:last-child td { border-bottom: 0; }
+    td code, p code { font-family: Consolas, monospace; font-size: .95em; }
+    td button { padding: 0; border: 0; background: transparent; color: #23594f; text-decoration: underline; text-underline-offset: 3px; font: inherit; }
+    tr.selected td { background: #eef3e6; }
+    .notes { margin-block: 16px 24px; }
+    .notes ul { padding-left: 19px; margin: 6px 0 0; display: grid; gap: 8px; }
+    .status { padding: 12px 16px; background: #e9eedf; border-radius: 8px; margin-bottom: 22px; }
+    footer { display: flex; flex-wrap: wrap; gap: 12px 20px; padding-block: 0 25px; font-size: .86rem; }
+    section[id] { scroll-margin-top: 14px; }
+    @media (max-width: 1120px) { .map-grid { grid-template-columns: minmax(0, 1fr); } .inspector { grid-row: 1; border-left: 0; border-bottom: 1px solid var(--rule); min-height: 0; } }
+    @media (max-width: 680px) { .wiring-grid { grid-template-columns: minmax(0, 1fr); } .mast nav a { display: none; } .print { font-size: .8rem; } .card { padding: 14px; } }
+    @media print {
+      @page { size: A4 landscape; margin: 10mm; }
+      .mast { background: #fff; color: #142c2a; } .mast .wrap { min-height: 35px; }
+      .filters, nav, .inspector { display: none; } .map-grid { display: block; }
+      #diagram { min-width: 0; max-height: 135mm; } .drawing { overflow: visible; }
+      .intro { padding-block: 10px; } h1 { font-size: 32px; }
+      .layout { break-inside: avoid; } .wire.dim { opacity: 1; }
+      body { background: #fff; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <header class="mast"><div class="wrap">
+    <div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="8" y="8" width="16" height="16" rx="2" fill="none" stroke="#cef5b0" stroke-width="2"/><path d="M4 12h4m-4 8h4m16-8h4m-4 8h4M12 4v4m8-4v4m-8 16v4m8-4v4" stroke="#cef5b0" stroke-width="2"/></svg>CAMERA_ESP</div>
+    <nav aria-label="Seções"><a href="#mapa">Mapa</a><a href="#ligacoes">Pinos</a><a href="#firmware">Firmware</a><button class="print" type="button" id="print">Imprimir</button></nav>
+  </div></header>
+  <main class="wrap">
+    <div class="intro">
+      <h1>STM32 <span>+</span> ESP32-CAM</h1>
+      <p>O STM32G431CBU6 lê o teclado e a bateria, faz os cálculos offline e controla o LCD. A ESP32-CAM cuida da câmera, do Wi-Fi, da API e do OTA.</p>
+    </div>
+    <section class="layout" id="mapa" aria-labelledby="map-title">
+      <div class="map-head"><h2 id="map-title">Mapa de ligações</h2><div class="filters" id="filters" aria-label="Filtrar sinais"></div></div>
+      <div class="map-grid">
+        <div class="drawing" tabindex="0" role="region" aria-label="Diagrama com rolagem horizontal em telas pequenas">
+          <svg id="diagram" viewBox="0 0 1210 767" aria-label="Teclado, STM32, ESP32-CAM, LCD e divisor da bateria">
+            <defs><marker id="arrow-uart" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#235bb6"/></marker></defs>
+            <g id="devices"></g><g id="wires"></g><g id="ports"></g>
+          </svg>
+        </div>
+        <aside class="inspector" aria-live="polite"><h3 id="selection">Selecione um fio</h3><p id="ends"></p><p id="detail">Clique em um fio, em um terminal ou em uma ligação da tabela para conferir os dois pontos.</p></aside>
+      </div>
+      <p class="caption">Os desenhos agrupam os pinos por função. Solde pelos rótulos impressos nas placas. No celular, deslize o desenho ou use as tabelas.</p>
+    </section>
+    <noscript><p class="status">Ative JavaScript para exibir o mapa e as tabelas de ligação.</p></noscript>
+    <section class="wiring-grid" id="ligacoes" aria-label="Lista de ligações">
+      <div class="layout card">
+        <h2>Teclado original</h2>
+        <table><thead><tr><th>Trilha</th><th>GPIO</th><th>Rótulo na placa</th><th>Borda</th></tr></thead><tbody id="key-table"></tbody></table>
+        <p>Com o USB-C à esquerda e o SWD à direita, T01 a T16 e T19 ficam na borda inferior (lado B13/B12). T17 e T18 ficam na superior. T19 usa C6 com o LED D1 removido.</p>
+        <p>Mapa concluído: 49 contatos salvos no STM32, tecla ON dispensada. Preserve a orientação e a numeração das 19 vias; não refaça o mapeamento já salvo.</p>
+      </div>
+      <div class="stack">
+        <section class="layout card" aria-labelledby="lcd-title">
+          <h2 id="lcd-title">LCD GMG12864-06D</h2>
+          <table><thead><tr><th>LCD</th><th>STM32</th></tr></thead><tbody id="lcd-table"></tbody></table>
+          <p>Os sinais do LCD saem pela borda superior. Use SPI1 somente para escrita, com CS e reset por GPIO. A luz de fundo e a interface do chip de fontes ficam desconectadas nesta proposta.</p>
+        </section>
+        <section class="layout card" aria-labelledby="uart-title">
+          <h2 id="uart-title">UART entre as placas</h2>
+          <table><thead><tr><th>Origem</th><th>Destino</th></tr></thead><tbody id="uart-table"></tbody></table>
+          <p>UART a 3,3 V, 115200 baud, 8N1. Use USART2 na borda superior do STM32 (AF7). Deixe a microSD desativada na ESP32-CAM, pois ela compartilha GPIO13 e GPIO14. A UART0 em GPIO1/3 fica disponível para bancada.</p>
+        </section>
+        <section class="layout card" id="bateria" aria-labelledby="battery-title">
+          <h2 id="battery-title">Bateria no PA0</h2>
+          <table><thead><tr><th>Componente</th><th>Entre</th></tr></thead><tbody id="battery-table"></tbody></table>
+          <p><strong id="battery-result"></strong> Ligue o divisor à tensão da célula antes do regulador. Com chave geral, use o positivo após a chave. Coloque o capacitor próximo de A0.</p>
+          <p>Na bancada, alimente cada placa pela entrada prevista e una os GNDs. O LCD recebe 3,3 V do STM32. Mantenha separadas as saídas dos reguladores das duas placas. Para a alimentação final, confirme o caminho de VCC/V+ da sua placa STM32.</p>
+          <p><strong>ESP32-CAM:</strong> positivo de 5 V regulados no pino <code>5V</code> e negativo no <code>GND ao lado de 5V</code>. Deixe <code>3V3</code> e <code>VCC</code> sem alimentação externa. Um GND do ESP basta, comum ao STM32 e à fonte. O pino ao lado de U0T pode ser <code>GND/R</code> (reset), conforme a variante: deixe-o livre. Em uso normal, IO0 fica sem jumper ao GND.</p>
+        </section>
+      </div>
+    </section>
+    <section class="layout card notes" id="firmware">
+      <h2>Firmware e montagem</h2>
+      <ul>
+        <li><strong>STM32.</strong> Mapear uma trilha por vez, tratar o debounce, fazer os cálculos e desenhar no LCD. Usar <code>PB3</code> como GPIO com SWO desligado. Preservar SWD em PA13/PA14 e BOOT0 em PB8.</li>
+        <li><strong>Placa STM32.</strong> Confirme que SB3, SB5, SB6 e SB7 estão abertas para usar PA9, PA10, PB4 e PB6 no teclado. Configure <code>UCPD1_DBDIS=1</code> para desligar os pull-downs UCPD.</li>
+        <li><strong>ADC.</strong> Configurar PA0 como analógico, sem pulls. Usar VREFINT, amostragem longa e espaçada e conferir com multímetro. A tensão estimada da bateria é duas vezes a leitura no nó.</li>
+        <li><strong>ESP32-CAM.</strong> A câmera e sua pinagem interna permanecem no módulo. O ESP recebe comandos pela UART e envia progresso e texto paginado. Acordar pelo GPIO13 no próprio fio da UART é uma opção de firmware a testar. Guardar ou concluir fotos pendentes antes de entrar em sono profundo.</li>
+        <li><strong>Gravação do STM32.</strong> Reserve PA11 e PA12 para USB. Com um cabo USB de dados, mantenha BOOT0 pressionado, aperte e solte NRST, depois solte BOOT0. Se o STM32 entrar em DFU, grave com o STM32CubeProgrammer. Se USB-C ↔ USB-C não detectar a placa, tente USB-A ↔ USB-C.</li>
+        <li><strong>OTA.</strong> ESP Lyke R5 e STM32 Lyke R8 instalados. O portal Calc-Lyke abre a cada boot, sem prazo; desligar o Wi-Fi pelo STM vale até reiniciar o ESP. A atualização do ESP pela rede foi verificada. A OTA do STM32 via ESP está implementada e seu teste físico continua pendente.</li>
+        <li><strong>API e fotos.</strong> O ESP envia até três JPEGs ao serviço no Supabase, que guarda os originais privadamente e pede a resolução ao GPT-6.1 Terra. A resposta usa texto compatível com 21 colunas do LCD. A chave OpenAI fica no servidor.</li>
+      </ul>
+    </section>
+    <p class="status"><strong>Estado em 23/11/2026.</strong> 49 teclas reconhecidas pela UART, captura JPEG, API e arquivo privado testados com ESP R5 / STM R8. Alimentação definitiva pela bateria, três fotos numa consulta e OTA física do STM32 continuam em validação.</p>
+    <footer><a href="https://www.st.com/resource/en/datasheet/stm32g431cb.pdf">Datasheet STM32</a><a href="https://github.com/WeActStudio/WeActStudio.STM32G431CoreBoard">Placa STM32</a><a href="https://www.st.com/resource/en/application_note/an2606-stm32-microcontroller-system-memory-boot-mode-stmicroelectronics.pdf">Bootloader STM32</a><a href="https://support.newhavendisplay.com/hc/en-us/article_attachments/26189026785559">Controlador do LCD</a><a href="https://documentation.espressif.com/esp32_datasheet_en.html">Datasheet ESP32</a></footer>
+  </main>
+  <script type="application/json" id="plan">__PLAN__</script>
+  <script>
+    'use strict';
+    const plan = JSON.parse(document.getElementById('plan').textContent);
+    const devices = document.getElementById('devices');
+    const wires = document.getElementById('wires');
+    const ports = document.getElementById('ports');
+    const categories = {all:'Todos', keypad:'Teclado', uart:'UART', lcd:'LCD', battery:'Bateria', supply:'Alimentação'};
+    const nets = new Map();
+    let category = 'all';
+    let selected = null;
+
+    function svg(tag, attrs = {}, parent = devices, value) {
+      const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      for (const [key, val] of Object.entries(attrs)) node.setAttribute(key, val);
+      if (value !== undefined) node.textContent = value;
+      parent.append(node);
+      return node;
+    }
+    function rect(x, y, width, height, fill, rx = 6) {
+      return svg('rect', {x, y, width, height, rx, fill});
+    }
+    function label(x, y, value, opts = {}, parent = devices) {
+      return svg('text', {x,y,fill:'#203c37','font-size':14,...opts}, parent, value);
+    }
+    function spine(x, y, name, role) {
+      label(x,y,name,{'font-size':22,'font-weight':700});
+      label(x,y+24,role,{fill:'#506661'});
+    }
+    function addNet({id, group, name, ends, detail, path, terminals, junctions = [], arrow = false}) {
+      const categoryColor = id === 'vss' ? 'ground' : group;
+      const g = svg('g', {class:'wire', 'data-net':id, style:`--color:var(--${categoryColor})`}, wires);
+      svg('path', {d:path,class:'halo'},g);
+      svg('path', {d:path,class:'ink', ...(arrow ? {'marker-end':'url(#arrow-uart)'} : {})},g);
+      svg('path', {d:path,class:'hit',role:'button',tabindex:0,'aria-label':name},g);
+      activate(g, () => select(id));
+      for (const [x,y] of junctions) svg('circle',{cx:x,cy:y,r:3.6,fill:'var(--color)'},g);
+      for (const [x,y,value,side] of terminals) {
+        const p = svg('g', {class:'port','data-port':id,style:`--color:var(--${categoryColor})`},ports);
+        svg('circle',{cx:x,cy:y,r:4.5,fill:'var(--color)',stroke:'var(--color)'},p);
+        const end = side.startsWith('left');
+        const above = side.startsWith('above');
+        label(above?x:x+(end?-10:10),above?y-12:y+4,value,{
+          fill:side.endsWith('dark')?'#f5f9f0':'#203c37','font-size':12.4,
+          'text-anchor':above?'middle':end?'end':'start','font-family':'Consolas, monospace'
+        },p);
+        activate(p, () => select(id));
+      }
+      nets.set(id,{group,name,ends,detail});
+    }
+    function activate(node, action) {
+      node.addEventListener('click',action);
+      node.addEventListener('keydown',event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); action(); }
+      });
+    }
+    function select(id) {
+      selected = id;
+      const net = nets.get(id);
+      category = net.group;
+      document.getElementById('selection').textContent = net.name;
+      document.getElementById('ends').textContent = net.ends;
+      document.getElementById('detail').textContent = net.detail;
+      paint();
+    }
+    function paint() {
+      for (const wire of wires.children) {
+        const id = wire.dataset.net;
+        wire.classList.toggle('dim',selected ? selected !== id : category !== 'all' && category !== nets.get(id).group);
+        wire.classList.toggle('selected',selected === id);
+      }
+      document.querySelectorAll('[data-port],tr[data-net]').forEach(node => node.classList.toggle('selected',selected === (node.dataset.port || node.dataset.net)));
+      document.querySelectorAll('.filter').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.group === category)));
+    }
+    function addRow(bodyId, values, id) {
+      const row = document.getElementById(bodyId).insertRow();
+      if (id) row.dataset.net = id;
+      for (const [i,value] of values.entries()) {
+        const cell = row.insertCell();
+        if (i === 0 && id) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = value;
+          button.addEventListener('click',() => {
+            select(id);
+            document.getElementById('mapa').scrollIntoView({block:'start'});
+          });
+          cell.append(button);
+        } else cell.textContent = value;
+      }
+    }
+
+    spine(35,64,'Teclado original','19 trilhas · contatos a mapear');
+    rect(35,104,205,502,'#dfe9d7',14);
+    rect(48,117,96,476,'#9eb99d',9);
+    for (let y=140;y<570;y+=38) for (let x=59;x<128;x+=29) rect(x,y,17,24,'#426e5e',4);
+    spine(419,64,'STM32G431CBU6','Calculadora · teclado · LCD · ADC');
+    rect(417,104,294,522,'#203530',15);
+    rect(404,329,31,58,'#728b83',6);
+    rect(510,273,106,106,'#283334',8).setAttribute('transform','rotate(45 563 326)');
+    label(563,322,'STM32',{'text-anchor':'middle',fill:'#e6f1df','font-size':22,'font-weight':750});
+    label(563,346,'G431CBU6',{'text-anchor':'middle',fill:'#c0d5c1','font-size':14});
+    rect(532,200,61,29,'#879991',4); label(562,219,'8 MHz',{'text-anchor':'middle','font-size':11});
+    rect(533,463,60,23,'#3e5148',5); label(563,479,'SWD',{'text-anchor':'middle',fill:'#c0d5c1','font-size':11});
+    spine(962,64,'ESP32-CAM','Câmera · rede · OTA');
+    rect(943,104,220,181,'#284941',13);
+    rect(1027,119,114,48,'#c6ccb8',6); label(1084,148,'ESP32',{'text-anchor':'middle','font-weight':750});
+    rect(1048,180,77,88,'#233533',10);
+    svg('circle',{cx:1086,cy:222,r:32,fill:'#111d22'});
+    svg('circle',{cx:1086,cy:222,r:20,fill:'#28486b'});
+    svg('circle',{cx:1079,cy:214,r:6,fill:'#6e93b7'});
+    spine(962,322,'GMG12864-06D','LCD 128 × 64 · SPI1');
+    rect(943,363,220,226,'#446b49',13);
+    rect(1005,395,142,119,'#203a2c',11);
+    rect(1013,404,126,101,'#c9dc9b',6);
+    label(1076,460,'128 × 64',{'text-anchor':'middle','font-size':19,'font-weight':700});
+    label(1076,483,'SPI1',{'text-anchor':'middle','font-size':12});
+
+    const keyboardTracks = plan.keyboard.flatMap(({edge,pins}) => pins.map(pin => ({edge,pin})));
+    const trackNotes = {
+      PC6: 'GPIO liberado após a retirada do LED D1 de usuário.',
+      PA9: 'Confira que SB3 está aberta, isolando PB6.',
+      PA10: 'Confira que SB5 está aberta, isolando PB4.',
+      PB3: 'Configure como GPIO e deixe SWO desligado.',
+      PB4: 'Confira que SB5 e SB7 estão abertas, isolando PA10 e CC2.',
+      PB6: 'Confira que SB3 e SB6 estão abertas, isolando PA9 e CC1.'
+    };
+    for (const [i,{edge,pin}] of keyboardTracks.entries()) {
+      const track = 'T'+String(i+1).padStart(2,'0');
+      const y = 128+i*25;
+      addNet({id:track,group:'keypad',name:'Trilha '+track,ends:`Teclado ${track} ↔ STM32 ${pin} (${pin.slice(1)})`,
+        detail:`Borda ${edge.toLowerCase()} do STM32 na orientação da foto. ${trackNotes[pin] || 'A tecla e o par elétrico serão identificados na varredura.'}`,
+        path:`M240 ${y}H417`,terminals:[[240,y,track,'left'],[417,y,`${pin} / ${pin.slice(1)}`,'dark']]});
+      addRow('key-table',[track,pin,pin.slice(1),edge],track);
+    }
+    for (const [i,link] of plan.uart.entries()) {
+      const y=153+i*48;
+      const stm = `${link.stm} ${link.stmFunction}`;
+      const esp = `${link.esp} ${link.espFunction}`;
+      const forward = link.stmFunction === 'TX';
+      addNet({id:link.id,group:'uart',name:link.name,ends:forward?`${stm} → ${esp}`:`${esp} → ${stm}`,
+        detail:link.detail,path:forward?`M711 ${y}H943`:`M943 ${y}H711`,arrow:true,
+        terminals:[[711,y,stm,'left-dark'],[943,y,esp,'dark']]});
+      addRow('uart-table',forward?[`STM32 ${stm}`,`ESP ${esp}`]:[`ESP ${esp}`,`STM32 ${stm}`],link.id);
+    }
+    for (const [i,lcd] of plan.lcd.entries()) {
+      const y=390+i*28;
+      const wireId=lcd.signal.toLowerCase();
+      const isGround=lcd.signal==='VSS';
+      const isSupply=lcd.signal==='VDD';
+      const path=isGround?`M711 ${y}H784V741M943 ${y}H900V741M943 246H860V741M104 741H947`:`M711 ${y}H943`;
+      const terminals=[[711,y,lcd.stm,'left-dark'],[943,y,lcd.signal,'dark']];
+      if (isGround) terminals.push([943,246,'GND','dark'],[104,741,'BAT−','above']);
+      addNet({id:wireId,group:isGround||isSupply?'supply':'lcd',name:isGround?'Terra comum':`LCD · ${lcd.signal}`,
+        ends:isGround?'STM32 GND · ESP GND · LCD VSS · BAT−':`STM32 ${lcd.stm} → LCD ${lcd.signal}`,
+        detail:lcd.detail,path,terminals,junctions:isGround?[[784,741],[860,741],[900,741]]:[]});
+      addRow('lcd-table',[lcd.signal,lcd.stm],wireId);
+    }
+    addRow('uart-table',['GND do STM32','GND da ESP32-CAM'],'vss');
+
+    const battery = plan.battery;
+    const decimal = value => value.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const ohms = value => `${value/1000} kΩ`;
+    const measured = battery.cellMax*battery.r2Ohm/(battery.r1Ohm+battery.r2Ohm);
+    label(36,643,'Bateria · medição',{'font-size':20,'font-weight':700});
+    rect(36,663,58,66,'#ded3ed',10);
+    label(65,693,'+',{'font-size':24,'text-anchor':'middle',fill:'#7142a3'});
+    label(65,717,'−',{'font-size':22,'text-anchor':'middle',fill:'#7142a3'});
+    svg('path',{d:'M94 708H104V741',stroke:'var(--ground)','stroke-width':2.5,fill:'none'});
+    label(108,671,'BAT+',{'font-weight':650,fill:'#7142a3'});
+    svg('path',{d:'M94 687H177M243 687H399M399 687H450M504 687H547V741M399 687V708M386 708H412M386 714H412M399 714V741',stroke:'var(--battery)','stroke-width':2.5,fill:'none'});
+    rect(177,679,66,16,'#d8c9e9',2);
+    rect(450,679,54,16,'#d8c9e9',2);
+    label(177,671,`R1 ${ohms(battery.r1Ohm)}`,{fill:'#7142a3'});
+    label(444,671,`R2 ${ohms(battery.r2Ohm)}`,{fill:'#7142a3'});
+    label(325,724,`${battery.cNF} nF`,{fill:'#7142a3'});
+    addNet({id:'battery',group:'battery',name:'Divisor da bateria',ends:`Junção de R1 e R2 → STM32 ${battery.stm} (A0)`,
+      detail:`${battery.adc}. ${decimal(battery.cellMax)} V na bateria correspondem a ${decimal(measured)} V no ADC. O capacitor liga a junção ao GND perto do STM32.`,
+      path:'M399 687V650H620V626',terminals:[[620,626,`${battery.stm} / A0`,'above-dark']],junctions:[[399,687]]});
+    for (const x of [399,547]) svg('circle',{cx:x,cy:741,r:4,fill:'var(--ground)'},ports);
+    addRow('battery-table',[`R1 · ${ohms(battery.r1Ohm)}`,'BAT+ e a junção PA0'],'battery');
+    addRow('battery-table',[`R2 · ${ohms(battery.r2Ohm)}`,'Junção PA0 e GND'],'battery');
+    addRow('battery-table',[`${battery.cNF} nF`,'Junção PA0 e GND, junto ao STM32'],'battery');
+    document.getElementById('battery-result').textContent = `${decimal(battery.cellMax)} V na célula → ${decimal(measured)} V no ADC.`;
+
+    for (const [group,title] of Object.entries(categories)) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'filter';
+      button.dataset.group = group;
+      if (group !== 'all') {
+        const dot = document.createElement('span');
+        dot.className='dot';
+        dot.style.setProperty('--color',`var(--${group})`);
+        button.append(dot);
+      }
+      button.append(title);
+      button.addEventListener('click',() => {
+        category=group;
+        selected=null;
+        document.getElementById('selection').textContent=group==='all'?'Todas as ligações':title;
+        document.getElementById('ends').textContent='';
+        document.getElementById('detail').textContent='Selecione um fio para ver origem, destino e função.';
+        paint();
+      });
+      document.getElementById('filters').append(button);
+    }
+    document.getElementById('print').addEventListener('click',()=>window.print());
+    paint();
+  </script>
+</body>
+</html>

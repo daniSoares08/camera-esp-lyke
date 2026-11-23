@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2130" viewBox="0 0 1800 2130">
+<rect width="100%" height="100%" fill="#f3f6fa"/>
+<text x="50" y="29" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="43" font-weight="600" fill="#14253b">ESP-CAM + teclado 4×5 + LCD GMG12864-06D</text>
+<text x="52" y="90" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" fill="#53647a">Usar os rótulos originais da placa azul, DEPOIS da troca pelo PCF8575 (PF575).</text>
+<rect x="50" y="215" width="380" height="220" rx="16" fill="white" stroke="#1766b4" stroke-width="2"/>
+<text x="75" y="237" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="32" font-weight="600" fill="#1766b4">ESP32-CAM</text>
+<text x="75" y="290" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">Câmera: ligação atual</text>
+<text x="75" y="324" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">UART TX/RX: preservada</text>
+<text x="75" y="358" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">4 GPIOs digitais + GPIO33 ADC</text>
+<rect x="700" y="215" width="420" height="220" rx="16" fill="white" stroke="#1766b4" stroke-width="2"/>
+<text x="725" y="237" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="600" fill="#1766b4">Placa convertida</text>
+<text x="725" y="288" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" fill="#14253b">PCF8575 / endereço 0x20</text>
+<text x="725" y="322" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" fill="#14253b">C8 = SDA   •   C9 = SCL</text>
+<text x="725" y="356" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" fill="#14253b">Teclado + controles da tela</text>
+<rect x="1370" y="215" width="380" height="220" rx="16" fill="white" stroke="#a64c00" stroke-width="2"/>
+<text x="1395" y="237" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="600" fill="#a64c00">LCD 128×64</text>
+<text x="1395" y="288" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">SCL / SI: direto ao ESP</text>
+<text x="1395" y="322" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">CS / RSE / RS: via PCF</text>
+<text x="1395" y="356" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">VDD = 3V3  •  VSS = GND</text>
+<polyline points="430,335 700,335" fill="none" stroke="#1766b4" stroke-width="4"/>
+<polygon points="700,335 683.0,327.0 683.0,343.0" fill="#1766b4"/>
+<text x="457" y="276" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="600" fill="#1766b4">GPIO13 → C8</text>
+<text x="457" y="305" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="600" fill="#1766b4">GPIO14 → C9</text>
+<polyline points="1120,335 1370,335" fill="none" stroke="#a64c00" stroke-width="4"/>
+<polygon points="1370,335 1353.0,327.0 1353.0,343.0" fill="#a64c00"/>
+<text x="1142" y="271" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="600" fill="#a64c00">S0/S1/S2</text>
+<text x="1142" y="303" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#a64c00">→ CS/RSE/RS</text>
+<polyline points="235,215 235,160 1560,160 1560,215" fill="none" stroke="#a64c00" stroke-width="4"/>
+<polygon points="1560,215 1568.0,198.0 1552.0,198.0" fill="#a64c00"/>
+<rect x="530" y="137" width="780" height="44" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="550" y="143" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="600" fill="#a64c00">SPI direto: GPIO15 → SCL da tela  |  GPIO2 → SI da tela</text>
+<rect x="700" y="505" width="420" height="115" rx="16" fill="white" stroke="#137246" stroke-width="2"/>
+<text x="725" y="520" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="600" fill="#137246">Teclado matricial 4×5</text>
+<text x="725" y="565" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" fill="#137246">4 linhas + 5 colunas = 9 fios</text>
+<polyline points="910,435 910,505" fill="none" stroke="#137246" stroke-width="4"/>
+<polygon points="910,505 918.0,488.0 902.0,488.0" fill="#137246"/>
+<text x="945" y="456" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#137246">C0–C5 + C11–C13</text>
+<text x="65" y="480" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="600" fill="#14253b">Sem cartão microSD.</text>
+<text x="65" y="522" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#53647a">GPIO0 e GPIO16 não entram</text>
+<text x="65" y="555" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#53647a">neste esquema.</text>
+<rect x="50" y="650" width="1700" height="92" rx="16" fill="#e7edf5" stroke="#cad5e2" stroke-width="2"/>
+<text x="72" y="664" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600" fill="#b33333">3V3 → VCC da placa convertida + VDD da tela</text>
+<text x="72" y="702" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600" fill="#14253b">GND comum → ESP + GND da placa + VSS da tela + C6 + C7 + C10</text>
+<rect x="50" y="775" width="530" height="343" rx="16" fill="white" stroke="#cad5e2" stroke-width="2"/>
+<text x="70" y="793" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="600" fill="#1766b4">ESP ↔ placa convertida</text>
+<text x="70" y="840" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="#53647a">ESP / destino</text>
+<text x="290" y="840" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="#53647a">Rótulo da placa</text>
+<rect x="59" y="873" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="70" y="877" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GPIO13</text>
+<text x="290" y="877" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C8 (SDA)</text>
+<text x="70" y="916" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GPIO14</text>
+<text x="290" y="916" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C9 (SCL)</text>
+<rect x="59" y="951" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="70" y="955" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">3V3</text>
+<text x="290" y="955" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">VCC</text>
+<text x="70" y="994" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GND</text>
+<text x="290" y="994" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GND</text>
+<rect x="59" y="1029" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="70" y="1033" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GND</text>
+<text x="290" y="1033" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C6, C7 e C10</text>
+<text x="70" y="1072" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">Sem fio</text>
+<text x="290" y="1072" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">SIG / INT</text>
+<rect x="635" y="775" width="530" height="382" rx="16" fill="white" stroke="#cad5e2" stroke-width="2"/>
+<text x="655" y="793" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="600" fill="#a64c00">Tela → ligar em</text>
+<text x="655" y="840" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="#53647a">Pino da tela</text>
+<text x="835" y="840" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="#53647a">Destino</text>
+<rect x="644" y="873" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="655" y="877" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">CS</text>
+<text x="835" y="877" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">S0 (P06)</text>
+<text x="655" y="916" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">RSE</text>
+<text x="835" y="916" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">S1 (P07)</text>
+<rect x="644" y="951" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="655" y="955" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">RS</text>
+<text x="835" y="955" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">S2 (P11)</text>
+<text x="655" y="994" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">SCL</text>
+<text x="835" y="994" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GPIO15</text>
+<rect x="644" y="1029" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="655" y="1033" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">SI</text>
+<text x="835" y="1033" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GPIO2</text>
+<text x="655" y="1072" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">VDD</text>
+<text x="835" y="1072" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">3V3</text>
+<rect x="644" y="1107" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="655" y="1111" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">VSS</text>
+<text x="835" y="1111" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GND</text>
+<rect x="1220" y="775" width="530" height="460" rx="16" fill="white" stroke="#cad5e2" stroke-width="2"/>
+<text x="1240" y="793" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="600" fill="#137246">Teclado → placa convertida</text>
+<text x="1240" y="840" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="#53647a">Teclado</text>
+<text x="1410" y="840" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="#53647a">Placa / PCF8575</text>
+<rect x="1229" y="873" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="1240" y="877" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">L1</text>
+<text x="1410" y="877" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C0 (P05)</text>
+<text x="1240" y="916" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">L2</text>
+<text x="1410" y="916" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C1 (P04)</text>
+<rect x="1229" y="951" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="1240" y="955" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">L3</text>
+<text x="1410" y="955" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C2 (P03)</text>
+<text x="1240" y="994" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">L4</text>
+<text x="1410" y="994" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C3 (P02)</text>
+<rect x="1229" y="1029" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="1240" y="1033" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">COL1</text>
+<text x="1410" y="1033" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C4 (P01)</text>
+<text x="1240" y="1072" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">COL2</text>
+<text x="1410" y="1072" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C5 (P00)</text>
+<rect x="1229" y="1107" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="1240" y="1111" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">COL3</text>
+<text x="1410" y="1111" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C11 (P17)</text>
+<text x="1240" y="1150" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">COL4</text>
+<text x="1410" y="1150" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C12 (P16)</text>
+<rect x="1229" y="1185" width="512" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="1240" y="1189" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">COL5</text>
+<text x="1410" y="1189" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C13 (P15)</text>
+<rect x="50" y="1260" width="1115" height="343" rx="16" fill="white" stroke="#cad5e2" stroke-width="2"/>
+<text x="70" y="1278" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="600" fill="#1766b4">Resistores e capacitor</text>
+<text x="70" y="1325" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="#53647a">Valor</text>
+<text x="240" y="1325" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="#53647a">Uma ponta</text>
+<text x="715" y="1325" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="#53647a">Outra ponta</text>
+<rect x="59" y="1358" width="1097" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="70" y="1362" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">4,7 kΩ</text>
+<text x="240" y="1362" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C8 / GPIO13</text>
+<text x="715" y="1362" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">3V3</text>
+<text x="70" y="1401" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">4,7 kΩ</text>
+<text x="240" y="1401" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">C9 / GPIO14</text>
+<text x="715" y="1401" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">3V3</text>
+<rect x="59" y="1436" width="1097" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="70" y="1440" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">10 kΩ</text>
+<text x="240" y="1440" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">S0 / CS da tela</text>
+<text x="715" y="1440" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">3V3</text>
+<text x="70" y="1479" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">10 kΩ</text>
+<text x="240" y="1479" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">S1 / RSE da tela</text>
+<text x="715" y="1479" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">3V3</text>
+<rect x="59" y="1514" width="1097" height="37" rx="4" fill="#f3f6fa" stroke="#f3f6fa" stroke-width="2"/>
+<text x="70" y="1518" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">10 kΩ</text>
+<text x="240" y="1518" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GPIO2 / SI da tela</text>
+<text x="715" y="1518" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GND</text>
+<text x="70" y="1557" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">100 nF</text>
+<text x="240" y="1557" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">VCC da placa convertida</text>
+<text x="715" y="1557" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#14253b">GND, próximo ao PCF</text>
+<rect x="1220" y="1260" width="530" height="355" rx="16" fill="white" stroke="#cad5e2" stroke-width="2"/>
+<text x="1240" y="1280" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="600" fill="#14253b">Antes de soldar</text>
+<text x="1240" y="1335" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">C0…C15 são nomes na placa azul.</text>
+<text x="1240" y="1373" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">COL1…COL5 são colunas do teclado.</text>
+<text x="1240" y="1411" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">Identifique a ordem dos 9 contatos.</text>
+<text x="1240" y="1449" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">RSE tem pull-up para 3V3, não GND.</text>
+<text x="1240" y="1487" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">A/K e IC_* da tela ficam sem fio.</text>
+<text x="1240" y="1525" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">S3, EN, C14 e C15 ficam livres.</text>
+<rect x="50" y="1650" width="1700" height="345" rx="16" fill="white" stroke="#7754a4" stroke-width="2"/>
+<text x="75" y="1668" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="600" fill="#7754a4">Bateria 1S • 4,2 V máximo • GPIO33 / ADC1_CH5</text>
+<text x="85" y="1760" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="600" fill="#b33333">BAT+</text>
+<polyline points="160,1776 230,1776" fill="none" stroke="#b33333" stroke-width="3"/>
+<polygon points="230,1776 213.0,1768.0 213.0,1784.0" fill="#b33333"/>
+<rect x="230" y="1763" width="110" height="26" rx="2" fill="#f1eaf7" stroke="#7754a4" stroke-width="2"/>
+<text x="235" y="1724" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#7754a4">R1 470 kΩ</text>
+<polyline points="340,1776 480,1776" fill="none" stroke="#7754a4" stroke-width="3"/>
+<polygon points="480,1776 463.0,1768.0 463.0,1784.0" fill="#7754a4"/>
+<polyline points="480,1776 480,1720 745,1720" fill="none" stroke="#7754a4" stroke-width="3"/>
+<polygon points="745,1720 728.0,1712.0 728.0,1728.0" fill="#7754a4"/>
+<text x="755" y="1707" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600" fill="#7754a4">GPIO33</text>
+<text x="353" y="1800" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="600" fill="#7754a4">2,10 V máx.</text>
+<polyline points="480,1776 600,1776" fill="none" stroke="#7754a4" stroke-width="3"/>
+<polygon points="600,1776 583.0,1768.0 583.0,1784.0" fill="#7754a4"/>
+<rect x="600" y="1763" width="110" height="26" rx="2" fill="#f1eaf7" stroke="#7754a4" stroke-width="2"/>
+<text x="603" y="1724" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#7754a4">R2 470 kΩ</text>
+<polyline points="710,1776 865,1776 865,1915 480,1915" fill="none" stroke="#53647a" stroke-width="3"/>
+<polygon points="480,1915 497.0,1923.0 497.0,1907.0" fill="#53647a"/>
+<polyline points="480,1776 480,1842" fill="none" stroke="#7754a4" stroke-width="3"/>
+<polygon points="480,1842 488.0,1825.0 472.0,1825.0" fill="#7754a4"/>
+<path d="M456 1842H504M456 1855H504" stroke="#53647a" stroke-width="3"/>
+<polyline points="480,1855 480,1915" fill="none" stroke="#53647a" stroke-width="3"/>
+<polygon points="480,1915 488.0,1898.0 472.0,1898.0" fill="#53647a"/>
+<text x="525" y="1841" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" fill="#53647a">Cbat 100 nF</text>
+<text x="535" y="1927" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#53647a">GND comum = BAT− = GND do ESP</text>
+<circle cx="480" cy="1776" r="5" fill="#7754a4"/>
+<text x="990" y="1724" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">GPIO33: retirar/isolar o LED vermelho.</text>
+<text x="990" y="1761" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">Soldar no lado ligado ao GPIO33, não ao 3V3.</text>
+<text x="990" y="1798" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">Confirmar por continuidade antes de conectar.</text>
+<text x="990" y="1835" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">100 nF perto do GPIO33; divisor: 4,47 µA máx.</text>
+<text x="990" y="1872" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">Medir a bateria antes do conversor de tensão.</text>
+<text x="990" y="1909" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#14253b">Entrada analógica sem pull-up/down; VBAT = 2 × VADC.</text>
+<text x="55" y="2042" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="600" fill="#14253b">Ligação proposta • Alimentação lógica de 3,3 V • Divisor de bateria mede tensão, não alimenta o ESP.</text>
+<text x="55" y="2082" dominant-baseline="text-before-edge" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#53647a">O firmware atual testa a câmera; teclado, LCD e leitura da bateria ainda precisam de integração. Diagrama fora de escala.</text>
+</svg>

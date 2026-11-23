@@ -1,0 +1,51 @@
+id,rotulo,trilha_a,gpio_a,trilha_b,gpio_b,estado
+SHIFT,SHIFT,T01,PB13,T13,PB4,mapeada na flash
+ALPHA,ALPHA,T01,PB13,T14,PB7,mapeada na flash
+UP,REPLAY CIMA,T01,PB13,T15,PB6,mapeada na flash
+LEFT,REPLAY ESQUERDA,T04,PB14,T13,PB4,mapeada na flash
+RIGHT,REPLAY DIREITA,T05,PA8,T13,PB4,mapeada na flash
+DOWN,REPLAY BAIXO,T01,PB13,T16,PB9,mapeada na flash
+MODE,MODE,T02,PB12,T16,PB9,mapeada na flash
+ON,ON,,,,,dispensada pelo usuario
+INV,X^-1,T13,PB4,T19,PC6,mapeada na flash
+NCR,nCr,T03,PB15,T13,PB4,mapeada na flash
+POL,Pol(,T06,PA10,T13,PB4,mapeada na flash
+CUBE,X^3,T07,PA9,T13,PB4,mapeada na flash
+FRAC,ab/c,T14,PB7,T19,PC6,mapeada na flash
+SQRT,RAIZ QUADRADA,T03,PB15,T14,PB7,mapeada na flash
+SQUARE,X^2,T04,PB14,T14,PB7,mapeada na flash
+POWER,^ (POTENCIA),T05,PA8,T14,PB7,mapeada na flash
+LOG,log,T06,PA10,T14,PB7,mapeada na flash
+LN,ln,T07,PA9,T14,PB7,mapeada na flash
+NEG,(-) SINAL,T15,PB6,T19,PC6,mapeada na flash
+DMS,GRAUS ,T03,PB15,T15,PB6,mapeada na flash
+HYP,hyp,T04,PB14,T15,PB6,mapeada na flash
+SIN,sin,T05,PA8,T15,PB6,mapeada na flash
+COS,cos,T06,PA10,T15,PB6,mapeada na flash
+TAN,tan,T07,PA9,T15,PB6,mapeada na flash
+RCL,RCL,T16,PB9,T19,PC6,mapeada na flash
+ENG,ENG,T03,PB15,T16,PB9,mapeada na flash
+LPAREN,(,T04,PB14,T16,PB9,mapeada na flash
+RPAREN,),T05,PA8,T16,PB9,mapeada na flash
+COMMA,", (VIRGULA)",T06,PA10,T16,PB9,mapeada na flash
+MPLUS,M+,T07,PA9,T16,PB9,mapeada na flash
+D7,7,T12,PB5,T16,PB9,mapeada na flash
+D8,8,T10,PC11,T16,PB9,mapeada na flash
+D9,9,T11,PB3,T16,PB9,mapeada na flash
+DEL,DEL,T08,PA15,T16,PB9,mapeada na flash
+AC,AC,T09,PC10,T16,PB9,mapeada na flash
+D4,4,T12,PB5,T15,PB6,mapeada na flash
+D5,5,T10,PC11,T15,PB6,mapeada na flash
+D6,6,T11,PB3,T15,PB6,mapeada na flash
+MUL,X (MULTIPLICAR),T08,PA15,T15,PB6,mapeada na flash
+DIV,/ (DIVIDIR),T09,PC10,T15,PB6,mapeada na flash
+D1,1,T12,PB5,T14,PB7,mapeada na flash
+D2,2,T10,PC11,T14,PB7,mapeada na flash
+D3,3,T11,PB3,T14,PB7,mapeada na flash
+ADD,+,T08,PA15,T14,PB7,mapeada na flash
+SUB,- (SUBTRAIR),T09,PC10,T14,PB7,mapeada na flash
+D0,0,T12,PB5,T13,PB4,mapeada na flash
+DOT,. (PONTO),T10,PC11,T13,PB4,mapeada na flash
+EXP,EXP,T11,PB3,T13,PB4,mapeada na flash
+ANS,Ans,T08,PA15,T13,PB4,mapeada na flash
+EQ,=,T09,PC10,T13,PB4,mapeada na flash

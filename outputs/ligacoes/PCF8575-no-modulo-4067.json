@@ -1,0 +1,151 @@
+{
+  "assumptions": [
+    "Original IC is CD74HC4067 with standard 24-pin pinout.",
+    "Replacement is TI PCF8575, marking PF575, with matching physical footprint.",
+    "Pin 1 aligned with original pin 1.",
+    "Board header-to-pad routing must be checked with continuity; no physical measurements performed."
+  ],
+  "sources": {
+    "4067": "https://www.ti.com/lit/ds/symlink/cd74hc4067.pdf",
+    "PCF8575": "https://www.ti.com/lit/ds/symlink/pcf8575.pdf"
+  },
+  "mapping": [
+    {
+      "board_label": "C0",
+      "ic_pin": 9,
+      "pcf8575_function": "P05"
+    },
+    {
+      "board_label": "C1",
+      "ic_pin": 8,
+      "pcf8575_function": "P04"
+    },
+    {
+      "board_label": "C2",
+      "ic_pin": 7,
+      "pcf8575_function": "P03"
+    },
+    {
+      "board_label": "C3",
+      "ic_pin": 6,
+      "pcf8575_function": "P02"
+    },
+    {
+      "board_label": "C4",
+      "ic_pin": 5,
+      "pcf8575_function": "P01"
+    },
+    {
+      "board_label": "C5",
+      "ic_pin": 4,
+      "pcf8575_function": "P00"
+    },
+    {
+      "board_label": "C6",
+      "ic_pin": 3,
+      "pcf8575_function": "A2"
+    },
+    {
+      "board_label": "C7",
+      "ic_pin": 2,
+      "pcf8575_function": "A1"
+    },
+    {
+      "board_label": "C8",
+      "ic_pin": 23,
+      "pcf8575_function": "SDA"
+    },
+    {
+      "board_label": "C9",
+      "ic_pin": 22,
+      "pcf8575_function": "SCL"
+    },
+    {
+      "board_label": "C10",
+      "ic_pin": 21,
+      "pcf8575_function": "A0"
+    },
+    {
+      "board_label": "C11",
+      "ic_pin": 20,
+      "pcf8575_function": "P17"
+    },
+    {
+      "board_label": "C12",
+      "ic_pin": 19,
+      "pcf8575_function": "P16"
+    },
+    {
+      "board_label": "C13",
+      "ic_pin": 18,
+      "pcf8575_function": "P15"
+    },
+    {
+      "board_label": "C14",
+      "ic_pin": 17,
+      "pcf8575_function": "P14"
+    },
+    {
+      "board_label": "C15",
+      "ic_pin": 16,
+      "pcf8575_function": "P13"
+    },
+    {
+      "board_label": "SIG",
+      "ic_pin": 1,
+      "pcf8575_function": "INT"
+    },
+    {
+      "board_label": "S0",
+      "ic_pin": 10,
+      "pcf8575_function": "P06"
+    },
+    {
+      "board_label": "S1",
+      "ic_pin": 11,
+      "pcf8575_function": "P07"
+    },
+    {
+      "board_label": "S2",
+      "ic_pin": 14,
+      "pcf8575_function": "P11"
+    },
+    {
+      "board_label": "S3",
+      "ic_pin": 13,
+      "pcf8575_function": "P10"
+    },
+    {
+      "board_label": "EN",
+      "ic_pin": 15,
+      "pcf8575_function": "P12"
+    },
+    {
+      "board_label": "VCC",
+      "ic_pin": 24,
+      "pcf8575_function": "VCC"
+    },
+    {
+      "board_label": "GND",
+      "ic_pin": 12,
+      "pcf8575_function": "GND"
+    }
+  ],
+  "initial_connections": {
+    "VCC": "3.3V",
+    "GND": "GND",
+    "C6": "GND (A2)",
+    "C7": "GND (A1)",
+    "C10": "GND (A0)",
+    "C8": "ESP32 GPIO13 (SDA), 4.7k pull-up to 3.3V",
+    "C9": "ESP32 GPIO14 (SCL), 4.7k pull-up to 3.3V",
+    "SIG": "INT, leave unconnected if unused"
+  },
+  "address_7bit": "0x20",
+  "notes": [
+    "Check footprint dimensions; PF575 marking is used on several TI packages.",
+    "Check/remove any pre-existing EN pull-down if P12 is needed.",
+    "PCF8575 is quasi-bidirectional; write 1 before reading a port.",
+    "Previous MCP23017 wiring/driver is not applicable; do not reuse LCD reset pull-down with PCF8575 weak high output."
+  ]
+}

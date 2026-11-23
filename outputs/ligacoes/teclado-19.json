@@ -1,0 +1,29 @@
+{
+  "status": "Proposta para teclado passivo isolado, com 19 trilhas ainda sem mapa medido",
+  "bus": {"controller": 0, "sda_gpio": 13, "scl_gpio": 14, "voltage": 3.3},
+  "expanders": {
+    "A": {"address": "0x20", "a2": "GND", "a1": "GND", "a0": "GND"},
+    "B": {"address": "0x21", "a2": "GND", "a1": "GND", "a0": "3V3"}
+  },
+  "traces": [
+    {"track":"T01", "board":"A", "header":"C0"},
+    {"track":"T02", "board":"A", "header":"C1"},
+    {"track":"T03", "board":"A", "header":"C2"},
+    {"track":"T04", "board":"A", "header":"C3"},
+    {"track":"T05", "board":"A", "header":"C4"},
+    {"track":"T06", "board":"A", "header":"C5"},
+    {"track":"T07", "board":"B", "header":"C0"},
+    {"track":"T08", "board":"B", "header":"C1"},
+    {"track":"T09", "board":"B", "header":"C2"},
+    {"track":"T10", "board":"B", "header":"C3"},
+    {"track":"T11", "board":"B", "header":"C4"},
+    {"track":"T12", "board":"B", "header":"C5"},
+    {"track":"T13", "board":"B", "header":"C11"},
+    {"track":"T14", "board":"B", "header":"C12"},
+    {"track":"T15", "board":"B", "header":"C13"},
+    {"track":"T16", "board":"B", "header":"C14"},
+    {"track":"T17", "board":"B", "header":"C15"},
+    {"track":"T18", "board":"B", "header":"S0"},
+    {"track":"T19", "board":"B", "header":"S1"}
+  ]
+}

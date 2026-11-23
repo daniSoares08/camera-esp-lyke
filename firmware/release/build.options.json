@@ -1,0 +1,9 @@
+{
+  "additionalFiles": "..\\..",
+  "compiler.optimization_flags": "-Os",
+  "customBuildProperties": "",
+  "fqbn": "esp32:esp32:esp32s3:PSRAM=opi,FlashSize=16M,USBMode=default,CDCOnBoot=cdc,PartitionScheme=default",
+  "hardwareFolders": "C:\\Users\\daniel.soares\\AppData\\Local\\Arduino15\\packages",
+  "otherLibrariesFolders": "C:\\Users\\daniel.soares\\Documents\\Arduino\\libraries",
+  "sketchLocation": "C:\\Users\\daniel.soares\\Documents\\Codex\\2026-10-09\\ten\\work\\serial_camera_usb"
+}

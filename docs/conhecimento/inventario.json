@@ -1,0 +1,763 @@
+{
+  "snapshot_date": "2026-11-09",
+  "timezone": "America/Sao_Paulo",
+  "workspace": "C:\\Projects\\CAMERA_ESP",
+  "scope": "Technical project memory; no API key or Wi-Fi passwords copied",
+  "firmware_manifests": [
+    {
+      "manifest": "firmware/release_esp32cam/manifest.json",
+      "content": {
+        "serial_camera_usb.ino.bin": {
+          "bytes": 405168,
+          "sha256": "660b499312e90f2b43d7b5ceef2fb749e6677a51e3b350312777b88d71189d69"
+        },
+        "serial_camera_usb.ino.merged.bin": {
+          "bytes": 4194304,
+          "sha256": "dbe4c9d402a81e4790af0570e84b15fe814ee50f473c90e880b240eca358b72e"
+        },
+        "serial_camera_usb.ino.partitions.bin": {
+          "bytes": 3072,
+          "sha256": "aaae2888c5a6a348004b5b436f47abb25ae32e72d9003902955a998eda723edd"
+        },
+        "serial_camera_usb.ino.bootloader.bin": {
+          "bytes": 25184,
+          "sha256": "7b606bcb0dc4865b8adea291638f5746abceb0b0f1f727b0b95e27b55f566e16"
+        },
+        "boot_app0.bin": {
+          "bytes": 8192,
+          "sha256": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0"
+        }
+      },
+      "checks": [
+        {
+          "file": "firmware/release_esp32cam/serial_camera_usb.ino.bin",
+          "exists": true,
+          "sha256_actual": "660b499312e90f2b43d7b5ceef2fb749e6677a51e3b350312777b88d71189d69",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/release_esp32cam/serial_camera_usb.ino.merged.bin",
+          "exists": true,
+          "sha256_actual": "dbe4c9d402a81e4790af0570e84b15fe814ee50f473c90e880b240eca358b72e",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/release_esp32cam/serial_camera_usb.ino.partitions.bin",
+          "exists": true,
+          "sha256_actual": "aaae2888c5a6a348004b5b436f47abb25ae32e72d9003902955a998eda723edd",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/release_esp32cam/serial_camera_usb.ino.bootloader.bin",
+          "exists": true,
+          "sha256_actual": "7b606bcb0dc4865b8adea291638f5746abceb0b0f1f727b0b95e27b55f566e16",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/release_esp32cam/boot_app0.bin",
+          "exists": true,
+          "sha256_actual": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0",
+          "manifest_matches": true
+        }
+      ]
+    },
+    {
+      "manifest": "firmware/calculadora/bin/s3_calculadora/manifest.json",
+      "content": {
+        "target": "s3_calculadora",
+        "files": {
+          "boot_app0.bin": {
+            "bytes": 8192,
+            "sha256": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0"
+          },
+          "s3_calculadora.ino.bootloader.bin": {
+            "bytes": 20224,
+            "sha256": "d4de4a82b5bb75231586e500ab80a1037303117de73babc8bf62276ef307b6da"
+          },
+          "s3_calculadora.ino.partitions.bin": {
+            "bytes": 3072,
+            "sha256": "e0f50a169cdba2c14cc13bc562466f5e657241451f3477aaa19d45c5b8300b37"
+          },
+          "s3_calculadora.ino.merged.bin": {
+            "bytes": 16777216,
+            "sha256": "ae6e3d0244da82190f29ebe97c762c1fb156583ab10b6176c03b61ad4dc406b5"
+          },
+          "s3_calculadora.ino.bin": {
+            "bytes": 1378608,
+            "sha256": "887a69eaf83a872e9155f27b1f9257d91d6d20b017a7f0616ee9b88f21025859"
+          }
+        },
+        "fqbn": "esp32:esp32:esp32s3:PSRAM=opi,FlashSize=16M,USBMode=hwcdc,CDCOnBoot=default,PartitionScheme=huge_app",
+        "ota_capacity": 3145728
+      },
+      "checks": [
+        {
+          "file": "firmware/calculadora/bin/s3_calculadora/boot_app0.bin",
+          "exists": true,
+          "sha256_actual": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/calculadora/bin/s3_calculadora/s3_calculadora.ino.bootloader.bin",
+          "exists": true,
+          "sha256_actual": "d4de4a82b5bb75231586e500ab80a1037303117de73babc8bf62276ef307b6da",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/calculadora/bin/s3_calculadora/s3_calculadora.ino.partitions.bin",
+          "exists": true,
+          "sha256_actual": "e0f50a169cdba2c14cc13bc562466f5e657241451f3477aaa19d45c5b8300b37",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/calculadora/bin/s3_calculadora/s3_calculadora.ino.merged.bin",
+          "exists": true,
+          "sha256_actual": "ae6e3d0244da82190f29ebe97c762c1fb156583ab10b6176c03b61ad4dc406b5",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/calculadora/bin/s3_calculadora/s3_calculadora.ino.bin",
+          "exists": true,
+          "sha256_actual": "887a69eaf83a872e9155f27b1f9257d91d6d20b017a7f0616ee9b88f21025859",
+          "manifest_matches": true
+        }
+      ]
+    },
+    {
+      "manifest": "firmware/calculadora/bin/devkit_display/manifest.json",
+      "content": {
+        "target": "devkit_display",
+        "fqbn": "esp32:esp32:esp32:FlashSize=4M,PartitionScheme=huge_app",
+        "files": {
+          "devkit_display.ino.merged.bin": {
+            "sha256": "32b573c1872c16a9fbdd18b1b41f94fe4902bf294e8020e7f1c5e5de12a77d8e",
+            "bytes": 4194304
+          },
+          "devkit_display.ino.bin": {
+            "sha256": "d9cdf76d38d84da44bf89cf44809ffc34ee53d99267635a551704b2560caf6cc",
+            "bytes": 983920
+          },
+          "devkit_display.ino.bootloader.bin": {
+            "sha256": "7b606bcb0dc4865b8adea291638f5746abceb0b0f1f727b0b95e27b55f566e16",
+            "bytes": 25184
+          },
+          "devkit_display.ino.partitions.bin": {
+            "sha256": "fc22d7750c62b98ebc4a74afc5ae33c47829e8691ad47b67a3b8705b29f9b941",
+            "bytes": 3072
+          },
+          "boot_app0.bin": {
+            "sha256": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0",
+            "bytes": 8192
+          }
+        },
+        "ota_capacity": 1572864
+      },
+      "checks": [
+        {
+          "file": "firmware/calculadora/bin/devkit_display/devkit_display.ino.merged.bin",
+          "exists": true,
+          "sha256_actual": "32b573c1872c16a9fbdd18b1b41f94fe4902bf294e8020e7f1c5e5de12a77d8e",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/calculadora/bin/devkit_display/devkit_display.ino.bin",
+          "exists": true,
+          "sha256_actual": "d9cdf76d38d84da44bf89cf44809ffc34ee53d99267635a551704b2560caf6cc",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/calculadora/bin/devkit_display/devkit_display.ino.bootloader.bin",
+          "exists": true,
+          "sha256_actual": "7b606bcb0dc4865b8adea291638f5746abceb0b0f1f727b0b95e27b55f566e16",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/calculadora/bin/devkit_display/devkit_display.ino.partitions.bin",
+          "exists": true,
+          "sha256_actual": "fc22d7750c62b98ebc4a74afc5ae33c47829e8691ad47b67a3b8705b29f9b941",
+          "manifest_matches": true
+        },
+        {
+          "file": "firmware/calculadora/bin/devkit_display/boot_app0.bin",
+          "exists": true,
+          "sha256_actual": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0",
+          "manifest_matches": true
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "file": "firmware/camera_usb/serial_camera_usb.ino",
+      "bytes": 14412,
+      "sha256": "1cb34423ed97c0ae37f299d33e233278d8e7af69dcbae38a57a7801a3f491bb9"
+    },
+    {
+      "file": "firmware/calculadora/s3_calculadora/s3_calculadora.ino",
+      "bytes": 105,
+      "sha256": "e491d0a6975e5929978fa128cf652e43000ba74fbc864dabf4f355f4a48cec07"
+    },
+    {
+      "file": "firmware/calculadora/devkit_display/devkit_display.ino",
+      "bytes": 6432,
+      "sha256": "a7128661767e55b42d94efcfee28fb3a0bd72de3967bbf795f6ddc7afc1a6a62"
+    },
+    {
+      "file": "firmware/calculadora/common/keyboard_map.h",
+      "bytes": 1005,
+      "sha256": "16fab10e967930c9c223df0e88b90c7fd5c8d7e8d46bb1621c2f4cf341f8aa63"
+    },
+    {
+      "file": "outputs/controle_camera.py",
+      "bytes": 17772,
+      "sha256": "f7f16d3cc1b125c8abc1f1e4be687ff52aef550be053c0b28d0e88f6939ab5ec"
+    },
+    {
+      "file": "outputs/camera_usb.py",
+      "bytes": 5661,
+      "sha256": "89fbc9e8d834befc64fff06ad530434ac1cddcf3fcbe21b60de961150edd53c7"
+    },
+    {
+      "file": "outputs/ligacoes/ESP-CAM-esquema.html",
+      "bytes": 54822,
+      "sha256": "30eeebe95827e9787af9fcdcb706c187a5b64a3b39a75d4fba3422adb50ba2df"
+    },
+    {
+      "file": "outputs/ligacoes/gerar_esquema_geral.py",
+      "bytes": 17917,
+      "sha256": "d7e51b18638b82c58fb18241c9d0876bdc5d1da3c106c12365987bdc057aa9bd"
+    },
+    {
+      "file": "outputs/ligacoes/esquema-esp-cam.template.html",
+      "bytes": 46978,
+      "sha256": "a63d02654a367a34b9c589be5d0dda6d59bd9f5790bf89afc84d8d1f592ae022"
+    }
+  ],
+  "hp48_key_count": 49,
+  "hp48_mapped_count": 46,
+  "hp48_missing": [
+    "M",
+    "S",
+    "ALPHA"
+  ],
+  "new_wiring_plan": {
+    "board": "ESP32-CAM AI Thinker / ESP32 clássico, câmera e PSRAM ativas",
+    "converted_board": "PCF8575 no footprint do CD74HC4067, pino 1 alinhado",
+    "no_microsd": true,
+    "voltage": "3.3V",
+    "address_7bit": "0x20",
+    "i2c": {
+      "GPIO13": "C8 / SDA",
+      "GPIO14": "C9 / SCL"
+    },
+    "lcd": [
+      {
+        "lcd": "CS",
+        "connect_to": "S0",
+        "pcf": "P06"
+      },
+      {
+        "lcd": "RSE",
+        "connect_to": "S1",
+        "pcf": "P07"
+      },
+      {
+        "lcd": "RS",
+        "connect_to": "S2",
+        "pcf": "P11"
+      },
+      {
+        "lcd": "SCL",
+        "connect_to": "GPIO15",
+        "pcf": null
+      },
+      {
+        "lcd": "SI",
+        "connect_to": "GPIO2",
+        "pcf": null
+      },
+      {
+        "lcd": "VDD",
+        "connect_to": "3V3",
+        "pcf": null
+      },
+      {
+        "lcd": "VSS",
+        "connect_to": "GND",
+        "pcf": "GND"
+      }
+    ],
+    "keyboard": [
+      {
+        "keypad": "L1",
+        "board_header": "C0",
+        "pcf": "P05"
+      },
+      {
+        "keypad": "L2",
+        "board_header": "C1",
+        "pcf": "P04"
+      },
+      {
+        "keypad": "L3",
+        "board_header": "C2",
+        "pcf": "P03"
+      },
+      {
+        "keypad": "L4",
+        "board_header": "C3",
+        "pcf": "P02"
+      },
+      {
+        "keypad": "COL1",
+        "board_header": "C4",
+        "pcf": "P01"
+      },
+      {
+        "keypad": "COL2",
+        "board_header": "C5",
+        "pcf": "P00"
+      },
+      {
+        "keypad": "COL3",
+        "board_header": "C11",
+        "pcf": "P17"
+      },
+      {
+        "keypad": "COL4",
+        "board_header": "C12",
+        "pcf": "P16"
+      },
+      {
+        "keypad": "COL5",
+        "board_header": "C13",
+        "pcf": "P15"
+      }
+    ],
+    "ground_headers": [
+      "GND",
+      "C6",
+      "C7",
+      "C10"
+    ],
+    "unused_headers": [
+      "SIG",
+      "S3",
+      "EN",
+      "C14",
+      "C15"
+    ],
+    "resistors": [
+      {
+        "value": "4,7 kΩ",
+        "from": "C8 / GPIO13",
+        "to": "3V3"
+      },
+      {
+        "value": "4,7 kΩ",
+        "from": "C9 / GPIO14",
+        "to": "3V3"
+      },
+      {
+        "value": "10 kΩ",
+        "from": "S0 / CS da tela",
+        "to": "3V3"
+      },
+      {
+        "value": "10 kΩ",
+        "from": "S1 / RSE da tela",
+        "to": "3V3"
+      },
+      {
+        "value": "10 kΩ",
+        "from": "GPIO2 / SI da tela",
+        "to": "GND"
+      }
+    ],
+    "capacitor": "100nF between converted board VCC/GND, close to IC; keep existing if suitable",
+    "battery": {
+      "chemistry": "1S Li-ion/LiPo",
+      "maximum_voltage": 4.2,
+      "gpio": 33,
+      "adc": "ADC1_CH5",
+      "sense_node": "VBAT_SENSE",
+      "top_resistor_ohm": 470000,
+      "bottom_resistor_ohm": 470000,
+      "capacitor_nf": 100,
+      "maximum_adc_voltage": 2.1,
+      "divider_current_max_ua": 4.468085106382979,
+      "source_resistance_ohm": 235000,
+      "settle_ms": 200,
+      "connections": [
+        [
+          "BAT+",
+          "470 kΩ / R1",
+          "VBAT_SENSE"
+        ],
+        [
+          "VBAT_SENSE",
+          "470 kΩ / R2",
+          "BAT− / GND"
+        ],
+        [
+          "VBAT_SENSE",
+          "100 nF / Cbat",
+          "BAT− / GND"
+        ],
+        [
+          "VBAT_SENSE",
+          "fio direto",
+          "GPIO33"
+        ]
+      ],
+      "access": "GPIO33 is not on the standard header. Remove/isolate the red status LED branch and identify the GPIO33-side pad by continuity; do not use the 3V3-side pad or GPIO4 white flash LED.",
+      "firmware": "Input analog, internal pulls disabled; calibrated ADC at 12 dB (legacy 11 dB), settle 200 ms, spaced multisampling; battery voltage = 2 * calibrated ADC voltage. Never drive GPIO33 as LED output.",
+      "power": "Measure raw battery before the boost/regulator. Keep battery negative and ESP GND common. This divider is not the battery power or charging circuit."
+    },
+    "firmware_status": "Proposed wiring; integrated keyboard/LCD/battery firmware not yet implemented or bench-tested",
+    "firmware_constraints": [
+      "Use a separate ESP32 I2C controller from camera SCCB; preserve camera bus configuration.",
+      "Maintain a shared 16-bit PCF output shadow; LCD writes and keypad scanning must preserve each other.",
+      "PCF quasi-bidirectional column inputs must stay written high."
+    ],
+    "keypad_contact_order": "Logical L1-L4/COL1-COL5; physical ribbon order must be identified"
+  },
+  "converted_board_pin_map": {
+    "assumptions": [
+      "Original IC is CD74HC4067 with standard 24-pin pinout.",
+      "Replacement is TI PCF8575, marking PF575, with matching physical footprint.",
+      "Pin 1 aligned with original pin 1.",
+      "Board header-to-pad routing must be checked with continuity; no physical measurements performed."
+    ],
+    "sources": {
+      "4067": "https://www.ti.com/lit/ds/symlink/cd74hc4067.pdf",
+      "PCF8575": "https://www.ti.com/lit/ds/symlink/pcf8575.pdf"
+    },
+    "mapping": [
+      {
+        "board_label": "C0",
+        "ic_pin": 9,
+        "pcf8575_function": "P05"
+      },
+      {
+        "board_label": "C1",
+        "ic_pin": 8,
+        "pcf8575_function": "P04"
+      },
+      {
+        "board_label": "C2",
+        "ic_pin": 7,
+        "pcf8575_function": "P03"
+      },
+      {
+        "board_label": "C3",
+        "ic_pin": 6,
+        "pcf8575_function": "P02"
+      },
+      {
+        "board_label": "C4",
+        "ic_pin": 5,
+        "pcf8575_function": "P01"
+      },
+      {
+        "board_label": "C5",
+        "ic_pin": 4,
+        "pcf8575_function": "P00"
+      },
+      {
+        "board_label": "C6",
+        "ic_pin": 3,
+        "pcf8575_function": "A2"
+      },
+      {
+        "board_label": "C7",
+        "ic_pin": 2,
+        "pcf8575_function": "A1"
+      },
+      {
+        "board_label": "C8",
+        "ic_pin": 23,
+        "pcf8575_function": "SDA"
+      },
+      {
+        "board_label": "C9",
+        "ic_pin": 22,
+        "pcf8575_function": "SCL"
+      },
+      {
+        "board_label": "C10",
+        "ic_pin": 21,
+        "pcf8575_function": "A0"
+      },
+      {
+        "board_label": "C11",
+        "ic_pin": 20,
+        "pcf8575_function": "P17"
+      },
+      {
+        "board_label": "C12",
+        "ic_pin": 19,
+        "pcf8575_function": "P16"
+      },
+      {
+        "board_label": "C13",
+        "ic_pin": 18,
+        "pcf8575_function": "P15"
+      },
+      {
+        "board_label": "C14",
+        "ic_pin": 17,
+        "pcf8575_function": "P14"
+      },
+      {
+        "board_label": "C15",
+        "ic_pin": 16,
+        "pcf8575_function": "P13"
+      },
+      {
+        "board_label": "SIG",
+        "ic_pin": 1,
+        "pcf8575_function": "INT"
+      },
+      {
+        "board_label": "S0",
+        "ic_pin": 10,
+        "pcf8575_function": "P06"
+      },
+      {
+        "board_label": "S1",
+        "ic_pin": 11,
+        "pcf8575_function": "P07"
+      },
+      {
+        "board_label": "S2",
+        "ic_pin": 14,
+        "pcf8575_function": "P11"
+      },
+      {
+        "board_label": "S3",
+        "ic_pin": 13,
+        "pcf8575_function": "P10"
+      },
+      {
+        "board_label": "EN",
+        "ic_pin": 15,
+        "pcf8575_function": "P12"
+      },
+      {
+        "board_label": "VCC",
+        "ic_pin": 24,
+        "pcf8575_function": "VCC"
+      },
+      {
+        "board_label": "GND",
+        "ic_pin": 12,
+        "pcf8575_function": "GND"
+      }
+    ],
+    "initial_connections": {
+      "VCC": "3.3V",
+      "GND": "GND",
+      "C6": "GND (A2)",
+      "C7": "GND (A1)",
+      "C10": "GND (A0)",
+      "C8": "ESP32 GPIO13 (SDA), 4.7k pull-up to 3.3V",
+      "C9": "ESP32 GPIO14 (SCL), 4.7k pull-up to 3.3V",
+      "SIG": "INT, leave unconnected if unused"
+    },
+    "address_7bit": "0x20",
+    "notes": [
+      "Check footprint dimensions; PF575 marking is used on several TI packages.",
+      "Check/remove any pre-existing EN pull-down if P12 is needed.",
+      "PCF8575 is quasi-bidirectional; write 1 before reading a port.",
+      "Previous MCP23017 wiring/driver is not applicable; do not reuse LCD reset pull-down with PCF8575 weak high output."
+    ]
+  },
+  "lyke_current": {
+    "updated": "2026-11-23",
+    "timezone": "America/Sao_Paulo",
+    "stm32": {
+      "chip": "STM32G431CBU6",
+      "revision": "lyke-r8",
+      "application_origin": "0x08002000",
+      "application": {
+        "path": ".build/lyke_stm32/lyke-r8/main.bin",
+        "bytes": 55860,
+        "sha256": "0eaaa824bbc5a9eb81997ce8692c7566c3dfd79f97449349712080f797ba7e28"
+      },
+      "manifest": ".build/lyke_stm32/lyke-r8/manifest.json",
+      "verification": "DFU readback matched application; configuration pages unchanged",
+      "usb_serial_historical": "209D35994333",
+      "mapped_contacts": 49,
+      "skipped_key": "ON",
+      "map_source": ".private/stm32_lyke_r7/configuration-after.bin",
+      "keymap_csv": "docs/conhecimento/teclado-lyke.csv",
+      "repaired_key": [
+        "INV"
+      ]
+    },
+    "esp32": {
+      "chip": "ESP32-D0WD-V3",
+      "flash_bytes": 4194304,
+      "psram_bytes": 4194304,
+      "revision": "lyke-r5",
+      "slot": "app1",
+      "application_origin": "0x190000",
+      "application": {
+        "path": "firmware/esp32cam_integrada/bin/lyke-r5/esp32cam_integrada.ino.bin",
+        "bytes": 1315616,
+        "sha256": "578de56bb213d127559a4f354622a9a5dff7880eae2e1fa408af2219a4deddc7"
+      },
+      "manifest": "firmware/esp32cam_integrada/bin/lyke-r5/manifest.json",
+      "image_digest": "befc58b61c7f070f423900b40605413e441a2e1e74ca0faaae3dd2d8ad14c2d7",
+      "verification": "OTA accepted; revision/slot/digest verified after reboot; 49-key UART, station connection, capture, device API request, archived JPEG hash and response verified",
+      "ap_ssid": "Calc-Lyke",
+      "ap_address": "192.168.8.1",
+      "portal_opens_at_boot": true,
+      "private_report": ".private/lyke-cloud/device-r5-ota.json",
+      "measurement": {
+        "camera_active": false,
+        "portal_active": true,
+        "free_psram": 4183120,
+        "free_heap": 155908,
+        "largest_internal": 110580
+      },
+      "boot_test_report": ".private/esp32cam_lyke_serial_r4/boot-test.json",
+      "wifi_off_persists_across_reboot": false,
+      "portal_idle_timeout_seconds": null,
+      "isolated_from_stm_during_test": false,
+      "api_test_report": ".private/lyke-cloud/device-real-api-test.json"
+    },
+    "connection_plan": {
+      "stm_tx_pa2": "esp_gpio13",
+      "stm_rx_pa3": "esp_gpio14",
+      "ground": "common",
+      "remove_diagnostic_jumper": "STM CLK/PA14 -> ESP U0R/GPIO3",
+      "battery_sense_pa0": "470k/470k divider",
+      "physical_final_wiring_confirmed": false,
+      "confirmation_basis": "User isolated ESP for R4 recovery; integrated R5 reports 49 mapped keys and successful device API flow on 23/11. This confirms UART operation, not all final battery wiring.",
+      "uart_communication_confirmed": true
+    },
+    "pending": [
+      "Three-photo session on real exercises and LCD reading confirmation",
+      "STM32 OTA via ESP physical test",
+      "Cold power-on with service connector removed and station auto-join",
+      "Battery voltage measured against multimeter",
+      "Wi-Fi scan and alternate mobile hotspot connection"
+    ],
+    "stm32_prepared": {
+      "revision": "lyke-r8",
+      "installed": true,
+      "manifest": ".build/lyke_stm32/lyke-r8/manifest.json",
+      "ota": {
+        "path": ".build/lyke_stm32/lyke-r8/lyke-stm32-ota.bin",
+        "bytes": 55876,
+        "sha256": "ed3c252953fcab2d0dcb8359686d68fa97ccf433dbaf5576270ec689494cbdac"
+      },
+      "behavior": "Open the ESP portal through PA2/PA3 USART2; retry and timeout feedback; CLK service removed"
+    },
+    "esp32_prepared": {
+      "revision": "lyke-r5",
+      "installed": true,
+      "manifest": "firmware/esp32cam_integrada/bin/lyke-r5/manifest.json",
+      "application": {
+        "path": "firmware/esp32cam_integrada/bin/lyke-r5/esp32cam_integrada.ino.bin",
+        "bytes": 1315616,
+        "sha256": "578de56bb213d127559a4f354622a9a5dff7880eae2e1fa408af2219a4deddc7"
+      },
+      "verification": "OTA accepted; revision/slot/digest verified after reboot; 49-key UART, station connection, capture, device API request, archived JPEG hash and response verified"
+    },
+    "power_measurement_latest": {
+      "date": "2026-11-22",
+      "source": "user multimeter report",
+      "vcc_v": 3.3,
+      "3v3_v": 3.3,
+      "5v_v": 5.01,
+      "limitations": "Current static measurements; VCC topology and transient behavior unverified"
+    },
+    "esp32_history": [
+      {
+        "chip": "ESP32-D0WD-V3",
+        "flash_bytes": 4194304,
+        "psram_bytes": 4194304,
+        "revision": "lyke-r3",
+        "slot": "app0",
+        "application_origin": "0x10000",
+        "application": {
+          "path": "firmware/esp32cam_integrada/bin/lyke-r3/esp32cam_integrada.ino.bin",
+          "bytes": 1312064,
+          "sha256": "96a75314bdea88db2fa9a991ca359b7fa1c1a41eee1ba41c03663ff39a16e209"
+        },
+        "manifest": "firmware/esp32cam_integrada/bin/lyke-r3/manifest.json",
+        "image_digest": "0691d72b07c3aa17e4919b07de8b0a0622a6ba0e5504740a3e4e4c08b201ded9",
+        "verification": "OTA HTTP 200; new revision, slot and image digest checked after reboot",
+        "ap_ssid": "Calc-Lyke",
+        "ap_address": "192.168.8.1",
+        "portal_opens_at_boot": true,
+        "private_report": ".private/esp32cam_lyke_migration/result.json",
+        "measurement": {
+          "camera_active": false,
+          "portal_active": true,
+          "free_psram": 4183120,
+          "free_heap": 161140,
+          "largest_internal": 110580
+        }
+      },
+      {
+        "chip": "ESP32-D0WD-V3",
+        "flash_bytes": 4194304,
+        "psram_bytes": 4194304,
+        "revision": "lyke-r4",
+        "slot": "app0",
+        "application_origin": "0x10000",
+        "application": {
+          "path": "firmware/esp32cam_integrada/bin/lyke-r4/esp32cam_integrada.ino.bin",
+          "bytes": 1312608,
+          "sha256": "bc0032f79f7966114b64cfddec052c87c9cd8e6e83ff82e0f5efddf959adcdf5"
+        },
+        "manifest": "firmware/esp32cam_integrada/bin/lyke-r4/manifest.json",
+        "image_digest": "11143849e707b080e5d2954e638ff4c2d867ab6c6624c6b583e5d0ea6dd4c3b2",
+        "verification": "UART flash digest verified; partition/NVS/otadata unchanged; boot and HTTP checked; OFF over USB service console stayed off, then reset restored AP and HTTP",
+        "ap_ssid": "Calc-Lyke",
+        "ap_address": "192.168.8.1",
+        "portal_opens_at_boot": true,
+        "private_report": ".private/esp32cam_lyke_serial_r4/report.json",
+        "measurement": {
+          "camera_active": false,
+          "portal_active": true,
+          "free_psram": 4183120,
+          "free_heap": 161540,
+          "largest_internal": 110580
+        },
+        "boot_test_report": ".private/esp32cam_lyke_serial_r4/boot-test.json",
+        "wifi_off_persists_across_reboot": false,
+        "portal_idle_timeout_seconds": null,
+        "isolated_from_stm_during_test": true
+      }
+    ],
+    "cloud": {
+      "organization": "CAMERA_ESP",
+      "project": "camera-esp-lyke",
+      "project_ref": "vxjmoctaomihrmxmuxip",
+      "region": "sa-east-1",
+      "plan": "free",
+      "function": "lyke-solve",
+      "bucket": "lyke-images",
+      "bucket_public": false,
+      "table": "lyke_requests",
+      "model": "gpt-6.1-terra",
+      "reasoning_effort": "high",
+      "security_advisors": [],
+      "docs": "docs/API-E-ARQUIVO.md",
+      "credentials_published": false
+    },
+    "repository": {
+      "full_name": "daniSoares08/camera-esp-lyke",
+      "url": "https://github.com/daniSoares08/camera-esp-lyke",
+      "private": true,
+      "publication_copy": ".private/github_repo",
+      "credentials_included": false,
+      "firmware_binaries_included": false
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "serial_camera_usb.ino.bin": {
+    "bytes": 405168,
+    "sha256": "660b499312e90f2b43d7b5ceef2fb749e6677a51e3b350312777b88d71189d69"
+  },
+  "serial_camera_usb.ino.merged.bin": {
+    "bytes": 4194304,
+    "sha256": "dbe4c9d402a81e4790af0570e84b15fe814ee50f473c90e880b240eca358b72e"
+  },
+  "serial_camera_usb.ino.partitions.bin": {
+    "bytes": 3072,
+    "sha256": "aaae2888c5a6a348004b5b436f47abb25ae32e72d9003902955a998eda723edd"
+  },
+  "serial_camera_usb.ino.bootloader.bin": {
+    "bytes": 25184,
+    "sha256": "7b606bcb0dc4865b8adea291638f5746abceb0b0f1f727b0b95e27b55f566e16"
+  },
+  "boot_app0.bin": {
+    "bytes": 8192,
+    "sha256": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "keyboard": [
+    {"edge": "Inferior", "pins": ["PB13", "PB12", "PB15", "PB14", "PA8", "PA10", "PA9", "PA15", "PC10", "PC11", "PB3", "PB5", "PB4", "PB7", "PB6", "PB9"]},
+    {"edge": "Superior", "pins": ["PB11", "PB10"]},
+    {"edge": "Inferior", "pins": ["PC6"]}
+  ],
+  "uart": [
+    {"id": "command", "name": "Comandos para o ESP", "stm": "PA2", "stmFunction": "TX", "esp": "GPIO13", "espFunction": "RX", "detail": "USART2_TX (AF7) no STM32. GPIO13 também é uma entrada RTC para um possível despertar em nível baixo, a validar no firmware."},
+    {"id": "response", "name": "Respostas para o STM32", "stm": "PA3", "stmFunction": "RX", "esp": "GPIO14", "espFunction": "TX", "detail": "USART2_RX (AF7) no STM32. O ESP devolve estados, progresso e texto paginado."}
+  ],
+  "lcd": [
+    {"signal": "CS", "stm": "PA4", "detail": "Seleção do LCD, ativa em nível baixo. Configure PA4 como GPIO e use a seleção por software no SPI1."},
+    {"signal": "RSE", "stm": "PA6", "detail": "Reset físico do LCD, ativo em nível baixo. Configure PA6 como GPIO. O LCD usa somente escrita e dispensa MISO."},
+    {"signal": "RS", "stm": "PA1", "detail": "Comando ou dados do LCD."},
+    {"signal": "SCL", "stm": "PA5", "detail": "Clock do SPI1, função alternativa AF5."},
+    {"signal": "SI", "stm": "PA7", "detail": "MOSI do SPI1, função alternativa AF5."},
+    {"signal": "VDD", "stm": "3V3", "detail": "Alimentação lógica do LCD em 3,3 V."},
+    {"signal": "VSS", "stm": "GND", "detail": "Terra comum do LCD, STM32, ESP32-CAM e bateria."}
+  ],
+  "battery": {"stm": "PA0", "adc": "ADC1 canal 1", "cellMax": 4.2, "r1Ohm": 470000, "r2Ohm": 470000, "cNF": 100}
+}

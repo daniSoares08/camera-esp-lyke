@@ -1,0 +1,182 @@
+{
+  "board": "ESP32-CAM AI Thinker / ESP32 clássico, câmera e PSRAM ativas",
+  "converted_board": "PCF8575 no footprint do CD74HC4067, pino 1 alinhado",
+  "no_microsd": true,
+  "voltage": "3.3V",
+  "address_7bit": "0x20",
+  "i2c": {
+    "GPIO13": "C8 / SDA",
+    "GPIO14": "C9 / SCL"
+  },
+  "lcd": [
+    {
+      "lcd": "CS",
+      "connect_to": "S0",
+      "pcf": "P06"
+    },
+    {
+      "lcd": "RSE",
+      "connect_to": "S1",
+      "pcf": "P07"
+    },
+    {
+      "lcd": "RS",
+      "connect_to": "S2",
+      "pcf": "P11"
+    },
+    {
+      "lcd": "SCL",
+      "connect_to": "GPIO15",
+      "pcf": null
+    },
+    {
+      "lcd": "SI",
+      "connect_to": "GPIO2",
+      "pcf": null
+    },
+    {
+      "lcd": "VDD",
+      "connect_to": "3V3",
+      "pcf": null
+    },
+    {
+      "lcd": "VSS",
+      "connect_to": "GND",
+      "pcf": "GND"
+    }
+  ],
+  "keyboard": [
+    {
+      "keypad": "L1",
+      "board_header": "C0",
+      "pcf": "P05"
+    },
+    {
+      "keypad": "L2",
+      "board_header": "C1",
+      "pcf": "P04"
+    },
+    {
+      "keypad": "L3",
+      "board_header": "C2",
+      "pcf": "P03"
+    },
+    {
+      "keypad": "L4",
+      "board_header": "C3",
+      "pcf": "P02"
+    },
+    {
+      "keypad": "COL1",
+      "board_header": "C4",
+      "pcf": "P01"
+    },
+    {
+      "keypad": "COL2",
+      "board_header": "C5",
+      "pcf": "P00"
+    },
+    {
+      "keypad": "COL3",
+      "board_header": "C11",
+      "pcf": "P17"
+    },
+    {
+      "keypad": "COL4",
+      "board_header": "C12",
+      "pcf": "P16"
+    },
+    {
+      "keypad": "COL5",
+      "board_header": "C13",
+      "pcf": "P15"
+    }
+  ],
+  "ground_headers": [
+    "GND",
+    "C6",
+    "C7",
+    "C10"
+  ],
+  "unused_headers": [
+    "SIG",
+    "S3",
+    "EN",
+    "C14",
+    "C15"
+  ],
+  "resistors": [
+    {
+      "value": "4,7 kΩ",
+      "from": "C8 / GPIO13",
+      "to": "3V3"
+    },
+    {
+      "value": "4,7 kΩ",
+      "from": "C9 / GPIO14",
+      "to": "3V3"
+    },
+    {
+      "value": "10 kΩ",
+      "from": "S0 / CS da tela",
+      "to": "3V3"
+    },
+    {
+      "value": "10 kΩ",
+      "from": "S1 / RSE da tela",
+      "to": "3V3"
+    },
+    {
+      "value": "10 kΩ",
+      "from": "GPIO2 / SI da tela",
+      "to": "GND"
+    }
+  ],
+  "capacitor": "100nF between converted board VCC/GND, close to IC; keep existing if suitable",
+  "battery": {
+    "chemistry": "1S Li-ion/LiPo",
+    "maximum_voltage": 4.2,
+    "gpio": 33,
+    "adc": "ADC1_CH5",
+    "sense_node": "VBAT_SENSE",
+    "top_resistor_ohm": 470000,
+    "bottom_resistor_ohm": 470000,
+    "capacitor_nf": 100,
+    "maximum_adc_voltage": 2.1,
+    "divider_current_max_ua": 4.468085106382979,
+    "source_resistance_ohm": 235000,
+    "settle_ms": 200,
+    "connections": [
+      [
+        "BAT+",
+        "470 kΩ / R1",
+        "VBAT_SENSE"
+      ],
+      [
+        "VBAT_SENSE",
+        "470 kΩ / R2",
+        "BAT− / GND"
+      ],
+      [
+        "VBAT_SENSE",
+        "100 nF / Cbat",
+        "BAT− / GND"
+      ],
+      [
+        "VBAT_SENSE",
+        "fio direto",
+        "GPIO33"
+      ]
+    ],
+    "access": "GPIO33 is not on the standard header. Remove/isolate the red status LED branch and identify the GPIO33-side pad by continuity; do not use the 3V3-side pad or GPIO4 white flash LED.",
+    "firmware": "Input analog, internal pulls disabled; calibrated ADC at 12 dB (legacy 11 dB), settle 200 ms, spaced multisampling; battery voltage = 2 * calibrated ADC voltage. Never drive GPIO33 as LED output.",
+    "power": "Measure raw battery before the boost/regulator. Keep battery negative and ESP GND common. This divider is not the battery power or charging circuit."
+  },
+  "firmware_status": "Proposed wiring; integrated keyboard/LCD/battery firmware not yet implemented or bench-tested",
+  "firmware_constraints": [
+    "Use a separate ESP32 I2C controller from camera SCCB; preserve camera bus configuration.",
+    "Maintain a shared 16-bit PCF output shadow; LCD writes and keypad scanning must preserve each other.",
+    "PCF quasi-bidirectional column inputs must stay written high."
+  ],
+  "keypad_contact_order": "Logical L1-L4/COL1-COL5; physical ribbon order must be identified"
+}
