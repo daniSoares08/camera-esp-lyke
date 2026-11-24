@@ -10,6 +10,10 @@ completo e arquivo privado no Supabase; somente OpenAI integrada/testada.
 
 ## Começar
 
+Preparada em 24/11/2026 a [revisão R12/R9 com desenhos e novo aviso Wi-Fi](docs/REVISAO-R12-DESENHOS-E-WIFI.md),
+ainda sem instalar. API v3 publicada, com suporte opcional a figuras e
+compatibilidade textual. O conjunto físico continua R11/R8 até o próximo teste.
+
 - [Estado e continuidade](docs/conhecimento/ESTADO-E-RETOMADA.md)
 - [Manual ilustrado do comprador em PDF](docs/manual/Manual-Lyke.pdf)
 - [Manual completo em Markdown para leitura e uso com IA](docs/manual/Manual-Lyke.md)
@@ -44,21 +48,22 @@ As ferramentas locais ficam em `.tools/` e `.venv/`; elas não são publicadas n
 Crie `.private/ap-password.txt` com a senha WPA2 do portal (8–63 caracteres ASCII) e execute:
 
 ```powershell
-.\.venv\Scripts\python.exe firmware/esp32cam_integrada/build.py --profile lyke --revision lyke-r8
+.\.venv\Scripts\python.exe firmware/esp32cam_integrada/build.py --profile lyke --revision lyke-r9
 ```
 
 STM32 no WSL, com GCC ARM e Newlib Nano:
 
 ```sh
-sh firmware/lyke_stm32/build.sh lyke-r11
+sh firmware/lyke_stm32/build.sh lyke-r12
 ```
 
 Teste da API sem consumir créditos, com Node **24**:
 
 ```sh
-node --test supabase/tests/cloud.test.ts
+node --test supabase/tests/cloud.test.ts supabase/tests/graphics.test.ts
 ```
 
+Os comandos compilam a revisão preparada R12/R9, ainda sem teste físico.
 Os testes nativos e a geração do manual estão documentados em
 `firmware/lyke_stm32/BATERIA-R11.md` e `scripts/manual_lyke/README.md`.
 A instalação inicial do carregador V2 exige USB uma vez; com a base instalada,

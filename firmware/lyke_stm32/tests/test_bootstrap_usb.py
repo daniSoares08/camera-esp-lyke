@@ -19,7 +19,7 @@ class BootstrapTest(unittest.TestCase):
             self.assertFalse(internal_flash_matches('name="'+value+'"'))
 
     def test_release_and_preserved_tail(self):
-        _, image = verify_release(ROOT / '.build/lyke_stm32/lyke-r11')
+        _, image = verify_release(ROOT / '.build/lyke_stm32/lyke-r12')
         before = bytes((i * 19) % 256 for i in range(FLASH))
         after = image + before[KEEP:]
         verify_readback(before, after, image)
@@ -35,7 +35,7 @@ class BootstrapTest(unittest.TestCase):
             verify_readback(before[:-1], after, image)
 
     def test_legacy_loader_manifest_rejected(self):
-        source = ROOT / '.build/lyke_stm32/lyke-r11'
+        source = ROOT / '.build/lyke_stm32/lyke-r12'
         manifest = json.loads((source / 'manifest.json').read_text())
         manifest['loader_protocol'] = 'LYKE BOOT'
         with tempfile.TemporaryDirectory() as folder:

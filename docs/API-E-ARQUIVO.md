@@ -1,5 +1,12 @@
 # API e arquivo privado de fotos — 23/11/2026
 
+**Atualização de 24/11:** API v3 publicada com documento gráfico opcional
+(`display=lyke-graphics-v1`), mantendo clientes antigos em texto. Schema,
+comandos e limites em `supabase/functions/lyke-solve/graphics.ts`.
+Sem alteração de tabelas/RLS/bucket/segredos. Dezesseis testes locais e
+smoke GET/401 aprovados; nenhuma nova chamada paga. Geração real de figuras
+e conjunto preparado STM R12/ESP R9 ainda aguardam teste no aparelho.
+
 **Edição final:** STM R11/ESP R8, manual 2.0 em `docs/manual/`. O usuário
 tornou o repositório público; o arquivo de fotos permanece privado e as
 credenciais continuam fora do Git. Os detalhes abaixo registram a integração

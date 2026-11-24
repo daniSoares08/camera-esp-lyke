@@ -1,5 +1,10 @@
 # Firmware Lyke 101078 · STM32G431 e ESP32-CAM clássica
 
+**Preparação de 24/11: STM R12 + ESP R9**, ainda não instalados. Leia
+[desenhos roláveis e Wi-Fi](../../docs/REVISAO-R12-DESENHOS-E-WIFI.md).
+Os fontes atuais compilam com `sh firmware/lyke_stm32/build.sh lyke-r12`.
+O estado R11/R8 abaixo continua sendo o conjunto fisicamente instalado.
+
 **Estado final: STM32 R11 + ESP Lyke R8**, instalados por Wi-Fi, com 49
 teclas e indicador de bateria confirmados pelo usuário. Divisor corrigido
 para dois 470 kilohms. Detalhes em [Bateria e R11](BATERIA-R11.md).

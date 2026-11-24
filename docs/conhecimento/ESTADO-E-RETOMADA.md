@@ -1,8 +1,47 @@
-# Estado e retomada — 23/11/2026
+# Estado e retomada — 24/11/2026
 
 ## Próxima retomada
 
-### Encerramento solicitado pelo usuário: R11, bateria e manual final
+### Preparados STM R12 + ESP Lyke R9; usuário ligará depois
+
+Pedido de 24/11/2026: conferir rede Visitantes salva no Windows; ocultar
+sinal Wi-Fi normal, piscar três vezes no sucesso e alternar X/sinal na
+falha; preparar desenhos roláveis entre os passos da resposta. **Não houve
+gravação física nesta etapa. Instalados continuam STM R11 + ESP R8.**
+
+- Perfis `Visitantes` e `VISITANTES` verificados sem exibir/exportar senha:
+  ambos abertos, sem chave. Usuário confirmou internet direta, sem login.
+  Compatíveis com o caminho de rede aberta do ESP; frequência não consta
+  no perfil. Exige cobertura 2,4 GHz no campus, ainda não testada.
+- Compilados STM `lyke-r12` e ESP `lyke-r9`. Loader V2/mapa de flash
+  inalterados. App STM 62.568 bytes/CRC `37e35397`, OTA 45.530 bytes.
+  ESP 1.362.784 bytes, dentro do slot. Hashes nos manifestos desses alvos.
+- Estado Wi-Fi comunicado por LINK: três pulsos de 300 ms, depois oculto;
+  falha alterna sinal/X a cada 500 ms até reconectar/desligar. Não aparece
+  no leitor da resposta. Sem aviso permanente de sucesso no rodapé.
+- Leitor novo READG recebe janelas monocromáticas 126×48, 768 bytes,
+  numeradas e verificadas por checksum/máscara de 48 linhas. Texto e
+  desenhos convivem no documento do ESP. Setas verticais rolam 16 pixels;
+  horizontais movem 24 em figura larga ou 48 verticais em região estreita.
+- API v3 **publicada** no serviço existente. Só solicita documento JSON
+  quando o cliente manda `display=lyke-graphics-v1`; clientes antigos
+  continuam em texto. Schema estrito/comandos limitados e sem código/URLs.
+  JSON bruto no `answer_text`, texto compatível em `answer_lcd`; sem migração.
+  Dezesseis testes locais aprovados. GET confirma versão 3, POST sem token
+  retorna 401. Nenhuma chamada paga/consulta de fotos nova nesta preparação.
+- Testes nativos: Wi-Fi, frames, interface, circuito/gráfico/ângulo,
+  rolagem, compatibilidade e regressões aprovados; loader 514+209 pontos
+  simulados. Relatório `.build/lyke_stm32/native-tests.json`. Os exemplos
+  de desenho são determinísticos; ainda não são uma resposta real do modelo.
+- **Próximo:** após usuário ligar, identificar via portal, instalar aplicação
+  ESP R9 e STM R12 por Wi-Fi; conferir revisões/teclas/bateria/animação;
+  validar uma questão com figura no aparelho. Não afirmar instalação feita.
+- Guia e prévia em `docs/REVISAO-R12-DESENHOS-E-WIFI.md` e
+  `output/previews/lyke-r12-desenhos.png`. Manual 2.0 permanece edição R11/R8,
+  correspondente ao hardware instalado; revisão nova está descrita no guia.
+
+### Histórico de 23/11: encerramento R11, bateria e manual
+
 
 Em 23/11/2026, o usuário informou 3,84 V no multímetro e corrigiu um
 resistor amarelo-roxo-marrom (470 ohms) para dois amarelo-roxo-amarelo

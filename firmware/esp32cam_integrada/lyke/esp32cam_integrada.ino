@@ -12,6 +12,18 @@
 #include "api_contract.h"
 #include "vision_body.h"
 #include "answer_pager.h"
+#include "answer_json.h"
+#include "answer_frame.h"
+#include <esp_heap_caps.h>
+
+struct AnswerAllocator:ArduinoJson::Allocator {
+  void* allocate(size_t n) override{return heap_caps_malloc(n,MALLOC_CAP_SPIRAM|MALLOC_CAP_8BIT);}
+  void* reallocate(void *p,size_t n) override{return heap_caps_realloc(p,n,MALLOC_CAP_SPIRAM|MALLOC_CAP_8BIT);}
+  void deallocate(void *p) override{free(p);}
+};
+static AnswerAllocator answerAllocator;
+static JsonDocument answerJson(&answerAllocator);
+static lyke::AnswerDocument answerDocument;
 
 static constexpr char projectName[] = "esp32cam_integrada";
 static constexpr char apName[] = "Calc-Lyke";
@@ -25,6 +37,7 @@ static PhotoQueue photos;
 static bool portal, otaMode, scanActive, connectActive, storageReady;
 // Deliberately RAM-only: OFF lasts until the next ESP boot.
 static bool wifiEnabled = true;
+static bool connectionFailed;
 static uint32_t rebootAt, connectAt, portalAttemptAt;
 static String sessionToken, activeSsid, lastAnswer, pendingRequestId;
 static String scanned[MaxNetworks];
@@ -67,6 +80,42 @@ static String printable(const String& text, size_t limit) {
 static void sendStatus() {
   stmSerial.printf("STATE %u %u %u %u\n", WiFi.status() == WL_CONNECTED, photos.count,
               portal, !lastAnswer.isEmpty());
+  sendLine(String("LINK ")+(!wifiEnabled?"OFF":connectActive?"JOIN":WiFi.status()==WL_CONNECTED?"OK":connectionFailed?"FAIL":"IDLE"));
+  sendLine("CAPS G1");
+}
+
+static uint32_t answerTextCRC(){return ~image_crc_update(UINT32_MAX,(const uint8_t*)lastAnswer.c_str(),lastAnswer.length());}
+
+static void setAnswerDocument(JsonVariantConst value) {
+  answerJson.clear();
+  if(value.is<JsonObjectConst>()&&answerJson.set(value)&&loadAnswerDocument(answerJson.as<JsonVariantConst>(),answerDocument))return;
+  answerJson.clear();answerDocument.plain(lastAnswer.c_str());
+}
+
+static void saveAnswerDrawing() {
+  if(!storageReady)return;
+  if(answerJson.isNull()){LittleFS.remove("/lyke-drawing.json");return;}
+  answerJson["_text_crc32"]=answerTextCRC();
+  File file=LittleFS.open("/lyke-drawing.tmp","w");
+  if(!file)return;
+  size_t expected=measureJson(answerJson),n=serializeJson(answerJson,file);file.close();
+  if(n==expected)LittleFS.rename("/lyke-drawing.tmp","/lyke-drawing.json");
+  else {LittleFS.remove("/lyke-drawing.tmp");LittleFS.remove("/lyke-drawing.json");}
+}
+
+static void sendAnswerWindow(unsigned x,unsigned y,unsigned sequence) {
+  if(sequence>65535||x>65535||y>65535)return;
+  if(!answerDocument.count)answerDocument.plain(lastAnswer.c_str());
+  if(y>answerDocument.height-48)y=answerDocument.height-48;
+  unsigned width=answerDocument.widthAt(y);if(x>width-126)x=width-126;
+  static lyke::AnswerRaster raster;raster.render(answerDocument,x,y);
+  stmSerial.printf("FRAME %u %u %u %u %u %u\n",sequence,x,y,width,answerDocument.height,frame_checksum(&raster.pixels[0][0],768));
+  static const char hex[]="0123456789abcdef";
+  for(unsigned row=0;row<48;++row) {
+    char bytes[33];for(unsigned i=0;i<16;++i){unsigned b=raster.pixels[row][i];bytes[2*i]=hex[b>>4];bytes[2*i+1]=hex[b&15];}bytes[32]=0;
+    stmSerial.printf("PIX %u %u %s\n",sequence,row,bytes);
+  }
+  stmSerial.printf("FRAME_END %u\n",sequence);
 }
 
 static bool startPortal() {
@@ -180,7 +229,9 @@ static bool join(unsigned index) {
   activeSsid = ssid;
   connectAt = millis();
   connectActive = true;
+  connectionFailed=false;
   sendLine("NOTE CONECTANDO");
+  sendStatus();
   return true;
 }
 
@@ -201,20 +252,24 @@ static void wifiTick() {
   }
   wl_status_t status = WiFi.status();
   if (status != lastWifi) {
+    if(lastWifi==WL_CONNECTED&&status!=WL_CONNECTED&&wifiEnabled&&!connectActive)connectionFailed=true;
     lastWifi = status;
     sendStatus();
   }
   if (connectActive && (status == WL_CONNECTED || millis() - connectAt > 22000)) {
     connectActive = false;
     if (status == WL_CONNECTED && WiFi.SSID() == activeSsid) {
+      connectionFailed=false;
       for (unsigned i = 0; i < MaxNetworks; ++i)
         if (ssidAt(i) == activeSsid) { config.putUChar("last_net", i); break; }
       configTime(0, 0, "pool.ntp.org", "time.nist.gov");
       sendLine("NOTE WIFI CONECTADO");
     } else {
+      connectionFailed=true;
       WiFi.disconnect(false, false);
       sendLine("NOTE FALHA NO WIFI");
     }
+    sendStatus();
   }
   if (!scanActive) return;
   int found = WiFi.scanComplete();
@@ -280,6 +335,7 @@ static String askAI() {
   calc::makeApiRequest(request, economy, photos.count);
   request["model"] = economy ? "gpt-6-luna" : "gpt-6.1-terra";
   request["max_output_tokens"] = 10000;
+  request["display"] = "lyke-graphics-v1";
   request["reasoning"]["effort"] = economy ? "medium" : "high";
   BodyStream stream;
   {
@@ -324,7 +380,7 @@ static String askAI() {
   http.end();
   if (status >= 400 && status != 409) pendingRequestId = "";
   if (!received) return "Falha HTTPS ou resposta grande";
-  JsonDocument parsed;
+  JsonDocument parsed(&answerAllocator);
   JsonDocument filter;
   filter["status"] = true;
   filter["error"] = true;
@@ -332,11 +388,14 @@ static String askAI() {
   filter["output"][0]["content"][0] = true;
   filter["usage"] = true;
   filter["archive"]["request_id"] = true;
+  filter["lyke_document"] = true;
   if (deserializeJson(parsed, response.text, response.length, DeserializationOption::Filter(filter)))
     return "Falha lendo resposta da IA";
   auto answer = calc::parseApiResponse(parsed, status);
   if (!answer.ok) return String(answer.error.c_str());
   lastAnswer = answer.text.c_str();
+  setAnswerDocument(parsed["lyke_document"]);
+  saveAnswerDrawing();
   const String archiveId = parsed["archive"]["request_id"] | "";
   if (archiveId.length()) config.putString("last_req", archiveId);
   if (storageReady) {
@@ -364,6 +423,9 @@ static void sendAnswerPage(unsigned page, unsigned columns, unsigned rows, bool 
 static void runCommand(const String& command) {
   if (command == "STATUS" || command == "LYKE APP V1") {
     sendStatus();
+  } else if(command.startsWith("READG ")) {
+    unsigned x,y,sequence;char extra;
+    if(sscanf(command.c_str(),"READG %u %u %u %c",&x,&y,&sequence,&extra)==3)sendAnswerWindow(x,y,sequence);
   } else if (command.startsWith("STM32 ")) {
     stmRevision = printable(command.substring(6), 31);
   } else if (command.startsWith("MAP ")) {
@@ -412,6 +474,7 @@ static void runCommand(const String& command) {
   } else if (command == "OFF") {
     if (ota.receiving || ota.complete || rebootAt) { sendLine("NOTE ATUALIZACAO ATIVA"); return; }
     wifiEnabled = false;
+    connectionFailed=false;
     otaMode = false;
     scanActive = connectActive = false;
     web.stop();
@@ -436,7 +499,13 @@ void setup() {
   if (storageReady) {
     File file = LittleFS.open("/lyke-response.txt", "r");
     if (file && file.size() <= 13000) lastAnswer = file.readString();
+    File drawing=LittleFS.open("/lyke-drawing.json","r");
+    if(drawing&&drawing.size()<=32768&&!deserializeJson(answerJson,drawing)&&
+       answerJson["_text_crc32"].is<uint32_t>()&&answerJson["_text_crc32"].as<uint32_t>()==answerTextCRC()&&
+       loadAnswerDocument(answerJson.as<JsonVariantConst>(),answerDocument)){}
+    else {answerJson.clear();answerDocument.plain(lastAnswer.c_str());}
   }
+  if(!answerDocument.count)answerDocument.plain(lastAnswer.c_str());
   cameraStop();
   routes();
   startPortal();

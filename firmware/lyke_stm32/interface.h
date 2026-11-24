@@ -5,6 +5,11 @@
 #include "settings.h"
 #endif
 #include "battery_gauge.h"
+#include "wifi_indicator.h"
+#include "answer_frame.h"
+static WifiIndicator wifi_indicator;
+static AnswerFrame answer_frame;
+static bool graphics_capable;
 
 enum View { CALCULATOR, MENU, SETTINGS, SCAN_LIST, SAVED_LIST, PORTAL_VIEW, ANSWER_VIEW, BATTERY_VIEW, STAT_VIEW, SEND_CONFIRM, HELP, CONSTANTS, PROGRAM };
 enum Menu { SEARCH, JOIN, CONFIG, PHOTOS, SEND, ANSWER, GALLERY, REMOVE, CLEAR, UPDATE, WIFI_OFF, BATTERY, CALC_SETUP, STATS, CONSTANT_MENU, PROGRAM_MENU, HELP_MENU, MENU_COUNT };
@@ -393,9 +398,12 @@ static void header(void)
     if (alpha) text[5] = 'A';
     if (hyp) text[7] = 'H';
     line(0, text, false);
-    if (wifi) {
+    unsigned signal=wifi_symbol(&wifi_indicator,ticks);
+    if (signal==WIFI_SIGNAL) {
         dot(0,1); dot(4,1); dot(1,0); dot(2,0); dot(3,0);
         dot(1,3); dot(3,3); dot(2,2); dot(2,5);
+    } else if(signal==WIFI_CROSS) {
+        for(unsigned i=0;i<5;++i){dot(i,i);dot(4-i,i);}
     }
     static unsigned level = BATTERY_LEVEL_UNKNOWN;
     level = battery_level(&battery, level);
@@ -466,8 +474,12 @@ static void interface_draw(void)
         line(5, portal_ready ? "" : "= TENTAR NOVAMENTE", false);
         break;
     case ANSWER_VIEW:
-        for (unsigned i = 0; i < sizeof(answer_rows)/sizeof(answer_rows[0]); ++i)
-            line(i, answer_rows[i], false);
+        if(graphics_capable && answer_frame.valid) {
+            for(unsigned y=0;y<48;++y)for(unsigned x=0;x<126;++x)
+                if(answer_frame.data[y][x/8]&(0x80u>>(x%8)))
+                    pixels[5-y/8][125-x]|=(uint8_t)(1u<<(7-y%8));
+        } else for (unsigned i = 0; i < sizeof(answer_rows)/sizeof(answer_rows[0]); ++i)
+                line(i, answer_rows[i], false);
         break;
     case SEND_CONFIRM:
         print_text(text, sizeof(text), "ENVIAR %u FOTO(S)?", photo_count);
@@ -521,16 +533,21 @@ static void interface_draw(void)
 
 static void open_page(void)
 {
-    char command[24];
+    char command[40];
     memset(answer_rows, 0, sizeof(answer_rows));
     answer_wait = true;
     answer_more = false;
-    print_text(command, sizeof(command), "READ6 %u", answer_page);
+    if(graphics_capable) {
+        answer_frame.sequence=(answer_frame.sequence+1)&65535u;
+        answer_frame.receiving=answer_frame.valid=false;
+        print_text(command,sizeof(command),"READG %u %u %u",answer_frame.x,answer_frame.y,answer_frame.sequence);
+    } else print_text(command, sizeof(command), "READ6 %u", answer_page);
     request(command);
 }
 
 static void start_action(const char *command)
 {
+    if(!strcmp(command,"OFF"))wifi_mark(&wifi_indicator,WIFI_DISABLED,ticks);
     view = CALCULATOR;
     if (!photo_busy && !api_busy) {
         if (strcmp(command, "CAPTURE") == 0) photo_busy = true;
@@ -549,7 +566,7 @@ static void menu_action(void)
         view = PORTAL_VIEW; portal_ready = false; portal_pending = true; request("PORTAL"); break;
     case PHOTOS: start_action("CAPTURE"); break;
     case SEND: if (photo_count) view = SEND_CONFIRM; else { view = CALCULATOR; notice("TIRE UMA FOTO"); } break;
-    case ANSWER: if (last_answer) { view = ANSWER_VIEW; answer_page = 0; open_page(); }
+    case ANSWER: if (last_answer) { view = ANSWER_VIEW; answer_page = 0; answer_frame.x=answer_frame.y=0; open_page(); }
                  else { view = CALCULATOR; notice("SEM RESPOSTA SALVA"); } break;
     case REMOVE: start_action("REMOVE"); break;
     case CLEAR: start_action("CLEAR"); break;
@@ -621,6 +638,18 @@ static void navigation(enum Key key)
         }
         break;
     case ANSWER_VIEW:
+        if(graphics_capable) {
+            if(answer_wait||!answer_frame.valid)break;
+            unsigned x=answer_frame.x,y=answer_frame.y;
+            if(key==KEY_DOWN)y+=16;
+            if(key==KEY_UP)y=y>16?y-16:0;
+            if(key==KEY_RIGHT){if(answer_frame.width>126)x+=24;else y+=48;}
+            if(key==KEY_LEFT){if(answer_frame.width>126)x=x>24?x-24:0;else y=y>48?y-48:0;}
+            if(x>answer_frame.width-126)x=answer_frame.width-126;
+            if(y>answer_frame.height-48)y=answer_frame.height-48;
+            if(x!=answer_frame.x||y!=answer_frame.y){answer_frame.x=x;answer_frame.y=y;open_page();}
+            break;
+        }
         if (!answer_wait && move_next(key) && answer_more) { ++answer_page; open_page(); }
         if (!answer_wait && move_previous(key) && answer_page) { --answer_page; open_page(); }
         break;
@@ -752,7 +781,7 @@ static void interface_key(enum Key key)
     }
     if (key == KEY_AC) {
         edit_clear(); hyp = false;
-        if (shifted) { blanked = true; request("OFF"); }
+        if (shifted) { blanked = true; wifi_mark(&wifi_indicator,WIFI_DISABLED,ticks);request("OFF"); }
         return;
     }
     if (key == KEY_DEL) {
@@ -828,7 +857,21 @@ static void interface_mapped(void)
 static bool interface_message(const char *text)
 {
     link_state_at = ticks;
+    if(!strcmp(text,"CAPS G1")){graphics_capable=true;return false;}
+    if(!strncmp(text,"FRAME ",6)||!strncmp(text,"PIX ",4)||!strncmp(text,"FRAME_END ",10)) {
+        int result=frame_message(&answer_frame,text);
+        if(result){answer_wait=false;if(result<0){answer_frame.receiving=answer_frame.valid=false;strcpy(answer_rows[0],"FALHA NO DESENHO");}return true;}
+        return false;
+    }
+    if(!strncmp(text,"LINK ",5)) {
+        unsigned phase=!strcmp(text+5,"OK")?WIFI_OK:!strcmp(text+5,"FAIL")?WIFI_FAIL:
+            !strcmp(text+5,"JOIN")?WIFI_JOIN:!strcmp(text+5,"OFF")?WIFI_DISABLED:WIFI_IDLE;
+        wifi_mark(&wifi_indicator,phase,ticks);return true;
+    }
     if (strncmp(text, "STATE ", 6) == 0 && strlen(text) == 13) {
+        bool connected=text[6]=='1';
+        if(connected&&!wifi)wifi_mark(&wifi_indicator,WIFI_OK,ticks);
+        else if(!connected&&wifi&&wifi_indicator.phase!=WIFI_DISABLED)wifi_mark(&wifi_indicator,WIFI_FAIL,ticks);
         wifi = text[6] == '1';
         photo_count = text[8] >= '0' && text[8] <= '3' ? (unsigned)(text[8]-'0') : 0;
         portal_ready = text[10] == '1';
@@ -836,6 +879,9 @@ static bool interface_message(const char *text)
         last_answer = text[12] == '1';
         photo_busy = false;
     } else if (strncmp(text, "NOTE ", 5) == 0) {
+        if(!strcmp(text+5,"CONECTANDO")){wifi_mark(&wifi_indicator,WIFI_JOIN,ticks);return true;}
+        if(!strcmp(text+5,"WIFI CONECTADO")){wifi_mark(&wifi_indicator,WIFI_OK,ticks);return true;}
+        if(!strcmp(text+5,"FALHA NO WIFI")){wifi_mark(&wifi_indicator,WIFI_FAIL,ticks);return true;}
         portal_pending = false;
         photo_busy = api_busy = false;
         notice(text+5);
@@ -845,7 +891,7 @@ static bool interface_message(const char *text)
         api_busy = true;
     } else if (strcmp(text, "ANSWER OK") == 0) {
         api_busy = false;
-        view = ANSWER_VIEW; answer_page=0; open_page();
+        view = ANSWER_VIEW; answer_page=0; answer_frame.x=answer_frame.y=0;open_page();
     } else if (strcmp(text, "PORTAL OK") == 0) {
         portal_ready = true;
         portal_pending = false;
@@ -878,6 +924,7 @@ static bool interface_tick(void)
     static uint32_t last_ping, last_blink, last_battery_blink;
     if (mapped < KEY_COUNT) return false;
     uint32_t now = ticks;
+    if(wifi_animation(&wifi_indicator,now)&&!blanked&&view!=ANSWER_VIEW)return true;
     if (!blanked && view != ANSWER_VIEW && battery_low(&battery) && now-last_battery_blink>=500) {
         last_battery_blink=now;
         return true;
@@ -891,7 +938,7 @@ static bool interface_tick(void)
         serial_send("STATUS");
         last_ping = now;
     }
-    if (!api_busy && wifi && now - link_state_at > 14000) { wifi = false; return true; }
+    if (!api_busy && wifi && now - link_state_at > 14000) { wifi = false; wifi_mark(&wifi_indicator,WIFI_FAIL,now);return true; }
     if (note[0] && now - note_at > 4200) { note[0]=0; return true; }
     if ((scan_busy || wifi_saved_busy || answer_wait || photo_busy) && now - started > 22000) {
         scan_busy = wifi_saved_busy = answer_wait = photo_busy = false;

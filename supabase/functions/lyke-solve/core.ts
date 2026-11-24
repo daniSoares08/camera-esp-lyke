@@ -52,7 +52,7 @@ export class RequestError extends Error {
 }
 
 export type Photo = { bytes: Uint8Array; dataUrl: string };
-export type Validated = { photos: Photo[]; model: string };
+export type Validated = { photos: Photo[]; model: string; graphics: boolean };
 
 export function validateRequest(body: unknown): Validated {
   if (!body || typeof body !== 'object') throw new RequestError(400, 'invalid_request', 'Envie 1 a 3 fotos JPEG.');
@@ -80,7 +80,8 @@ export function validateRequest(body: unknown): Validated {
       throw new RequestError(400, 'invalid_image', 'JPEG incompleto. Tire outra foto.');
     return { bytes, dataUrl: url };
   });
-  return { photos, model: value.economy === true || value.model === ECONOMY_MODEL ? ECONOMY_MODEL : MODEL };
+  return { photos, model: value.economy === true || value.model === ECONOMY_MODEL ? ECONOMY_MODEL : MODEL,
+    graphics: value.display === 'lyke-graphics-v1' };
 }
 
 export async function sha256(value: string | Uint8Array): Promise<string> {
@@ -124,10 +125,12 @@ export function openAIRequest(valid: Validated) {
   return {
     model: valid.model, store: false, max_output_tokens: 10000,
     reasoning: { effort: valid.model === ECONOMY_MODEL ? 'medium' : 'high' },
-    instructions: INSTRUCTIONS,
+    instructions: INSTRUCTIONS + (valid.graphics ? GRAPHIC_INSTRUCTIONS : ''),
+    ...(valid.graphics ? { text: { format: { type: 'json_schema', name: 'lyke_answer', strict: true, schema: GRAPHIC_SCHEMA } } } : {}),
     input: [{ role: 'user', content: [
       { type: 'input_text', text: 'Resolva todos os itens das imagens na ordem. Mostre formula, substituicao numerica, desenvolvimento das contas e resultado. Use o formato de uma resolucao completa de avaliacao, sem dialogo, sem linhas em branco e sem omitir etapas para caber no LCD.' },
       ...valid.photos.map(p => ({ type: 'input_image', detail: 'high', image_url: p.dataUrl })),
     ] }],
   };
 }
+import { GRAPHIC_SCHEMA, GRAPHIC_INSTRUCTIONS } from './graphics.ts';

@@ -1,4 +1,5 @@
 import { BUCKET, MAX_BODY_BYTES, MODEL, RequestError, openAIRequest, sha256, toLCD, validateRequest } from './core.ts';
+import { legacyDocumentText, normalizeDocument, storedDocument } from './graphics.ts';
 
 export type Environment = {
   supabaseUrl: string; serviceKey: string; openaiKey: string;
@@ -7,12 +8,14 @@ export type Environment = {
 const jsonHeaders = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
 const reply = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: jsonHeaders });
 
-function completed(row: Record<string, any>) {
+function completed(row: Record<string, any>, graphics = false) {
+  const document = graphics ? storedDocument(row.answer_text,toLCD) : undefined;
   return {
     id: row.id, object: 'response', status: 'completed', model: row.model,
     output: [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text: row.answer_lcd }] }],
     usage: { input_tokens: row.input_tokens || 0, output_tokens: row.output_tokens || 0 },
     archive: { request_id: row.id, bucket: BUCKET, photos: row.photo_paths, private: true },
+    ...(document ? { lyke_document: document } : {}),
   };
 }
 
@@ -33,7 +36,7 @@ export function createHandler(env: Environment, transport: typeof fetch = fetch)
     let activeId = '';
     let finished = false;
     try {
-      if (req.method === 'GET') return reply({ service: 'lyke-solve', model: MODEL, version: '2', private_storage: true });
+      if (req.method === 'GET') return reply({ service: 'lyke-solve', model: MODEL, version: '3', graphics: 'lyke-graphics-v1', private_storage: true });
       if (req.method !== 'POST') return reply({ error: { code: 'method_not_allowed', message: 'Use POST.' } }, 405);
       if (!env.tokenHash || !env.openaiKey || !env.serviceKey) throw new RequestError(503, 'not_configured', 'Servico ainda nao configurado.');
       const auth = req.headers.get('Authorization') || '';
@@ -59,12 +62,12 @@ export function createHandler(env: Environment, transport: typeof fetch = fetch)
       const valid = validateRequest(body);
       const requestId = req.headers.get('X-Lyke-Request-ID') || crypto.randomUUID();
       if (!/^[A-Za-z0-9_-]{16,64}$/.test(requestId)) throw new RequestError(400, 'invalid_request_id', 'Identificador de consulta invalido.');
-      const fingerprint = await sha256(valid.model + ':' + (await Promise.all(valid.photos.map(p => sha256(p.bytes)))).join(':'));
+      const fingerprint = await sha256(valid.model + (valid.graphics ? ':graphics-v1' : '') + ':' + (await Promise.all(valid.photos.map(p => sha256(p.bytes)))).join(':'));
       const claim = await db('rpc/lyke_claim_request', 'POST', {
         p_id: requestId, p_device_id: env.deviceId, p_fingerprint: fingerprint,
         p_model: valid.model, p_photo_count: valid.photos.length, p_daily_limit: env.dailyLimit,
       });
-      if (claim.decision === 'cached') return reply(completed(claim.request));
+      if (claim.decision === 'cached') return reply(completed(claim.request,valid.graphics));
       if (claim.decision === 'failed') {
         const saved = claim.request.error || {};
         return reply({ error: { code: saved.code || 'previous_failure', message: saved.message || 'Consulta anterior falhou. Tente novamente.' } }, saved.http_status || 502);
@@ -100,15 +103,20 @@ export function createHandler(env: Environment, transport: typeof fetch = fetch)
         .flatMap((i: any) => i.content || []).filter((c: any) => c.type === 'output_text')
         .map((c: any) => c.text || '').join('\n');
       if (!answer.trim()) throw new RequestError(502, 'empty_answer', 'A IA nao retornou texto.');
+      let answerLCD: string;
+      if (valid.graphics) {
+        try { answerLCD = legacyDocumentText(normalizeDocument(JSON.parse(answer),toLCD),toLCD); }
+        catch { throw new RequestError(502,'invalid_drawing','A IA retornou um desenho invalido. As fotos foram guardadas.'); }
+      } else answerLCD = toLCD(answer);
       const row = {
         id: requestId, model: valid.model, status: 'completed', photo_paths: paths,
-        answer_text: answer, answer_lcd: toLCD(answer),
+        answer_text: answer, answer_lcd: answerLCD,
         input_tokens: result.usage?.input_tokens || 0, output_tokens: result.usage?.output_tokens || 0,
         finished_at: new Date().toISOString(), openai_response_id: result.id || null,
       };
       await db(selector, 'PATCH', row);
       finished = true;
-      return reply(completed(row));
+      return reply(completed(row,valid.graphics));
     } catch (cause) {
       const error = cause instanceof RequestError ? cause : new RequestError(502, 'network_error', 'Falha de conexao. Tente novamente em instantes.');
       if (activeId && !finished) {

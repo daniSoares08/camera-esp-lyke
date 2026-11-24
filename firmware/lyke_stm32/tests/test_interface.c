@@ -34,6 +34,13 @@ static void save(const char *folder,const char *name)
 int main(int argc,char **argv)
 {
     const char *folder=argc>1?argv[1]:NULL;
+    ticks=10;assert(interface_message("STATE 1 0 1 0"));
+    assert(wifi_symbol(&wifi_indicator,ticks)==WIFI_SIGNAL);
+    ticks=1810;assert(interface_message("LINK OK"));
+    assert(wifi_symbol(&wifi_indicator,ticks)==WIFI_HIDDEN);
+    assert(interface_message("LINK FAIL"));assert(wifi_symbol(&wifi_indicator,ticks)==WIFI_SIGNAL);
+    ticks+=500;assert(wifi_symbol(&wifi_indicator,ticks)==WIFI_CROSS);
+    assert(interface_message("LINK OFF"));assert(wifi_symbol(&wifi_indicator,ticks)==WIFI_HIDDEN);
     // Icon stays inside the current header; photo boxes and hidden rows are intact.
     battery=(BatteryReading){.status=BATTERY_OK,.mv=3840};
     interface_draw();save(folder,"bateria_media");
@@ -65,6 +72,17 @@ int main(int argc,char **argv)
     uint8_t status[128];memcpy(status,pixels[0],128);line(5,"CAPTURANDO FOTO",false);assert(!memcmp(status,pixels[0],128));
     view=ANSWER_VIEW;open_page();assert(!strcmp(sent,"READ6 0"));
     assert(interface_message("TEXT 5 SEXTA LINHA"));assert(!strcmp(answer_rows[5],"SEXTA LINHA"));
+    assert(!interface_message("CAPS G1"));answer_frame.sequence=42;
+    uint8_t bitmap[768]={0};for(unsigned y=0;y<48;++y)bitmap[y*16+y/8]|=0x80u>>(y%8);
+    char message[100];snprintf(message,sizeof(message),"FRAME 42 0 0 192 200 %u",frame_checksum(bitmap,768));
+    assert(!interface_message(message));
+    for(unsigned y=0;y<48;++y){unsigned at=snprintf(message,sizeof(message),"PIX 42 %u ",y);
+        for(unsigned x=0;x<16;++x)snprintf(message+at+2*x,3,"%02x",bitmap[y*16+x]);assert(!interface_message(message));}
+    assert(interface_message("FRAME_END 42"));interface_draw();save(folder,"tela_frame_bitmap");
+    for(unsigned y=0;y<48;++y)for(unsigned x=0;x<126;++x)
+        assert(((pixels[5-y/8][125-x]>>(7-y%8))&1)==(x==y));
+    PRESS(KEY_RIGHT);assert(!strcmp(sent,"READG 24 0 43"));
+    answer_frame.valid=true;answer_wait=false;PRESS(KEY_DOWN);assert(!strcmp(sent,"READG 24 16 44"));
     puts("Actual interface: keyboard, Greek memory, 2D result, six-row response and status boundaries OK");
     return 0;
 }

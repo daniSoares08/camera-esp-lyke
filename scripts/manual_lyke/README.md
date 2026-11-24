@@ -1,5 +1,11 @@
 # Gerar o manual do comprador
 
+Em 24/11 os fontes atuais passaram à revisão preparada R12/R9. O PDF/MD
+edição 2.0 continua sendo o artefato da R11/R8 instalada. Para reproduzir
+essa edição exatamente, usar o snapshot do commit `a9bb93f` e as instruções
+abaixo. A revisão preparada está descrita em `docs/REVISAO-R12-DESENHOS-E-WIFI.md`;
+não rotular os fontes atuais como R11 ao gerar uma edição histórica.
+
 O conteúdo, as figuras determinísticas e a diagramação estão em
 `gerar_manual.py`. Não lê credenciais, não acessa a calculadora e não chama
 APIs pagas. A foto de referência comercial é baixada do fabricante apenas

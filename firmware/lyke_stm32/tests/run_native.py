@@ -6,7 +6,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[3]
 OUT = ROOT / '.build/lyke_stm32'
-RELEASE = OUT / 'lyke-r11'
+RELEASE = OUT / 'lyke-r12'
 TESTS = 'firmware/lyke_stm32/tests'
 results = []
 
@@ -36,7 +36,7 @@ def main():
 
     base = ['-O2', '-Wall', '-Wextra', '-Werror', '-Wno-unused-function']
     run('compile shared decoder', 'gcc', '-O2', '-c', 'firmware/lyke_stm32/vendor/puff.c', '-o', OUT/'puff-host.o')
-    for name in ['math_layout', 'interface', 'battery', 'battery_monitor']:
+    for name in ['math_layout', 'interface', 'battery', 'battery_monitor', 'wifi_indicator', 'answer_frame']:
         run('compile ' + name, 'gcc', '-std=c11', *base, '-Wno-misleading-indentation',
             f'{TESTS}/test_{name}.c', '-lm', '-o', OUT/f'test_{name}.exe')
         run(name, OUT/f'test_{name}.exe', *([previews] if name != 'battery' else []))
@@ -53,6 +53,10 @@ def main():
     run('codec bounds/corruption', sys.executable, f'{TESTS}/test_image_codec.py')
     run('USB preservation guards', sys.executable, f'{TESTS}/test_bootstrap_usb.py')
     run('USB prepare only', sys.executable, 'firmware/lyke_stm32/bootstrap_usb.py')
+    run('compile rich document', 'g++','-std=c++17',*base,'-Wno-misleading-indentation',
+        '-I','C:/Users/campo/Documents/Arduino/libraries/ArduinoJson/src','-I','firmware/calculadora/common',
+        f'{TESTS}/test_answer_document.cpp','-o',OUT/'test_answer_document.exe')
+    run('rich render and wire',OUT/'test_answer_document.exe',f'{TESTS}/fixtures/answer_graphics.json',previews)
 
 
 if __name__ == '__main__':

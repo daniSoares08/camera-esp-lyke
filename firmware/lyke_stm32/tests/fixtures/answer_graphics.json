@@ -1,0 +1,35 @@
+{"version":1,"blocks":[
+ {"kind":"text","text":"CIRCUITO RC\nR=100 ohm\nC=1e-6 F"},
+ {"kind":"drawing","width":192,"height":96,"alt":"Fonte V, R de 100 ohm e C de 1 uF em serie.","commands":[
+  {"op":"source","p":[16,16,16,80],"text":""},
+  {"op":"line","p":[16,16,48,16],"text":""},
+  {"op":"resistor","p":[48,16,120,16],"text":""},
+  {"op":"line","p":[120,16,160,16],"text":""},
+  {"op":"capacitor","p":[160,16,160,80],"text":""},
+  {"op":"line","p":[160,80,16,80],"text":""},
+  {"op":"text","p":[55,3],"text":"R=100"},
+  {"op":"text","p":[112,43],"text":"C=1uF"},
+  {"op":"text","p":[30,44],"text":"V"}
+ ]},
+ {"kind":"text","text":"tau=R*C\n=100*1e-6\n=0.0001 s"},
+ {"kind":"drawing","width":192,"height":128,"alt":"Carga RC: Vc/V contra t/tau, curva crescente de zero para um.","commands":[
+  {"op":"arrow","p":[16,110,180,110],"text":""},
+  {"op":"arrow","p":[16,110,16,12],"text":""},
+  {"op":"text","p":[24,4],"text":"Vc/V"},
+  {"op":"text","p":[142,117],"text":"t/tau"},
+  {"op":"text","p":[4,15],"text":"1"},
+  {"op":"text","p":[5,112],"text":"0"},
+  {"op":"line","p":[16,110,31,74],"text":""},
+  {"op":"line","p":[31,74,46,51],"text":""},
+  {"op":"line","p":[46,51,76,29],"text":""},
+  {"op":"line","p":[76,29,106,21],"text":""},
+  {"op":"line","p":[106,21,166,17],"text":""}
+ ]},
+ {"kind":"drawing","width":126,"height":96,"alt":"Duas semirretas formam angulo de 45 graus.","commands":[
+  {"op":"line","p":[20,76,116,76],"text":""},
+  {"op":"line","p":[20,76,87,9],"text":""},
+  {"op":"arc","p":[20,76,26,0,45],"text":""},
+  {"op":"text","p":[52,53],"text":"45 graus"}
+ ]},
+ {"kind":"text","text":"ANGULO=45 graus\nsin(45)=0.7071"}
+]}

@@ -2,6 +2,13 @@
 
 ## Produto
 
+- Em 24/11/2026, reaberto o projeto: verificar rede Visitantes salva,
+  Wi-Fi sem símbolo persistente (três pulsos no sucesso; X/sinal alternados
+  na falha), figuras roláveis entre passos da resposta. Usuário confirmou
+  que a rede aberta da universidade tem internet direta. Ele ligará a
+  calculadora depois; preparar sem gravar. API v3 compatível publicada,
+  sem chamadas pagas. Novo conjunto preparado: STM R12 + ESP R9.
+
 - Em 23/11/2026, usuário corrigiu divisor para dois 470 kilohms e pediu
   bateria desenhada à esquerda dos quadrados das fotos. Confirmou a R11
   instalada, ícone aparecendo e tensão normal. Tornou o GitHub público e

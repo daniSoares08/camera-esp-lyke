@@ -1,18 +1,23 @@
 # Base de conhecimento — CAMERA_ESP
 
-Atualização: **23/11/2026**, America/Sao_Paulo. Raiz atual:
+Atualização: **24/11/2026**, America/Sao_Paulo. Raiz atual:
 `C:\Projects\CAMERA_ESP`. Esta é a memória local do projeto para continuar em
 outro chat; não é uma garantia de memória automática fora desta pasta.
 
 ## Começar por aqui
 
-**Estado final:** instalados STM32 R11 + ESP Lyke R8, atualizados pelo
+**Último pedido:** preparados STM R12 + ESP R9, ainda não instalados,
+com novo aviso Wi-Fi e desenhos roláveis. API v3 publicada e compatível
+com texto antigo. O usuário ligará depois para atualizar. Guia em
+`docs/REVISAO-R12-DESENHOS-E-WIFI.md`; ver o início de `ESTADO-E-RETOMADA.md`.
+
+**Instalados:** STM32 R11 + ESP Lyke R8, atualizados pelo
 Wi-Fi/UART existente. Ícone de bateria e leitura normal confirmados pelo
 usuário após corrigir o divisor para dois resistores de 470 kilohms.
 Notação gráfica na janela original e leitor de seis linhas mantidos.
 Manual final edição 2.0 em PDF/MD em `docs/manual/` e `output/pdf/`.
 Repositório agora público; credenciais, fotos de questões e binários
-continuam privados. Usuário encerrou o projeto. Consultar `ESTADO-E-RETOMADA.md`.
+continuam privados. O encerramento de 23/11 é histórico; houve novo pedido em 24/11.
 
 1. [Estado, firmwares e próximos passos](ESTADO-E-RETOMADA.md)
 2. [Componentes, pinagens e alimentação](HARDWARE.md)

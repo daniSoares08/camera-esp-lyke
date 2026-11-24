@@ -59,7 +59,7 @@ def verify_readback(before, after, expected):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--release', type=Path, default=ROOT/'.build/lyke_stm32/lyke-r11')
+    parser.add_argument('--release', type=Path, default=ROOT/'.build/lyke_stm32/lyke-r12')
     parser.add_argument('--install', action='store_true')
     parser.add_argument('--serial', help='Serial observado agora em dfu-util -l')
     parser.add_argument('--tool', default=shutil.which('dfu-util'))
