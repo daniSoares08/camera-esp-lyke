@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "font5x7.h"
+#include "answer_pager.h"
 
 namespace lyke {
 enum DrawOp { D_LINE, D_RECT, D_CIRCLE, D_ARC, D_TEXT, D_RESISTOR, D_CAPACITOR, D_SOURCE, D_ARROW };
@@ -15,12 +16,12 @@ struct AnswerDocument {
   AnswerBlock blocks[32]{}; DrawCommand commands[384]{};
   unsigned count=0,commandCount=0,height=48; uint16_t origin[32]{};
   template<class F> static unsigned lines(const char *text,F emit) {
-    unsigned n=0;const char *p=text?text:"";
-    while(*p) {
-      while(*p=='\n'||*p=='\r'||*p==' '||*p=='\t')++p;
-      if(!*p)break;
-      unsigned used=0,space=0;while(p[used]&&p[used]!='\n'&&p[used]!='\r'&&used<21){if(p[used]==' ')space=used;++used;}
-      if(used==21&&p[used]&&p[used]!='\n'&&p[used]!='\r'&&p[used]!=' '&&space)used=space;
+    unsigned n=0;const char *p=text?text:"",*limit=p+answer_content_length(p,strlen(p));
+    while(p<limit) {
+      while(p<limit&&(*p=='\n'||*p=='\r'||*p==' '||*p=='\t'))++p;
+      if(p==limit)break;
+      unsigned used=0,space=0;while(p+used<limit&&p[used]!='\n'&&p[used]!='\r'&&used<21){if(p[used]==' ')space=used;++used;}
+      if(used==21&&p+used<limit&&p[used]!='\n'&&p[used]!='\r'&&p[used]!=' '&&space)used=space;
       char row[22]{};memcpy(row,p,used);emit(n++,row);p+=used;
     }
     return n;

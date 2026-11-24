@@ -578,15 +578,15 @@
     "timezone": "America/Sao_Paulo",
     "stm32": {
       "chip": "STM32G431CBU6",
-      "revision": "lyke-r11",
+      "revision": "lyke-r12",
       "application_origin": "0x08002000",
       "application": {
-        "path": ".build/lyke_stm32/lyke-r11/main.bin",
-        "bytes": 60592,
-        "sha256": "e317b4ee341e6173b91d54f8ee039d8a43c2b8d39e038fdae3d11ddf98ddeb38"
+        "path": ".build/lyke_stm32/lyke-r12/main.bin",
+        "bytes": 62568,
+        "sha256": "874f315d4f2ae3dee4f2234c084999320978a9249e1236a5869e4e7d78b90e59"
       },
-      "manifest": ".build/lyke_stm32/lyke-r11/manifest.json",
-      "verification": "Wi-Fi OTA 14.16 s; loader app CRC checked and restart/revision/MAP49 verified. User confirmed battery icon and normal voltage reading.",
+      "manifest": ".build/lyke_stm32/lyke-r12/manifest.json",
+      "verification": "Wi-Fi/UART update 14.34 s HTTP 200; loader application CRC checked; restart, R12 runtime revision and MAP49 ready confirmed; visual reader/indicator check requested, not yet confirmed.",
       "usb_serial_historical": "209D35994333",
       "mapped_contacts": 49,
       "skipped_key": "ON",
@@ -598,36 +598,42 @@
       "loader_protocol": "LYKE BOOT V2",
       "loader_sha256": "7ac77ea44cd52028ce293858692c50814e1de40da48d253c1044d6794f5ad811",
       "usb_serial_observed_20261123": "209D35994333",
-      "physical_update_report": ".private/lyke-cloud/device-stm-r11-wifi.json",
+      "physical_update_report": ".private/lyke-cloud/device-stm-r12-wifi.json",
       "usb_backup": ".private/stm32_lyke_r10_20261123_144822",
       "configuration_sha256_after_usb": "0b07abc98fb17e5ee20d9a4b8ea9261f36cf22505d16d0f0f6b2f6d32ab4c6dc",
       "lcd_visible_pixels": [
         126,
         48
-      ]
+      ],
+      "ota_package": {
+        "bytes": 45530,
+        "sha256": "15eea909599dfea5dffda02ee305635981114a2d2827cdd71eb4787b9c6c64ef"
+      },
+      "application_crc32": "37e35397"
     },
     "esp32": {
       "chip": "ESP32-D0WD-V3",
       "flash_bytes": 4194304,
       "psram_bytes": 4194304,
-      "revision": "lyke-r8",
+      "revision": "lyke-r9a",
       "slot": "app0",
       "application_origin": "0x10000",
       "application": {
-        "path": "firmware/esp32cam_integrada/bin/lyke-r8/esp32cam_integrada.ino.bin",
-        "bytes": 1320496,
-        "sha256": "e7fa0fc1b9ea0b66e65a6ad16d267c852666cec5eab7054a151c707041984c22"
+        "path": "firmware/esp32cam_integrada/bin/lyke-r9a/esp32cam_integrada.ino.bin",
+        "bytes": 1362896,
+        "sha256": "e7ff9868df52367e3f916ace8637cf7f40de18fa87416ade1b91c9f8b69776a8"
       },
-      "manifest": "firmware/esp32cam_integrada/bin/lyke-r8/manifest.json",
-      "image_digest": "1863e2d7a1c57deb9259901435a5121ba097f13e09710f11ef4a6961685546a7",
-      "verification": "OTA application installed and runtime revision/other slot/digest checked; configured API access/URL retained; STM32 Wi-Fi update passed; MAP 49 ready",
+      "manifest": "firmware/esp32cam_integrada/bin/lyke-r9a/manifest.json",
+      "image_digest": "f9e9dcc7a1722c0fa330b5c19f224e951d6e836446f23ebfaa6c5121f135e9a2",
+      "verification": "OTA HTTP 200; runtime revision, slot and digest confirmed; configuration preserved, saved answer identical byte for byte; MAP49 ready and portal active.",
       "ap_ssid": "Calc-Lyke",
       "ap_address": "192.168.8.1",
       "portal_opens_at_boot": true,
-      "private_report": ".private/lyke-cloud/device-r8-ota.json",
+      "private_report": ".private/lyke-cloud/device-r9a-ota.json",
       "wifi_off_persists_across_reboot": false,
       "portal_idle_timeout_seconds": null,
-      "isolated_from_stm_during_test": false
+      "isolated_from_stm_during_test": false,
+      "saved_answer_preserved": true
     },
     "connection_plan": {
       "stm_tx_pa2": "esp_gpio13",
@@ -640,13 +646,13 @@
       "uart_communication_confirmed": true
     },
     "pending": [
-      "User will power calculator later: identify device and install ESP R9 then STM R12 over existing Wi-Fi OTA",
-      "Physical Wi-Fi pulse/failure check and rendered drawing UART/LCD/scroll check",
-      "Real model-generated diagram and campus 2.4 GHz Visitantes connection"
+      "User visual check: menu, saved answer navigation and Wi-Fi pulse/failure indication",
+      "Real model-generated diagram with LCD/UART/scroll/persistence verification",
+      "Campus 2.4 GHz Visitantes connection; open profile/direct internet confirmed, real association not tested"
     ],
     "stm32_prepared": {
       "revision": "lyke-r12",
-      "installed": false,
+      "installed": true,
       "physical_test_pending": true,
       "manifest": ".build/lyke_stm32/lyke-r12/manifest.json",
       "compiled_manifest": {
@@ -681,15 +687,15 @@
       "instructions": "docs/REVISAO-R12-DESENHOS-E-WIFI.md"
     },
     "esp32_prepared": {
-      "revision": "lyke-r9",
-      "installed": false,
+      "revision": "lyke-r9a",
+      "installed": true,
       "physical_test_pending": true,
-      "manifest": "firmware/esp32cam_integrada/bin/lyke-r9/manifest.json",
+      "manifest": "firmware/esp32cam_integrada/bin/lyke-r9a/manifest.json",
       "compiled_manifest": {
         "target": "ESP32-D0WD-V3 / AI Thinker",
         "chip": "esp32",
         "flash_bytes": 4194304,
-        "revision": "lyke-r9",
+        "revision": "lyke-r9a",
         "optimization": "lto",
         "slot_bytes": 1572864,
         "core": "3.3.6",
@@ -700,8 +706,8 @@
             "sha256": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0"
           },
           "esp32cam_integrada.ino.bin": {
-            "bytes": 1362784,
-            "sha256": "edede512fa86a9fee129bcd4d01d14dd9ada809d487e60ccc13d6489a4b29a8a"
+            "bytes": 1362896,
+            "sha256": "e7ff9868df52367e3f916ace8637cf7f40de18fa87416ade1b91c9f8b69776a8"
           },
           "esp32cam_integrada.ino.bootloader.bin": {
             "bytes": 25184,
@@ -833,6 +839,29 @@
         "ap_address": "192.168.8.1",
         "portal_opens_at_boot": true,
         "private_report": ".private/lyke-cloud/device-r7-ota.json",
+        "wifi_off_persists_across_reboot": false,
+        "portal_idle_timeout_seconds": null,
+        "isolated_from_stm_during_test": false
+      },
+      {
+        "chip": "ESP32-D0WD-V3",
+        "flash_bytes": 4194304,
+        "psram_bytes": 4194304,
+        "revision": "lyke-r8",
+        "slot": "app0",
+        "application_origin": "0x10000",
+        "application": {
+          "path": "firmware/esp32cam_integrada/bin/lyke-r8/esp32cam_integrada.ino.bin",
+          "bytes": 1320496,
+          "sha256": "e7fa0fc1b9ea0b66e65a6ad16d267c852666cec5eab7054a151c707041984c22"
+        },
+        "manifest": "firmware/esp32cam_integrada/bin/lyke-r8/manifest.json",
+        "image_digest": "1863e2d7a1c57deb9259901435a5121ba097f13e09710f11ef4a6961685546a7",
+        "verification": "OTA application installed and runtime revision/other slot/digest checked; configured API access/URL retained; STM32 Wi-Fi update passed; MAP 49 ready",
+        "ap_ssid": "Calc-Lyke",
+        "ap_address": "192.168.8.1",
+        "portal_opens_at_boot": true,
+        "private_report": ".private/lyke-cloud/device-r8-ota.json",
         "wifi_off_persists_across_reboot": false,
         "portal_idle_timeout_seconds": null,
         "isolated_from_stm_during_test": false
@@ -973,18 +1002,18 @@
     ],
     "prepared_release": {
       "date": "2026-11-24",
-      "installed": false,
+      "installed": true,
       "stm_revision": "lyke-r12",
-      "esp_revision": "lyke-r9",
+      "esp_revision": "lyke-r9a",
       "new_wires_required": false,
-      "package": "output/firmware/lyke-r12-preparado.zip",
-      "manifest": "output/firmware/lyke-r12-preparado/release.json",
+      "package": "output/firmware/lyke-r12-final.zip",
+      "manifest": "output/firmware/lyke-r12-final/release.json",
       "native_checks_passed": true,
       "simulated_interruptions": {
         "fixture": 514,
         "compiled_release_sampled": 209
       },
-      "hardware_access_in_this_step": false,
+      "hardware_access_in_this_step": true,
       "paid_api_calls_in_this_step": 0
     },
     "stm32_history": [
@@ -1037,6 +1066,36 @@
           126,
           48
         ]
+      },
+      {
+        "chip": "STM32G431CBU6",
+        "revision": "lyke-r11",
+        "application_origin": "0x08002000",
+        "application": {
+          "path": ".build/lyke_stm32/lyke-r11/main.bin",
+          "bytes": 60592,
+          "sha256": "e317b4ee341e6173b91d54f8ee039d8a43c2b8d39e038fdae3d11ddf98ddeb38"
+        },
+        "manifest": ".build/lyke_stm32/lyke-r11/manifest.json",
+        "verification": "Wi-Fi OTA 14.16 s; loader app CRC checked and restart/revision/MAP49 verified. User confirmed battery icon and normal voltage reading.",
+        "usb_serial_historical": "209D35994333",
+        "mapped_contacts": 49,
+        "skipped_key": "ON",
+        "map_source": ".private/stm32_lyke_r7/configuration-after.bin",
+        "keymap_csv": "docs/conhecimento/teclado-lyke.csv",
+        "repaired_key": [
+          "INV"
+        ],
+        "loader_protocol": "LYKE BOOT V2",
+        "loader_sha256": "7ac77ea44cd52028ce293858692c50814e1de40da48d253c1044d6794f5ad811",
+        "usb_serial_observed_20261123": "209D35994333",
+        "physical_update_report": ".private/lyke-cloud/device-stm-r11-wifi.json",
+        "usb_backup": ".private/stm32_lyke_r10_20261123_144822",
+        "configuration_sha256_after_usb": "0b07abc98fb17e5ee20d9a4b8ea9261f36cf22505d16d0f0f6b2f6d32ab4c6dc",
+        "lcd_visible_pixels": [
+          126,
+          48
+        ]
       }
     ],
     "battery_final": {
@@ -1051,21 +1110,41 @@
       "exact_post_correction_calibration_performed": false
     },
     "manual_final": {
-      "edition": "2.0",
+      "edition": "3.0",
       "pages": 36,
-      "stm_revision": "lyke-r11",
-      "esp_revision": "lyke-r8",
+      "stm_revision": "lyke-r12",
+      "esp_revision": "lyke-r9a",
       "pdf": "docs/manual/Manual-Lyke.pdf",
       "markdown": "docs/manual/Manual-Lyke.md",
       "portable_zip": "output/pdf/Manual-Lyke-Completo.zip",
       "only_provider_integrated_and_tested": "OpenAI",
-      "rendered_and_visually_checked": true
+      "rendered_and_visually_checked": true,
+      "date": "2026-11-24"
     },
-    "project_status": "Reopened 2026-11-24; prepared software updates, hardware remains STM R11/ESP R8",
+    "project_status": "Installed STM R12 + ESP R9a over Wi-Fi on 2026-11-24; revisions/MAP49/configuration/saved answer verified. Real model diagram and campus Wi-Fi remain untested.",
     "known_validation_limits": [
       "No deliberate physical power cut during flash",
       "No measured battery runtime or charging-circuit certification",
       "Claude is documented for account preparation only; not integrated/tested"
-    ]
+    ],
+    "installation_20261124": {
+      "user_authorized": true,
+      "sequence": [
+        "ESP R9",
+        "STM R12",
+        "ESP R9a"
+      ],
+      "stm_seconds": 14.34,
+      "usb_used": false,
+      "new_wires": false,
+      "paid_api_calls": 0,
+      "saved_answer_preserved": true,
+      "r9a_change": "Suppress canonical legacy token footer in rich reader only; preserve saved text",
+      "reports": [
+        ".private/lyke-cloud/device-r9-ota.json",
+        ".private/lyke-cloud/device-stm-r12-wifi.json",
+        ".private/lyke-cloud/device-r9a-ota.json"
+      ]
+    }
   }
 }

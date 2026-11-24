@@ -1,6 +1,6 @@
 # Manual do comprador - Calculadora Lyke modificada
 
-> Edição 2.0, 23/11/2026. STM32 R11 + ESP32-CAM R8. Somente OpenAI testada. Claude ainda não integrado/testado.
+> Edição 3.0, 24/11/2026. STM32 R12 + ESP32-CAM R9a. Somente OpenAI testada. Claude ainda não integrado/testado.
 
 Este Markdown contém o conteúdo integral do PDF, com as mesmas figuras. Mantenha `manual-assets/` junto deste arquivo para exibir imagens. O ZIP inclui a pasta.
 
@@ -59,7 +59,7 @@ Guia de uso da calculadora Lyke 101078 modificada, com cálculo científico offl
 >
 > Para fazer contas, basta ligar o aparelho e usar o teclado. Para resolver fotos com IA, siga o início rápido e a conexão ao Wi-Fi.
 
-Edição 2.0 - 23/11/2026. Compatibilidade: STM32 Lyke R11 + ESP32-CAM Lyke R8. As telas deste guia são simulações baseadas no firmware.
+Edição 3.0 - 24/11/2026. Compatibilidade: STM32 Lyke R12 + ESP32-CAM Lyke R9a. As telas deste guia são simulações baseadas no firmware.
 
 **Integração testada: OpenAI, usada pelos modelos do ChatGPT.** Claude aparece como alternativa de preparação da conta; ainda não foi integrado nem testado nesta calculadora.
 
@@ -169,7 +169,7 @@ Simulações: o cabeçalho pode mostrar Wi-Fi, S, A, H e até três fotos.
 
 ### Entenda os pequenos sinais
 
-A bateria à esquerda das fotos mostra de zero a quatro barras. ! pisca quando está baixa; ? indica falha na medição. **S**: SHIFT está armado; **A**: ALPHA; **H**: função hiperbólica. Os três quadrados representam fotos: vazios sem captura, preenchidos após a captura, com indicação piscante durante a operação. O ícone de Wi-Fi indica conexão à rede externa, e não apenas a existência de Calc-Lyke.
+A bateria à esquerda das fotos mostra de zero a quatro barras. ! pisca quando está baixa; ? indica falha na medição. **S**: SHIFT está armado; **A**: ALPHA; **H**: função hiperbólica. Os três quadrados representam fotos: vazios sem captura, preenchidos após a captura, com indicação piscante durante a operação. Ao conectar à rede externa, o sinal Wi-Fi pisca três vezes e desaparece. Na falha, alterna Wi-Fi e X até reconectar ou desligar o Wi-Fi. Calc-Lyke disponível não significa internet conectada.
 
 > **SHIFT, AC não é desligamento elétrico**
 >
@@ -439,7 +439,7 @@ Diagrama conceitual. Calc-Lyke é uma rede local de configuração, não um plan
 | Calculadora > roteador ou hotspot | Acessar o servidor e a OpenAI. Use Wi-Fi 2,4 GHz. |
 | Ícone no LCD | Indica que a calculadora está conectada à rede externa. |
 
-1. Ligue a calculadora. Em R8, Calc-Lyke abre automaticamente ao iniciar o ESP e fica disponível até você desligar o Wi-Fi pelo menu.
+1. Ligue a calculadora. Em R9a, Calc-Lyke abre automaticamente ao iniciar o ESP e fica disponível até você desligar o Wi-Fi pelo menu.
 2. No celular, abra Ajustes/Configurações > Wi-Fi, escolha Calc-Lyke e informe a senha entregue pelo fornecedor.
 3. Se aparecer Sem internet, escolha permanecer conectado. Abra o navegador e digite exatamente http://192.168.8.1, incluindo http://.
 4. Se o celular sair dessa rede sozinho, desative temporariamente a troca automática para dados móveis ou outra rede. Tente novamente.
@@ -524,14 +524,14 @@ Simulação da seção Fotos. As imagens reais são abertas pelos links da galer
 
 ![Envie à IA e leia a resposta](manual-assets/resposta.png)
 
-Resposta ilustrativa para 2*x+3=11; não é uma transcrição do LCD do teste físico.
+Simulações do renderizador: texto e dois recortes de um circuito largo. Não são desenhos gerados pelo modelo em um teste físico.
 
 1. Confira conexão externa, serviço de IA e uma a três fotos da mesma questão. Abra MODE > ENVIAR FOTOS IA > =.
 2. Leia a quantidade e confirme com =. AC cancela antes de enviar. A tela indica AGUARDANDO IA; mantenha a energia e aguarde.
-3. Abra MODE > ULTIMA RESPOSTA > = para consultar a resposta disponível. Use direita/baixo para avançar uma página e esquerda/cima para voltar. AC ou MODE retorna ao cálculo.
-4. Se preferir uma tela maior, no portal toque em Abrir última resposta. Para rever mais tarde, use novamente ULTIMA RESPOSTA; a última resposta fica salva no ESP.
+3. Abra MODE > ULTIMA RESPOSTA > =. Cima/baixo rolam 16 pixels. Em figura larga, esquerda/direita movem 24 pixels para os lados; em texto ou figura estreita, recuam/avançam 48 pixels. AC ou MODE retorna ao cálculo.
+4. A última resposta fica salva no ESP. No portal, Abrir última resposta mostra texto e descrições das figuras; os desenhos aparecem no LCD.
 
-A resposta usa as seis linhas de 21 caracteres, sem cabeçalho, ícones ou título de página. O serviço pede fórmulas, substituições e desenvolvimento completo, sem conversa desnecessária. No leitor da IA, x^2 significa quadrado, sqrt(...) significa raiz e * significa multiplicação. Esse leitor usa texto; o desenho gráfico de fórmulas pertence à calculadora local.
+A janela continua com 126x48 pixels, sem cabeçalho ou ícones. Texto e desenhos 2D de circuitos, gráficos ou ângulos podem aparecer entre os passos. O serviço exige fórmula, substituição, desenvolvimento e resultado; a figura não substitui as contas. No texto, x^2 é quadrado, sqrt(...) é raiz e * é multiplicação.
 
 > **Se a IA pedir outra foto**
 >
@@ -591,7 +591,7 @@ Diagrama de configuração. Uma conta logada no ChatGPT, sozinha, não configura
 >
 > Estar logado no ChatGPT não cria uma chave de API. Confira a organização e o saldo na plataforma de API. Eventuais benefícios de créditos vinculados a planos exigem as condições e a vinculação oferecidas pela plataforma. [S1, S2]
 
-O serviço desta edição usa OpenAI Responses e armazenamento privado no Supabase. Não existe seletor de provedor no portal R8. Não cole uma chave sk-... ou sk-ant-... no campo de acesso da calculadora.
+O serviço desta edição usa OpenAI Responses e armazenamento privado no Supabase. Não existe seletor de provedor no portal R9a. Não cole uma chave sk-... ou sk-ant-... no campo de acesso da calculadora.
 
 
 <a id="pagina-22"></a>
@@ -648,7 +648,7 @@ A escolha do modelo fica no serviço, não na criação da chave. Nesta edição
 
 ![Ative o serviço e faça o teste](manual-assets/portal-api.png)
 
-Simulação do formulário real. Não há campo de seleção OpenAI/Claude na R8.
+Simulação do formulário real. Não há campo de seleção OpenAI/Claude na R9a.
 
 ### Se o serviço já está pronto
 
@@ -700,7 +700,7 @@ Simulação da criação de chave Claude. Somente a integração OpenAI foi test
 
 1. Abra https://platform.claude.com/settings/keys. Clique em Create key. Informe nome e validade; escolha a conta vinculada e o workspace adequado. Para um serviço compartilhado, o administrador pode usar uma conta de serviço. [S5]
 2. Copie o segredo quando ele for mostrado e guarde-o com segurança. A chave completa só aparece na criação; se perder, crie outra. Não a inclua em PDF, GitHub ou capturas de tela. [S5]
-3. Peça ao fornecedor uma versão do servidor que aceite Anthropic Messages, envie os JPEGs ao modelo de visão escolhido e normalize a resposta para o protocolo da calculadora. É uma implementação necessária, não uma configuração disponível nesta R8. [S9]
+3. Peça ao fornecedor uma versão do servidor que aceite Anthropic Messages, envie os JPEGs ao modelo de visão escolhido e normalize a resposta para o protocolo da calculadora. É uma implementação necessária, não uma configuração disponível nesta R9a. [S9]
 4. Somente depois dessa implementação, instale o segredo no servidor, configure o endereço/credencial de serviço apropriados no aparelho e repita os testes de foto, resposta curta, paginação e arquivo privado.
 5. Considere Claude disponível apenas quando esse teste passar na sua unidade. Até lá, use a integração OpenAI validada.
 
@@ -931,7 +931,7 @@ Fluxo de aprendizado. Nunca envie chaves, senhas ou dados de pagamento para obte
 
 > **Prompt de aprendizagem**
 >
-> Estou usando a Lyke modificada com STM32 R11 e ESP R8. Use o manual anexado como referência. Sou iniciante: explique uma ação por vez, diga exatamente qual tecla pressionar e o que devo ver. Diferencie captura, envio à IA e arquivo. Se a função não existir nesta versão, diga isso. Minha dúvida é: [descreva].
+> Estou usando a Lyke modificada com STM32 R12 e ESP R9a. Use o manual anexado como referência. Sou iniciante: explique uma ação por vez, diga exatamente qual tecla pressionar e o que devo ver. Diferencie captura, envio à IA e arquivo. Se a função não existir nesta versão, diga isso. Minha dúvida é: [descreva].
 
 ### O que anexar
 
@@ -957,16 +957,16 @@ Para suporte, informe revisão, mensagem, quantidade de fotos, status de rede e 
 
 ![Compatibilidade e entrega da unidade](manual-assets/validacao.png)
 
-Estado do projeto em 23/11/2026. Esquema, implementação e teste físico são coisas diferentes.
+Estado do projeto em 24/11/2026. Esquema, implementação e teste físico são coisas diferentes.
 
 | Situação | Evidência ou limite |
 | --- | --- |
 | Testado: OpenAI e arquivo | Consulta de visão com equação sintética 2*x+3=11 retornou x=4; reenvio em cache conferido. |
 | Testado: envio pelo ESP | Captura real da bancada enviada pelo próprio ESP, arquivada e respondida pela IA; JPEG recuperado com hash idêntico. |
 | Testado: AP e OTA do ESP | Portal automático, desligamento por comando, retorno após reinício e atualização ESP por Wi-Fi. |
-| Testado: atualização e LCD | STM R10→R10a e R10a→R11 pelo Wi-Fi; mapa de 49 teclas preservado. Usuário confirmou raiz/frações na janela original. |
+| Testado: atualização e LCD | STM R12 e ESP R9a instalados pelo Wi-Fi; revisões e mapa de 49 teclas conferidos. Raiz/frações confirmadas anteriormente pelo usuário. |
 | Bateria e resolução completa | Dois resistores de 470 kΩ corrigidos pelo proprietário; leitura normal. API v2 conferida com três fotos de questão real e desenvolvimento completo. |
-| Não integrado e não testado | Claude/Anthropic. O guia de conta não significa suporte pronto. |
+| Limites de validação | Figuras: testes locais do renderizador aprovados; geração real pelo modelo ainda não testada no aparelho. Claude não integrado/testado. |
 
 ### Checklist para receber a calculadora pronta
 
@@ -988,7 +988,7 @@ Este manual não é o manual original de fábrica da Lyke. A carcaça foi adapta
 
 Foto real da unidade modificada durante o ajuste da bateria, anterior ao ícone R11. As demais telas são simulações; o produto comercial original está em [S12].
 
-Links oficiais consultados em 23/11/2026. As telas de portais deste manual são desenhos explicativos: menus e condições comerciais podem mudar. As instruções de operação local foram conferidas nos fontes R11/R8.
+Links oficiais consultados em 23/11/2026. As telas de portais deste manual são desenhos explicativos: menus e condições comerciais podem mudar. As instruções de operação local foram conferidas nos fontes R12/R9a.
 
 | Referência | Documento oficial |
 | --- | --- |
@@ -1011,9 +1011,9 @@ Fontes locais: firmware/lyke_stm32/interface.h e scientific.h; firmware/esp32cam
 
 ```yaml
 produto: Lyke 101078 modificada
-data_manual: 2026-11-23
-stm32: lyke-r11
-esp: lyke-r8
+data_manual: 2026-11-24
+stm32: lyke-r12
+esp: lyke-r9a
 esp_chip: ESP32 clássico AI Thinker, 4 MB flash e 4 MB PSRAM
 nao_confundir: GOOUUU ESP32-S3 + DevKit (montagem diferente)
 teclas: 49; ON não mapeada
@@ -1027,7 +1027,9 @@ envio: MODE > ENVIAR FOTOS IA > confirmar com =
 arquivo: só após envio, no serviço privado
 bateria: 0-4 barras aproximadas; ! baixa; ? leitura inválida; medição a cada 30 s
 stm_ota: Wi-Fi do ESP + UART existente; base V2 já instalada e testada
-api_testada: OpenAI Responses
+api_testada: OpenAI Responses; figuras da API v3 ainda sem teste real no aparelho
+leitor: texto e desenhos 2D; cima/baixo 16px; lados 24px em figura larga ou 48px verticais em texto
+wifi_indicador: 3 pulsos no sucesso, depois oculto; falha alterna Wi-Fi/X
 modelo_principal: gpt-6.1-terra / high
 modelo_economico: gpt-6-luna / medium
 claude: não integrado e não testado; exige adaptador Anthropic no servidor

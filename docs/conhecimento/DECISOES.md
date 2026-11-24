@@ -2,6 +2,11 @@
 
 ## Produto
 
+- Ainda em 24/11, usuário ligou e autorizou a instalação. STM R12 e ESP
+  R9a instalados por Wi-Fi/UART, revisões/MAP49 conferidos; configurações
+  e resposta preservadas. R9a oculta rodapé legado de tokens no leitor.
+  Manual sincronizado para edição 3.0. Sem nova chamada paga à API.
+
 - Em 24/11/2026, reaberto o projeto: verificar rede Visitantes salva,
   Wi-Fi sem símbolo persistente (três pulsos no sucesso; X/sinal alternados
   na falha), figuras roláveis entre passos da resposta. Usuário confirmou

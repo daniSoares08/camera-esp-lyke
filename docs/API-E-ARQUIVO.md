@@ -5,9 +5,10 @@
 comandos e limites em `supabase/functions/lyke-solve/graphics.ts`.
 Sem alteração de tabelas/RLS/bucket/segredos. Dezesseis testes locais e
 smoke GET/401 aprovados; nenhuma nova chamada paga. Geração real de figuras
-e conjunto preparado STM R12/ESP R9 ainda aguardam teste no aparelho.
+no aparelho ainda aguarda teste. STM R12/ESP R9a instalados por Wi-Fi em
+24/11, revisões e mapa de 49 teclas conferidos; resposta salva preservada.
 
-**Edição final:** STM R11/ESP R8, manual 2.0 em `docs/manual/`. O usuário
+**Edição atual:** STM R12/ESP R9a, manual 3.0 em `docs/manual/`. O usuário
 tornou o repositório público; o arquivo de fotos permanece privado e as
 credenciais continuam fora do Git. Os detalhes abaixo registram a integração
 e os testes, incluindo a revisão v2 do serviço. Somente OpenAI integrada/testada.

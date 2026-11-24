@@ -15,7 +15,7 @@ from image_codec import unpack_image
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--revision',default='lyke-r12')
-    parser.add_argument('--esp-revision',default='lyke-r9')
+    parser.add_argument('--esp-revision',default='lyke-r9a')
     args=parser.parse_args()
     for value in [args.revision,args.esp_revision]:
         if not value.startswith('lyke-') or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789-.' for c in value):
@@ -53,7 +53,7 @@ ESP32/esp32cam_integrada.ino.bin é apenas para a linha ESP32-CAM.
 Não misturar arquivos nem publicar estes binários. Os manifestos contêm hashes.
 O manifesto ESP também lista auxiliares de compilação que não estão neste pacote.
 Manual final em output/pdf/Manual-Lyke.pdf e Manual-Lyke.md no workspace.
-Para R12/R9: atualizar ESP primeiro, confirmar e depois STM pelo portal.
+Para R12/R9a: atualizar ESP primeiro, confirmar e depois STM pelo portal.
 Guia: docs/REVISAO-R12-DESENHOS-E-WIFI.md no workspace.
 ''',encoding='utf-8')
     files={str(p.relative_to(out)).replace('\\','/'):{'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())}

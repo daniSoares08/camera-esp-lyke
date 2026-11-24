@@ -1,16 +1,18 @@
 # Firmware Lyke 101078 · STM32G431 e ESP32-CAM clássica
 
-**Preparação de 24/11: STM R12 + ESP R9**, ainda não instalados. Leia
+**Instalados em 24/11: STM R12 + ESP R9a**, por Wi-Fi/UART existente. Leia
 [desenhos roláveis e Wi-Fi](../../docs/REVISAO-R12-DESENHOS-E-WIFI.md).
 Os fontes atuais compilam com `sh firmware/lyke_stm32/build.sh lyke-r12`.
-O estado R11/R8 abaixo continua sendo o conjunto fisicamente instalado.
+Revisões, reinício e mapa de 49 teclas conferidos. Configurações e última
+resposta preservadas; geração real de figuras ainda aguarda teste no aparelho.
+Os estados R11/R8 e anteriores abaixo são históricos.
 
-**Estado final: STM32 R11 + ESP Lyke R8**, instalados por Wi-Fi, com 49
+**Histórico de 23/11: STM32 R11 + ESP Lyke R8**, instalados por Wi-Fi, com 49
 teclas e indicador de bateria confirmados pelo usuário. Divisor corrigido
 para dois 470 kilohms. Detalhes em [Bateria e R11](BATERIA-R11.md).
 Manual final do comprador: [PDF](../../docs/manual/Manual-Lyke.pdf) e
 [Markdown](../../docs/manual/Manual-Lyke.md). Para compilar a revisão atual,
-use `sh firmware/lyke_stm32/build.sh lyke-r11`; a base V2 é a mesma abaixo.
+use `sh firmware/lyke_stm32/build.sh lyke-r12`; a base V2 é a mesma abaixo.
 O restante desta página preserva a instalação e os históricos anteriores.
 
 ## Estado atual e instruções da R10 — 23/11/2026

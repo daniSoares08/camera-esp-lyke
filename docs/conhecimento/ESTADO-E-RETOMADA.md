@@ -2,7 +2,32 @@
 
 ## Próxima retomada
 
-### Preparados STM R12 + ESP Lyke R9; usuário ligará depois
+### Instalados STM R12 + ESP Lyke R9a — 24/11/2026
+
+Usuário informou “ligada, pode atualizar”. Identificado novamente pelo portal
+ESP32 clássico/4 MiB e conjunto anterior STM R11/ESP R8; fila de fotos vazia.
+Instalação ESP R9 → STM R12 → correção ESP R9a, sem USB nem novos fios.
+
+- STM R12 pelo portal/UART, 14,34 s, HTTP 200 e reinício; loader conferiu
+  CRC da aplicação `37e35397`. Revisão `lyke-r12`, 49 teclas e prontidão
+  confirmados depois. App 62.568 bytes, pacote OTA 45.530 bytes.
+- ESP R9a em app0, 1.362.896 bytes, SHA-256
+  `e7ff9868df52367e3f916ace8637cf7f40de18fa87416ade1b91c9f8b69776a8`.
+  Digest em execução conferido. Portal e configuração de API preservados.
+- R9a corrige compatibilidade da resposta antiga: oculta o rodapé canônico
+  de contagem de tokens no novo leitor, sem remover conteúdo do texto salvo.
+  Regressão nativa específica aprovada e resposta preservada byte a byte.
+- Relatórios privados `device-r9-ota.json`, `device-stm-r12-wifi.json` e
+  `device-r9a-ota.json`, em `.private/lyke-cloud/`.
+- Sem captura nova nem chamada paga à IA nesta instalação. API v3 já publicada.
+  Conferência visual solicitada ao usuário. Não inferir teste físico dos
+  desenhos/animações apenas pela revisão e MAP49. Geração real de desenho
+  pelo modelo e conexão Visitantes no campus continuam pendentes de ensaio.
+- Manual do comprador atualizado para edição 3.0 (36 páginas), R12/R9a,
+  PDF/Markdown com navegação dos desenhos e sinal Wi-Fi. Prévia é do renderizador
+  local, não figura gerada pelo modelo nem fotografia do LCD.
+
+### Histórico da preparação em 24/11: STM R12 + ESP Lyke R9
 
 Pedido de 24/11/2026: conferir rede Visitantes salva no Windows; ocultar
 sinal Wi-Fi normal, piscar três vezes no sucesso e alternar X/sinal na

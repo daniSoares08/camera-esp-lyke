@@ -6,18 +6,18 @@ outro chat; não é uma garantia de memória automática fora desta pasta.
 
 ## Começar por aqui
 
-**Último pedido:** preparados STM R12 + ESP R9, ainda não instalados,
-com novo aviso Wi-Fi e desenhos roláveis. API v3 publicada e compatível
-com texto antigo. O usuário ligará depois para atualizar. Guia em
-`docs/REVISAO-R12-DESENHOS-E-WIFI.md`; ver o início de `ESTADO-E-RETOMADA.md`.
+**Último pedido:** usuário ligou e autorizou a atualização. Instalados
+**STM R12 + ESP R9a**, por Wi-Fi/UART existente, sem novos fios/USB.
+Revisões, reinício, 49 teclas e portal conferidos; configurações e última
+resposta preservadas. API v3 publicada; novo aviso Wi-Fi e desenhos roláveis.
+Guia em `docs/REVISAO-R12-DESENHOS-E-WIFI.md`.
 
-**Instalados:** STM32 R11 + ESP Lyke R8, atualizados pelo
-Wi-Fi/UART existente. Ícone de bateria e leitura normal confirmados pelo
-usuário após corrigir o divisor para dois resistores de 470 kilohms.
-Notação gráfica na janela original e leitor de seis linhas mantidos.
-Manual final edição 2.0 em PDF/MD em `docs/manual/` e `output/pdf/`.
-Repositório agora público; credenciais, fotos de questões e binários
-continuam privados. O encerramento de 23/11 é histórico; houve novo pedido em 24/11.
+Manual edição 3.0 em PDF/MD em `docs/manual/` e `output/pdf/`.
+A geração real de figuras, rolagem no LCD e rede Visitantes no campus
+continuam sem confirmação física nesta etapa. Bateria normal/ícone e
+notação na janela original já haviam sido confirmados pelo usuário na R11.
+Repositório público; credenciais, fotos de questões e binários privados.
+O encerramento de 23/11 é histórico; houve novo pedido em 24/11.
 
 1. [Estado, firmwares e próximos passos](ESTADO-E-RETOMADA.md)
 2. [Componentes, pinagens e alimentação](HARDWARE.md)
@@ -35,7 +35,7 @@ continuam privados. O encerramento de 23/11 é histórico; houve novo pedido em 
 | Montagem | Processadores | Tela / teclado | Situação |
 |---|---|---|---|
 | Calculadora na carcaça HP48 | GOOUUU S3-CAM N16R8 + ESP32 DevKit V1 | LCM12864D-V1.0 paralela; teclado original HP48 com 46 contatos aceitos | Firmware próprio de calculadora, fotos e API; última revisão S3 preparada, envio pendente de confirmação |
-| Lyke 101078 | ESP32-CAM AI Thinker, ESP32 clássico + STM32G431CBU6 | Câmera AF, GMG12864-06D Ver.2.2 e teclado original de 19 trilhas | Instalados STM32 `lyke-r11`, ESP `lyke-r8` em app0. OTA, 49 teclas, raiz/frações e indicador de bateria confirmados; manual final R11/R8 |
+| Lyke 101078 | ESP32-CAM AI Thinker, ESP32 clássico + STM32G431CBU6 | Câmera AF, GMG12864-06D Ver.2.2 e teclado original de 19 trilhas | Instalados STM32 `lyke-r12`, ESP `lyke-r9a` em app0. OTA/revisões/MAP49 conferidos; leitor gráfico aguardando teste físico; manual 3.0 |
 
 O HTML atual usa o STM32 para teclado, LCD, cálculo offline e divisor de
 bateria no PA0. A ESP32-CAM fica com câmera, Wi-Fi, API e OTA. As placas
@@ -49,7 +49,7 @@ mapeamento guiado de 49 teclas. O mapeador de bancada foi preservado em
 ## Documentos técnicos já existentes
 
 - Manual do comprador em `output/pdf/Manual-Lyke.pdf` (36 páginas),
-  `Manual-Lyke.md` e `Manual-Lyke-Completo.zip`. Edição 2.0, funções R11/R8,
+  `Manual-Lyke.md` e `Manual-Lyke-Completo.zip`. Edição 3.0, funções R12/R9a,
   telas simuladas, Wi-Fi, fotos, arquivo e tutoriais de conta OpenAI/Claude.
   **Somente OpenAI integrada/testada; Claude ainda exige adaptador no servidor.**
   Gerador e notas de revisão: `scripts/manual_lyke/`.

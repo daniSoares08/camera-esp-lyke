@@ -1,5 +1,9 @@
 # Hardware e pinagens
 
+**24/11/2026:** STM R12 + ESP R9a instalados pelo Wi-Fi/UART existente.
+Sem mudança de componentes, alimentação ou pinagem; 49 teclas mapeadas
+e revisões conferidas. A correção física do divisor abaixo permanece válida.
+
 **Correção final de 23/11/2026:** usuário mediu 3,84 V com multímetro,
 encontrou um resistor de 470 ohms (amarelo-roxo-marrom) e o substituiu
 para ficar com dois de 470 kilohms (amarelo-roxo-amarelo). Informou leitura

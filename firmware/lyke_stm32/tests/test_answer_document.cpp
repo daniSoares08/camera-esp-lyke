@@ -42,6 +42,8 @@ int main(int argc,char **argv){
     assert(!deserializeJson(json,bytes.str()));json["blocks"][4]["commands"][2]["p"][4]=10000;assert(!loadAnswerDocument(json.as<JsonVariantConst>(),doc));
     doc.plain("2*x+3=11\nx=4");raster.render(doc,0,0);save(argv[2],"texto_legado",raster);
     assert(doc.height==48&&doc.widthAt(0)==126);
+    assert(lyke::AnswerDocument::lines("x=4\n\nTokens entrada: 9179\nTokens saida: 2616",[](unsigned,const char *s){assert(!strcmp(s,"x=4"));})==1);
+    assert(lyke::AnswerDocument::lines("Tokens entrada: dados\nEsta linha e conteudo",[](unsigned,const char*){})==2);
     raster={};raster.command(lyke::DrawCommand{{0,20,60,20,0},lyke::D_SOURCE,""},0);
     assert(bit(raster,26,18)&&!bit(raster,34,18));
     puts("Actual rich-document renderer: circuit/plot/angle, inline text, pan, legacy fallback, bounds and STM wire roundtrip OK");

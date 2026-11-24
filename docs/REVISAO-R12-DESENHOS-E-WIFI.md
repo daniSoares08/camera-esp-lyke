@@ -1,8 +1,9 @@
-# Revisão preparada: STM R12 + ESP Lyke R9
+# Revisão instalada: STM R12 + ESP Lyke R9a
 
-24/11/2026. **Compilados/testados no computador; ainda não gravados.**
-O usuário ligará a calculadora depois. Instalados continuam STM R11 + ESP
-Lyke R8. Serviço API v3 publicado, compatível com os clientes antigos.
+24/11/2026. **Instalados por Wi-Fi e UART existente**, após o usuário ligar
+a calculadora e autorizar. Reinício, revisões e 49 teclas mapeadas conferidos.
+Configurações e última resposta preservadas. API v3 publicada, compatível
+com clientes antigos. Geração real de figuras ainda aguarda teste no aparelho.
 Não confundir revisão do STM com a revisão independente do ESP.
 
 ## Rede da universidade
@@ -80,21 +81,29 @@ associar figura antiga a uma resposta nova após interrupção da gravação.
 O JSON bruto também fica em `answer_text` no arquivo privado do servidor,
 enquanto `answer_lcd` mantém a representação textual. Sem migração de banco.
 
-## Atualizar depois que o usuário ligar
+## Instalação concluída
 
-1. Reidentificar o aparelho pelo portal, conferindo ESP clássico/4 MiB,
-   revisões atuais e mapa de 49 teclas. Preservar os relatórios atuais.
-2. Atualizar só a aplicação do ESP para Lyke R9 pelo portal Calc-Lyke.
-3. Confirmar reinício/revisão/slot/digest; atualizar o STM para R12 pelo
-   mesmo portal, usando `lyke-stm32-ota.bin`.
-4. Confirmar R12, teclado/bateria, três piscadas no sucesso, alternância
-   na falha e retorno do cálculo normal sem símbolo persistente.
-5. Fotografar uma questão que peça desenho para validar geração pelo
-   modelo, leitor, rolagem e persistência no aparelho.
+1. Reidentificado ESP32 clássico com flash 4 MiB, ESP R8/STM R11 e 49 teclas.
+2. Aplicação ESP R9 instalada por OTA, slot app1 e digest conferidos.
+3. STM R12 instalado pelo mesmo portal/UART em 14,34 s, HTTP 200;
+   CRC da aplicação, reinício, revisão R12 e mapa de 49 teclas conferidos.
+4. A resposta salva tinha rodapé antigo de tokens. Correção R9a oculta
+   somente esse rodapé no leitor novo, sem alterar o texto salvo.
+5. ESP R9a instalado por OTA em app0; revisão/digest, configurações,
+   resposta idêntica byte a byte e `keyboard_ready=true` conferidos.
 
-O loader V2 instalado continua idêntico. Não precisa regravar por USB,
+Aplicação STM: 62.568 bytes, CRC32 `37e35397`. ESP R9a: 1.362.896 bytes.
+Hashes completos nos manifestos/inventário. Relatórios locais privados:
+`device-stm-r12-wifi.json` e `device-r9a-ota.json`, em `.private/lyke-cloud/`.
+
+O loader V2 instalado continua idêntico. Não foi necessário USB,
 alterar o mapa de flash nem acrescentar fios. Binário DFU é apenas para
 instalação inicial/recuperação e não vai no formulário de OTA.
+
+Para repetir: instalar primeiro a aplicação ESP R9a, conferir reinício,
+e então `lyke-stm32-ota.bin` da R12 na linha STM32 do portal.
+Conferência visual de animação, leitor e rolagem depende do aparelho;
+revisão/MAP49 por si só não comprovam esses resultados físicos.
 
 ## Testes e limites de validação
 
@@ -114,5 +123,5 @@ prova correção matemática ou topológica.
 
 ![Prévia do renderizador e recortes do LCD](assets/lyke-r12-desenhos.png)
 
-O manual do comprador edição 2.0 continua documentando o conjunto R11/R8
-efetivamente instalado; esta nota complementa a revisão preparada para teste.
+Manual do comprador edição 3.0 em `docs/manual/`: R12/R9a, com instruções
+e imagens do leitor gráfico e aviso Wi-Fi. As figuras são simulações locais.
