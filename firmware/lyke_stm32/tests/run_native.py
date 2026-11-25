@@ -3,10 +3,11 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import argparse
 
 ROOT = Path(__file__).resolve().parents[3]
 OUT = ROOT / '.build/lyke_stm32'
-RELEASE = OUT / 'lyke-r12'
+RELEASE = OUT / 'lyke-r13'
 TESTS = 'firmware/lyke_stm32/tests'
 results = []
 
@@ -36,9 +37,9 @@ def main():
 
     base = ['-O2', '-Wall', '-Wextra', '-Werror', '-Wno-unused-function']
     run('compile shared decoder', 'gcc', '-O2', '-c', 'firmware/lyke_stm32/vendor/puff.c', '-o', OUT/'puff-host.o')
-    for name in ['math_layout', 'interface', 'battery', 'battery_monitor', 'wifi_indicator', 'answer_frame']:
+    for name in ['math_layout', 'interface', 'battery', 'battery_monitor', 'wifi_indicator', 'answer_frame', 'sleep_control', 'power_stop']:
         run('compile ' + name, 'gcc', '-std=c11', *base, '-Wno-misleading-indentation',
-            f'{TESTS}/test_{name}.c', '-lm', '-o', OUT/f'test_{name}.exe')
+            '-I',previews.parent,f'{TESTS}/test_{name}.c', '-lm', '-o', OUT/f'test_{name}.exe')
         run(name, OUT/f'test_{name}.exe', *([previews] if name != 'battery' else []))
     run('compile answer pager', 'g++', '-std=c++17', *base, f'{TESTS}/test_answer_pager.cpp', '-o', OUT/'test_answer_pager.exe')
     run('answer pager', OUT/'test_answer_pager.exe')
@@ -60,6 +61,9 @@ def main():
 
 
 if __name__ == '__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('--revision',default='lyke-r13');args=parser.parse_args()
+    if not args.revision.startswith('lyke-') or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789-.' for c in args.revision):parser.error('Invalid revision')
+    RELEASE=OUT/args.revision
     try:
         main()
     finally:

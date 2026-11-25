@@ -14,8 +14,8 @@ from image_codec import unpack_image
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--revision',default='lyke-r12')
-    parser.add_argument('--esp-revision',default='lyke-r10')
+    parser.add_argument('--revision',default='lyke-r13')
+    parser.add_argument('--esp-revision',default='lyke-r11')
     args=parser.parse_args()
     for value in [args.revision,args.esp_revision]:
         if not value.startswith('lyke-') or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789-.' for c in value):
@@ -63,12 +63,16 @@ ESP32/esp32cam_integrada.ino.bin é apenas para a linha ESP32-CAM.
 Não misturar arquivos nem publicar estes binários. Os manifestos contêm hashes.
 O manifesto ESP também lista auxiliares de compilação que não estão neste pacote.
 Manual final em output/pdf/Manual-Lyke.pdf e Manual-Lyke.md no workspace.
-Se STM R12 ja estiver instalado, atualize apenas o ESP para R10; nao regrave o STM.
-R10 do ESP e R10 do STM sao revisoes independentes, nao arquivos intercambiaveis.
-Guia: docs/REVISAO-ESP-R10-ENERGIA-E-RESPOSTAS.md no workspace.
+Para sono profundo, atualizar os DOIS: ESP R11 primeiro; depois STM R13 pelo portal.
+O carregador V2 instalado e o mapa de teclas permanecem; nao usar DFU sem necessidade.
+As revisoes ESP/STM sao independentes, nao arquivos intercambiaveis.
+Guia: docs/REVISAO-R13-SONO-PROFUNDO.md no workspace.
 Para o novo perfil de energia, Calc-Lyke abre no boot/menu e encerra apos
 dois minutos sem atividade no portal; roteador continua em modo economico.
 Fotos pausam o radio e restauram o estado anterior automaticamente.
+SHIFT+AC apaga LCD e coordena ESP deep-sleep + STM STOP1; somente MODE desperta.
+Fotos temporarias ainda nao enviadas se perdem; resposta salva/configuracoes ficam.
+Nao ha Wi-Fi, captura, atualizacao nem medicao periodica durante o sono.
 ''',encoding='utf-8')
     files={str(p.relative_to(out)).replace('\\','/'):{'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())}
            for p in out.rglob('*') if p.is_file() and p.name!='release.json'}

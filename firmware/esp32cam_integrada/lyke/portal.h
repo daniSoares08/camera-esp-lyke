@@ -162,6 +162,8 @@ static void describeImage(JsonDocument& doc) {
   doc["portal_active"] = portal;
   doc["cpu_mhz"] = getCpuFrequencyMhz();
   doc["reset_reason"] = int(esp_reset_reason());
+  doc["wake_reason"] = int(esp_sleep_get_wakeup_cause());
+  doc["deep_sleep_supported"] = true;
   doc["power_policy"] = "sta-idle-portal-120s-camera-radio-pause";
   doc["capture_pending"] = capturePendingAt!=0;
   doc["capture_busy"] = captureBusy;

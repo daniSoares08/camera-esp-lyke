@@ -6,6 +6,14 @@ em [teclado-lyke.csv](teclado-lyke.csv); ON foi dispensada.
 O [HTML de montagem](../../outputs/ligacoes/ESP-CAM-esquema.html) mostra a
 arquitetura com STM32 e ESP32-CAM clássica.
 
+## Sono preparado em 25/11/2026
+
+STM R13 + ESP R11 ainda não gravados: MODE usa PB12/T02 e PB9/T16,
+conforme o mapa real. Em STOP1 só esse par tem pull-up/saída baixa e EXTI;
+as demais trilhas ficam analógicas sem pulls. Ao despertar, o STM restaura
+a matriz e acorda o ESP pela UART PA2→GPIO13 existente. Nenhum fio adicional.
+[Protocolo, limites e aplicação](../REVISAO-R13-SONO-PROFUNDO.md).
+
 ## Alternativa com STM32G431CBU6 e ESP32-CAM
 
 O usuário possui uma placa STM32G431CBU6 com layout compatível com a WeAct

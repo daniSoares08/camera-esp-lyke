@@ -2,6 +2,46 @@
 
 ## Próxima retomada
 
+### Preparados STM R13 + ESP R11: sono profundo por SHIFT+AC
+
+Novo pedido do usuário em 25/11: implementar sono, acordando apenas por MODE,
+sem monitoramento/rede/bateria periódicos. O resistor 330 Ω será retirado quando
+chegarem componentes novos; não houve remoção nem nova ligação.
+
+- **Instalados continuam STM R12 + ESP R9a. Preparados, não gravados:** STM
+  R13 + ESP R11. A restrição de carga segue vigente: usuário informou bateria
+  crítica e pediu deixar pronto. Nenhum hardware acessado nesta implementação.
+- Atualizar os DOIS, primeiro ESP R11 e depois STM R13 pelo Wi-Fi/UART.
+  A R11 incorpora toda a preparação ESP R10 de energia, captura e símbolos.
+- SHIFT+AC global (inclusive resposta/menu), confirmação S1 em duas etapas,
+  ESP deep-sleep/ext0 GPIO13, STM STOP1 com só EXTI do par MODE. Relógio de
+  aplicativo, ADC, UART e varredura param; LCD display/power interno desligados.
+- Par real MODE PB12/PB9 do mapa gravado. MODE acorda STM e o TX PA2 dá pulso
+  baixo de 50 ms ao RTC GPIO13 do ESP. Sem fio novo nem novo pino de reset.
+  Câmera PWDN GPIO32 em hold RTC alto; GPIO0 não é mantido baixo no sono.
+- Fotos locais em PSRAM não sobrevivem; resposta/desenho salvos, rede, mapa
+  e configurações permanecem. RAM do STM retida; MODE inicial não abre menu.
+  Mensagem atrasada/timeout/ESP antigo não gera desligamento falso.
+- Compilações aprovadas. STM app 64.688 bytes, CRC `b8d4541d`, OTA 47.273 bytes.
+  Loader recompilado idêntico byte a byte à base R12. 30 verificações nativas
+  aprovadas: protocolo, rotina STOP com registros simulados, apenas MODE,
+  bounce/pressão antecipada, restauração e pulso, além das regressões completas.
+- Sem gravação, captura nem consulta paga. Ciclo físico, GPIO/RTC no aparelho,
+  corrente, temperatura e autonomia ainda pendentes após a carga.
+- Guia `docs/REVISAO-R13-SONO-PROFUNDO.md`; pacote privado
+  `output/firmware/lyke-r13-esp-r11-preparado.zip`; manifesto e testes no pacote.
+  Validação `.private/lyke-sleep-2026-11-25/validation.json`.
+
+### Histórico da análise de bateria e preparação ESP R10
+
+**Esclarecimento posterior em 25/11:** bateria atual retirada de controle PS4;
+usar 1.000 mAh nominais (referência original Sony), não os 2.000 mAh da foto
+histórica. Capacidade real não aferida. SHIFT+AC apenas limpa tela/desliga
+rádio; não aplica deep-sleep ao ESP nem STOP profundo ao STM. Resistor 330 Ω
+continua na saída do boost, divisor também segue alimentado. Estimativa só
+dessas cargas: ~39–43 h com célula nova/cheia e boost assumido 80–90%;
+consumo real em soft-off é maior. Não foi alterado/gravado firmware nesta consulta.
+
 ### Preparada ESP R10; API v4 publicada — 25/11/2026
 
 Usuário relatou resposta prolixa, phi/pi e quebra confusa; reinício ao capturar

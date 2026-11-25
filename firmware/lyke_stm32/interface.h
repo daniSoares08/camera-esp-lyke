@@ -7,6 +7,8 @@
 #include "battery_gauge.h"
 #include "wifi_indicator.h"
 #include "answer_frame.h"
+#include "sleep_control.h"
+static SleepControl sleep_control;
 static WifiIndicator wifi_indicator;
 static AnswerFrame answer_frame;
 static bool graphics_capable;
@@ -733,10 +735,21 @@ static void stats_add(bool remove)
 static void interface_key(enum Key key)
 {
     if (blanked) {
-        if (key == KEY_ON || (!has_on() && key == KEY_MODE)) blanked = false;
+        if (key == KEY_MODE) sleep_control.wake_requested=true;
         return;
     }
-    if (view != CALCULATOR) { navigation(key); return; }
+    if (key==KEY_AC && shift) {
+        shift=alpha=false;
+        if(photo_busy||api_busy){notice("AGUARDE A OPERACAO");return;}
+        if(!sleep_start(&sleep_control,ticks)){notice("ATUALIZE O ESP");return;}
+        if(view==SETTINGS)save_settings(preferences.program);
+        edit_clear();hyp=false;recording=playing=false;blanked=true;
+        wifi_mark(&wifi_indicator,WIFI_DISABLED,ticks);
+        char command[24];print_text(command,sizeof(command),"SLEEP? %u",(unsigned)sleep_control.sequence);
+        request(command);return;
+    }
+    if(key==KEY_SHIFT && view!=CALCULATOR){shift=!shift;alpha=false;return;}
+    if (view != CALCULATOR) { shift=alpha=false;navigation(key); return; }
     if (recording && key != KEY_MODE && key != KEY_ON &&
         !(shift && (key == KEY_AC || key == KEY_RIGHT))) {
         if (recorded_keys < PROGRAM_CAP) recording_keys[recorded_keys++] = key + 1;
@@ -781,7 +794,6 @@ static void interface_key(enum Key key)
     }
     if (key == KEY_AC) {
         edit_clear(); hyp = false;
-        if (shifted) { blanked = true; wifi_mark(&wifi_indicator,WIFI_DISABLED,ticks);request("OFF"); }
         return;
     }
     if (key == KEY_DEL) {
@@ -857,6 +869,14 @@ static void interface_mapped(void)
 static bool interface_message(const char *text)
 {
     link_state_at = ticks;
+    if(!strcmp(text,"CAPS S1")){sleep_control.supported=true;return false;}
+    if(!strncmp(text,"SLEEP",5)) {
+        if(sleep_message(&sleep_control,text,ticks)==1) {
+            char command[24];print_text(command,sizeof(command),"SLEEP GO %u",(unsigned)sleep_control.sequence);
+            serial_send(command);
+        }
+        return false;
+    }
     if(!strcmp(text,"CAPS G1")){graphics_capable=true;return false;}
     if(!strncmp(text,"FRAME ",6)||!strncmp(text,"PIX ",4)||!strncmp(text,"FRAME_END ",10)) {
         int result=frame_message(&answer_frame,text);
@@ -923,6 +943,7 @@ static bool interface_tick(void)
 {
     static uint32_t last_ping, last_blink, last_battery_blink;
     if (mapped < KEY_COUNT) return false;
+    if(sleep_control.phase!=SLEEP_RUN){sleep_tick(&sleep_control,ticks);return false;}
     uint32_t now = ticks;
     if(wifi_animation(&wifi_indicator,now)&&!blanked&&view!=ANSWER_VIEW)return true;
     if (!blanked && view != ANSWER_VIEW && battery_low(&battery) && now-last_battery_blink>=500) {

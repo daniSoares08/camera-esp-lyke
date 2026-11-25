@@ -1,5 +1,9 @@
 # ESP Lyke R10: energia e respostas
 
+**Preparação sucedida por STM R13 + ESP R11**, que incorpora estes ajustes e
+adiciona sono profundo: [guia atual](REVISAO-R13-SONO-PROFUNDO.md). Continua
+sem gravação por bateria crítica; o restante registra a preparação anterior.
+
 25/11/2026. **Preparada, não instalada.** Usuário pediu esperar a carga:
 a bateria continua crítica. Hardware permanece STM R12 + ESP R9a.
 Somente o ESP precisa da atualização; não confundir com o antigo STM R10.

@@ -50,6 +50,7 @@ def main():
             shutil.copy2(shared/name, stage/name)
         image_format = (ROOT/'firmware/lyke_stm32/image_format.h').read_text()
         shutil.copy2(ROOT/'firmware/lyke_stm32/answer_frame.h',stage/'answer_frame.h')
+        shutil.copy2(ROOT/'firmware/lyke_stm32/sleep_control.h',stage/'sleep_control.h')
         (stage/'image_format.h').write_text(image_format.replace('"vendor/puff.h"', '"puff.h"'))
         for name in ('puff.c', 'puff.h'):
             shutil.copy2(ROOT/'firmware/lyke_stm32/vendor'/name, stage/name)

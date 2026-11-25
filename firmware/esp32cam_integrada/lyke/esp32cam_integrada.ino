@@ -16,7 +16,10 @@
 #include "answer_frame.h"
 #include <esp_heap_caps.h>
 #include <esp_system.h>
+#include <esp_sleep.h>
+#include <driver/rtc_io.h>
 #include "power_policy.h"
+#include "sleep_control.h"
 
 struct AnswerAllocator:ArduinoJson::Allocator {
   void* allocate(size_t n) override{return heap_caps_malloc(n,MALLOC_CAP_SPIRAM|MALLOC_CAP_8BIT);}
@@ -44,6 +47,7 @@ static PortalLease portalLease;
 static bool captureBusy;
 static uint32_t capturePendingAt;
 static String captureResult;
+static SleepPeer sleepPeer;
 static bool connectionFailed;
 static uint32_t rebootAt, connectAt, portalAttemptAt;
 static String sessionToken, activeSsid, lastAnswer, pendingRequestId;
@@ -91,6 +95,7 @@ static void sendStatus() {
               portal, !lastAnswer.isEmpty());
   sendLine(String("LINK ")+(!wifiEnabled?"OFF":connectActive?"JOIN":WiFi.status()==WL_CONNECTED?"OK":connectionFailed?"FAIL":"IDLE"));
   sendLine("CAPS G1");
+  sendLine("CAPS S1");
 }
 
 static uint32_t answerTextCRC(){return ~image_crc_update(UINT32_MAX,(const uint8_t*)lastAnswer.c_str(),lastAnswer.length());}
@@ -471,9 +476,46 @@ static void sendAnswerPage(unsigned page, unsigned columns, unsigned rows, bool 
   sendLine(more ? "TEXT_MORE" : "TEXT_END");
 }
 
+static bool enterDeepSleep(uint16_t sequence) {
+  // GPIO13 is already wired to STM PA2/UART TX. Idle HIGH keeps us asleep;
+  // only the STM's deliberate MODE wake pulse pulls it LOW for 50 ms.
+  if(esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL)!=ESP_OK ||
+     esp_sleep_enable_ext0_wakeup(GPIO_NUM_13,0)!=ESP_OK)return false;
+  cameraStop();
+  esp_err_t error=rtc_gpio_init(GPIO_NUM_32);
+  error|=rtc_gpio_set_direction(GPIO_NUM_32,RTC_GPIO_MODE_OUTPUT_ONLY);
+  error|=rtc_gpio_set_level(GPIO_NUM_32,1);
+  error|=rtc_gpio_hold_en(GPIO_NUM_32);
+  error|=rtc_gpio_init(GPIO_NUM_13);
+  error|=rtc_gpio_set_direction(GPIO_NUM_13,RTC_GPIO_MODE_INPUT_ONLY);
+  error|=rtc_gpio_pullup_en(GPIO_NUM_13);
+  error|=rtc_gpio_pulldown_dis(GPIO_NUM_13);
+  if(error!=ESP_OK){
+    rtc_gpio_hold_dis(GPIO_NUM_32);rtc_gpio_deinit(GPIO_NUM_32);rtc_gpio_deinit(GPIO_NUM_13);
+    cameraStop();return false;
+  }
+  wifiEnabled=false;portalLease.close();capturePendingAt=0;
+  scanActive=connectActive=false;if(portal)web.stop();portal=false;
+  WiFi.mode(WIFI_OFF);
+  stmSerial.printf("SLEEPING %u\n",sequence);stmSerial.flush();
+  stmSerial.end();Serial.flush();
+  // Only camera PWDN is held. Never hold GPIO0 LOW: it is a boot strap.
+  esp_deep_sleep_start();
+  return false;
+}
+
 static void runCommand(const String& command) {
   if (command == "STATUS" || command == "LYKE APP V1") {
     sendStatus();
+  } else if(command.startsWith("SLEEP? ")||command.startsWith("SLEEP GO ")) {
+    const bool query=command.startsWith("SLEEP? ");uint16_t sequence;
+    if(!sleep_number(command.c_str()+(query?7:9),&sequence))return;
+    if(ota.receiving||ota.complete||rebootAt||captureBusy||capturePendingAt){
+      stmSerial.printf("SLEEP BUSY %u\n",sequence);return;
+    }
+    if(query){sleep_peer_arm(&sleepPeer,sequence,millis());stmSerial.printf("SLEEP READY %u\n",sequence);}
+    else if(!sleep_peer_commit(&sleepPeer,sequence,millis())||!enterDeepSleep(sequence))
+      stmSerial.printf("SLEEP FAIL %u\n",sequence);
   } else if(command.startsWith("READG ")) {
     unsigned x,y,sequence;char extra;
     if(sscanf(command.c_str(),"READG %u %u %u %c",&x,&y,&sequence,&extra)==3)sendAnswerWindow(x,y,sequence);
@@ -543,6 +585,10 @@ static void runCommand(const String& command) {
 void setup() {
   Serial.begin(460800);
   setCpuFrequencyMhz(80);
+  // Release RTC mux/hold left by deep sleep before UART or camera uses the pads.
+  digitalWrite(32,HIGH);pinMode(32,OUTPUT);
+  rtc_gpio_hold_dis(GPIO_NUM_32);rtc_gpio_deinit(GPIO_NUM_32);rtc_gpio_deinit(GPIO_NUM_13);
+  cameraStop();
   pinMode(33, INPUT);
   stmSerial.setRxBufferSize(512);
   stmSerial.begin(115200, SERIAL_8N1, 13, 14);

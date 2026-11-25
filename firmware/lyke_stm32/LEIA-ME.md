@@ -1,12 +1,14 @@
 # Firmware Lyke 101078 · STM32G431 e ESP32-CAM clássica
 
-**25/11:** ESP R10 preparada com economia e símbolos no leitor IA; STM R12
-permanece, sem necessidade de nova gravação. Usuário adiou por bateria crítica.
-Leia [energia e respostas](../../docs/REVISAO-ESP-R10-ENERGIA-E-RESPOSTAS.md).
+**25/11:** preparados STM R13 + ESP R11 para SHIFT+AC → sono e MODE →
+despertar, sem fios adicionais. Ambos precisam atualizar, primeiro o ESP.
+Nenhuma gravação: espera pela bateria crítica continua. Inclui os ajustes
+anteriores de energia/símbolos. Leia [sono profundo](../../docs/REVISAO-R13-SONO-PROFUNDO.md).
+Compilação atual: `sh firmware/lyke_stm32/build.sh lyke-r13`.
 
 **Instalados em 24/11: STM R12 + ESP R9a**, por Wi-Fi/UART existente. Leia
 [desenhos roláveis e Wi-Fi](../../docs/REVISAO-R12-DESENHOS-E-WIFI.md).
-Os fontes atuais compilam com `sh firmware/lyke_stm32/build.sh lyke-r12`.
+A R12 instalada é histórica; os fontes atuais compilam para R13.
 Revisões, reinício e mapa de 49 teclas conferidos. Configurações e última
 resposta preservadas; geração real de figuras ainda aguarda teste no aparelho.
 Os estados R11/R8 e anteriores abaixo são históricos.

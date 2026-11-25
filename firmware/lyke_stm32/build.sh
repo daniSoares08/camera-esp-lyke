@@ -4,7 +4,7 @@ set -eu
 here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 root=$(CDPATH='' cd -- "$here/../.." && pwd)
 sdk="$root/.tools/stm32"
-revision=${1:-lyke-r12}
+revision=${1:-lyke-r13}
 case "$revision" in
     ''|[!A-Za-z0-9]*|*[!A-Za-z0-9._-]*) echo "Invalid revision" >&2; exit 1 ;;
 esac

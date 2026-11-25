@@ -1,5 +1,25 @@
 # Hardware e pinagens
 
+**Sono preparado em 25/11, sem alteração de fios:** MODE é PB12/T02 ↔
+PB9/T16 no mapa atual. Na STM R13 preparada, PB12 fica com pull-up/EXTI12
+e PB9 baixo; demais trilhas em analógico sem pulls. STM STOP1 suspende
+clock/ADC/UART. MODE dá pulso em PA2→GPIO13, que é RTC_GPIO14 no ESP32
+clássico, para acordar a ESP R11 de deep-sleep. PWDN/câmera GPIO32 é
+mantido alto por hold RTC; GPIO0 não é mantido baixo. Não foi gravado/testado
+no aparelho. Usuário pretende remover 330 Ω após instalar módulo novo;
+o resistor e o hardware permanecem como estão. Ver REVISAO-R13-SONO-PROFUNDO.
+
+**Esclarecimento de 25/11:** usuário informou que a bateria atualmente usada
+foi retirada de um controle PlayStation 4. Isso substitui a suposição de
+2.000 mAh da foto histórica para estimativas da bateria atual. A Sony informa
+1.000 mAh/3,65 V para DualShock 4 CUH-ZCT2 e 1.000 mAh para CUH-ZCT1;
+modelo/etiqueta e capacidade efetiva desta célula reaproveitada não conferidos.
+Fonte: https://www.playstation.com/en-us/ps4/tech-specs/ .
+Só 330 Ω na saída 5 V + divisor 2×470 kΩ: aproximadamente 39–43 h com
+1.000 mAh novos, boost assumido em 80–90%, ignorando consumo próprio e demais
+placas. SHIFT+AC não corta alimentação: limpa LCD e manda OFF ao rádio;
+STM continua varredura/WFI e ESP continua executando, sem deep-sleep.
+
 **25/11/2026:** usuário confirmou resistor **330 Ω entre +5 V e GND da saída
 do conversor**, para manter sua saída ligada. Consumo calculado 15,15 mA
 (75,76 mW); não remover sem testar a carga mínima do módulo. Divisor do STM

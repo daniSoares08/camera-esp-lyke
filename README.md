@@ -9,10 +9,11 @@ preservadas. Janela 126×48 mantida. API v3 com texto e desenhos opcionais;
 somente OpenAI integrada/testada. Figuras geradas pelo modelo ainda aguardam
 teste real no aparelho.
 
-**25/11:** [ESP R10 preparada, energia e respostas](docs/REVISAO-ESP-R10-ENERGIA-E-RESPOSTAS.md).
-API v4 publicada; o usuário adiou gravação por bateria crítica. A R10 adiciona
-símbolos no leitor IA e economia com portal sob demanda e pausa de rádio na foto.
+**25/11:** [STM R13 + ESP R11 preparados: SHIFT+AC e sono profundo](docs/REVISAO-R13-SONO-PROFUNDO.md).
+Usuário adiou gravação por bateria crítica. O conjunto inclui energia, símbolos
+e captura da preparação ESP R10. Agora os DOIS precisam atualizar, ESP primeiro.
 Instalados continuam STM R12/ESP R9a; o manual 3.0 corresponde a esse conjunto.
+API v4 já publicada.
 
 ## Começar
 
@@ -59,13 +60,13 @@ As ferramentas locais ficam em `.tools/` e `.venv/`; elas não são publicadas n
 Crie `.private/ap-password.txt` com a senha WPA2 do portal (8–63 caracteres ASCII) e execute:
 
 ```powershell
-.\.venv\Scripts\python.exe firmware/esp32cam_integrada/build.py --profile lyke --revision lyke-r10
+.\.venv\Scripts\python.exe firmware/esp32cam_integrada/build.py --profile lyke --revision lyke-r11
 ```
 
 STM32 no WSL, com GCC ARM e Newlib Nano:
 
 ```sh
-sh firmware/lyke_stm32/build.sh lyke-r12
+sh firmware/lyke_stm32/build.sh lyke-r13
 ```
 
 Teste da API sem consumir créditos, com Node **24**:
@@ -74,7 +75,7 @@ Teste da API sem consumir créditos, com Node **24**:
 node --test supabase/tests/cloud.test.ts supabase/tests/graphics.test.ts
 ```
 
-Os comandos compilam STM R12 + ESP R10 preparada; os limites de validação estão no guia da revisão.
+Os comandos compilam STM R13 + ESP R11 preparados; os limites de validação estão no guia da revisão.
 Os testes nativos e a geração do manual estão documentados em
 `firmware/lyke_stm32/BATERIA-R11.md` e `scripts/manual_lyke/README.md`.
 A instalação inicial do carregador V2 exige USB uma vez; com a base instalada,

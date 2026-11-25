@@ -83,6 +83,14 @@ int main(int argc,char **argv)
         assert(((pixels[5-y/8][125-x]>>(7-y%8))&1)==(x==y));
     PRESS(KEY_RIGHT);assert(!strcmp(sent,"READG 24 0 43"));
     answer_frame.valid=true;answer_wait=false;PRESS(KEY_DOWN);assert(!strcmp(sent,"READG 24 16 44"));
-    puts("Actual interface: keyboard, Greek memory, 2D result, six-row response and status boundaries OK");
+    photo_busy=api_busy=false;
+    PRESS(KEY_SHIFT,KEY_AC);assert(!blanked&&strstr(note,"ATUALIZE"));
+    assert(!interface_message("CAPS S1"));view=ANSWER_VIEW;
+    PRESS(KEY_SHIFT,KEY_AC);assert(blanked&&sleep_control.phase==SLEEP_QUERY&&!strcmp(sent,"SLEEP? 1"));
+    PRESS(KEY_D7,KEY_LEFT);assert(!sleep_control.wake_requested);
+    PRESS(KEY_MODE);assert(sleep_control.wake_requested);
+    assert(!interface_message("SLEEP READY 1")&&!strcmp(sent,"SLEEP GO 1"));
+    assert(!interface_message("SLEEPING 1")&&sleep_control.phase==SLEEP_ARMED);
+    puts("Actual interface: keyboard, math/answers, status and MODE-only coordinated shutdown OK");
     return 0;
 }

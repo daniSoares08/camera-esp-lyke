@@ -6,15 +6,24 @@ outro chat; não é uma garantia de memória automática fora desta pasta.
 
 ## Começar por aqui
 
-**Pedido atual de 25/11:** respostas prolixas, símbolos e quebras confusas;
-reinícios ao fotografar com Wi-Fi, calor e bateria curta. API v4 publicada.
-**ESP R10 preparada, não instalada:** usuário pediu aguardar porque a bateria
-segue crítica. Instalados continuam STM R12 + ESP R9a. Só o ESP precisa
-atualizar. Guia: `docs/REVISAO-ESP-R10-ENERGIA-E-RESPOSTAS.md`.
-Usuário autorizou trocar portal permanente por portal no boot/menu e economia
-no uso normal. Resistor de 330 Ω em +5 V/GND confirmado como carga mínima do boost.
-Onze fotos/cinco consultas recuperadas para download privado; uma consulta paga
-de regressão com foto existente. Não publicar fotos/credenciais/binários.
+**Pedido atual de 25/11:** sono profundo em SHIFT+AC e despertar somente
+por MODE. **Preparados STM R13 + ESP R11, ainda não gravados.** Ambos precisam
+atualizar, ESP primeiro. Sem fios adicionais, loader e mapa mantidos.
+Bateria segue crítica conforme último aviso; preparar e aguardar carga estável.
+Instalados continuam STM R12 + ESP R9a. Guia:
+`docs/REVISAO-R13-SONO-PROFUNDO.md`.
+
+ESP deep-sleep sem timer, câmera/rádio parados; STM STOP1 sem SysTick/ADC/UART,
+só EXTI de MODE. O pulso de despertar usa PA2→GPIO13 da UART existente.
+Fotos temporárias em PSRAM se perdem; resposta salva/configurações ficam.
+Usuário pretende retirar 330 Ω quando chegar o novo módulo; ainda não retirado.
+30 verificações nativas e as duas compilações aprovadas, sem ensaio físico.
+
+Preparação anterior ESP R10 (energia/símbolos) incorporada à R11; API v4 já
+publicada. Onze fotos e cinco consultas da sessão anterior recuperadas para
+arquivo privado, sem novas capturas nesta implementação. Não publicar
+fotos, credenciais ou binários. Mudança autorizada: portal só no boot/menu,
+com economia no uso normal, substituindo a preferência antiga de AP permanente.
 
 **Wi-Fi, ainda em 24/11:** roteador do celular salvo e conexão confirmada
 no ESP R9a em duas leituras separadas por 47 s. Visitantes encontrada
@@ -90,8 +99,8 @@ mapeamento guiado de 49 teclas. O mapeador de bancada foi preservado em
 > Continue o projeto em C:\Projects\CAMERA_ESP. Leia AGENTS.md e
 > docs/conhecimento/README.md, ESTADO-E-RETOMADA.md, HARDWARE.md e DECISOES.md.
 > A Lyke usa STM32 lyke-r12 e ESP32 clássico lyke-r9a, ambos gravados.
-> ESP R10 está preparada, não gravada: usuário adiou por bateria crítica.
-> API v4 publicada; leia a revisão de energia e respostas antes de atualizar.
+> STM R13 + ESP R11 estão preparados, não gravados: bateria crítica.
+> API v4 publicada. Leia REVISAO-R13-SONO-PROFUNDO antes de atualizar os dois.
 > Loader V2 instalado por USB com mapa/preferências preservados. OTA do STM
 > pelo Wi-Fi/UART passou. Usuário confirmou raiz/frações na janela do LCD.
 > Divisor corrigido para dois 470 kilohms; ícone e leitura da bateria confirmados.

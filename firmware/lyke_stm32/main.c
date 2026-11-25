@@ -287,6 +287,8 @@ static void redraw_screen(void)
     lcd_show();
 }
 
+#include "power_stop.h"
+
 int main(void)
 {
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN | RCC_AHB2ENR_GPIOCEN;
@@ -312,6 +314,17 @@ int main(void)
     uint32_t changed_at = ticks, last_scan = ticks;
     for (;;) {
         bool redraw = service_serial();
+        if(sleep_control.phase==SLEEP_ARMED||sleep_control.phase==SLEEP_FAILED) {
+            bool slept=sleep_control.phase==SLEEP_ARMED;
+            if(slept)stop_until_mode(keymap[KEY_MODE]);
+            else if(sleep_control.committed)esp_wake_pulse();
+            sleep_control.phase=SLEEP_RUN;sleep_control.wake_requested=false;
+            blanked=false;view=CALCULATOR;photo_count=slept?0:photo_count;
+            if(slept){wifi=portal_ready=portal_pending=photo_busy=api_busy=scan_busy=wifi_saved_busy=answer_wait=false;note[0]=0;}
+            else notice("SONO NAO CONFIRMADO");
+            pending=stable=previous=keyboard_scan();changed_at=last_scan=ticks;
+            redraw=true;
+        }
         if (battery_poll()) {
             voltage = battery.status == BATTERY_OK ? battery.mv : 0;
             redraw = true;

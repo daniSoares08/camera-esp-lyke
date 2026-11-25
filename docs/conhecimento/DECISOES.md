@@ -2,6 +2,12 @@
 
 ## Produto
 
+- Ainda em 25/11, usuário autorizou implementar sono profundo em SHIFT+AC,
+  mantendo apenas MODE para despertar; nada de outras atividades periódicas
+  no desligamento. O resistor 330 Ω será retirado quando chegarem os novos
+  componentes, sem troca física confirmada agora. Foram preparados STM R13
+  e ESP R11; a espera pela carga continua válida e não houve gravação.
+
 - Em 25/11, usuário priorizou autonomia e **revogou o portal permanente**:
   Calc-Lyke pode abrir no boot e via CONFIGURAR/ATUALIZAR, desligando no uso
   normal; cliente do roteador continua em economia. Pediu respostas completas
