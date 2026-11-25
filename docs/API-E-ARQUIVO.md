@@ -1,5 +1,12 @@
 # API e arquivo privado de fotos — 23/11/2026
 
+**25/11: API v4 publicada.** Instrução concisa de avaliação, menos repetição,
+notação de fasor padronizada e documento gráfico sem quebra prévia em 21
+caracteres, preservando separadores. π/φ viram glifos no novo ESP R10, ainda
+não instalado por bateria crítica. 17 testes locais aprovados e uma consulta
+real com foto existente (1.020 vs 1.666 caracteres). Sem mudança de esquema,
+RLS, bucket ou segredos. Guia: `REVISAO-ESP-R10-ENERGIA-E-RESPOSTAS.md`.
+
 **Atualização de 24/11:** API v3 publicada com documento gráfico opcional
 (`display=lyke-graphics-v1`), mantendo clientes antigos em texto. Schema,
 comandos e limites em `supabase/functions/lyke-solve/graphics.ts`.

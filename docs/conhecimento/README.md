@@ -1,20 +1,35 @@
 # Base de conhecimento — CAMERA_ESP
 
-Atualização: **24/11/2026**, America/Sao_Paulo. Raiz atual:
+Atualização: **25/11/2026**, America/Sao_Paulo. Raiz atual:
 `C:\Projects\CAMERA_ESP`. Esta é a memória local do projeto para continuar em
 outro chat; não é uma garantia de memória automática fora desta pasta.
 
 ## Começar por aqui
 
-**Último pedido:** usuário ligou e autorizou a atualização. Instalados
+**Pedido atual de 25/11:** respostas prolixas, símbolos e quebras confusas;
+reinícios ao fotografar com Wi-Fi, calor e bateria curta. API v4 publicada.
+**ESP R10 preparada, não instalada:** usuário pediu aguardar porque a bateria
+segue crítica. Instalados continuam STM R12 + ESP R9a. Só o ESP precisa
+atualizar. Guia: `docs/REVISAO-ESP-R10-ENERGIA-E-RESPOSTAS.md`.
+Usuário autorizou trocar portal permanente por portal no boot/menu e economia
+no uso normal. Resistor de 330 Ω em +5 V/GND confirmado como carga mínima do boost.
+Onze fotos/cinco consultas recuperadas para download privado; uma consulta paga
+de regressão com foto existente. Não publicar fotos/credenciais/binários.
+
+**Wi-Fi, ainda em 24/11:** roteador do celular salvo e conexão confirmada
+no ESP R9a em duas leituras separadas por 47 s. Visitantes encontrada
+na busca 2,4 GHz, mas conexão não confirmada; usuário priorizou o celular.
+Sem alteração do firmware instalado nem publicação de senha. Ver o estado.
+
+**Instalação de 24/11:** usuário ligou e autorizou a atualização. Instalados
 **STM R12 + ESP R9a**, por Wi-Fi/UART existente, sem novos fios/USB.
 Revisões, reinício, 49 teclas e portal conferidos; configurações e última
 resposta preservadas. API v3 publicada; novo aviso Wi-Fi e desenhos roláveis.
 Guia em `docs/REVISAO-R12-DESENHOS-E-WIFI.md`.
 
 Manual edição 3.0 em PDF/MD em `docs/manual/` e `output/pdf/`.
-A geração real de figuras, rolagem no LCD e rede Visitantes no campus
-continuam sem confirmação física nesta etapa. Bateria normal/ícone e
+A API retornou figuras nas consultas de 24/11; rolagem/desenhos no LCD
+e conexão Visitantes continuam sem confirmação física específica. Bateria normal/ícone e
 notação na janela original já haviam sido confirmados pelo usuário na R11.
 Repositório público; credenciais, fotos de questões e binários privados.
 O encerramento de 23/11 é histórico; houve novo pedido em 24/11.
@@ -74,7 +89,9 @@ mapeamento guiado de 49 teclas. O mapeador de bancada foi preservado em
 
 > Continue o projeto em C:\Projects\CAMERA_ESP. Leia AGENTS.md e
 > docs/conhecimento/README.md, ESTADO-E-RETOMADA.md, HARDWARE.md e DECISOES.md.
-> A Lyke usa STM32 lyke-r11 e ESP32 clássico lyke-r8, ambos gravados.
+> A Lyke usa STM32 lyke-r12 e ESP32 clássico lyke-r9a, ambos gravados.
+> ESP R10 está preparada, não gravada: usuário adiou por bateria crítica.
+> API v4 publicada; leia a revisão de energia e respostas antes de atualizar.
 > Loader V2 instalado por USB com mapa/preferências preservados. OTA do STM
 > pelo Wi-Fi/UART passou. Usuário confirmou raiz/frações na janela do LCD.
 > Divisor corrigido para dois 470 kilohms; ícone e leitura da bateria confirmados.

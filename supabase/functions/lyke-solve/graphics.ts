@@ -20,8 +20,12 @@ export const GRAPHIC_SCHEMA = object({ version: { type: 'integer', enum: [1] }, 
 export const GRAPHIC_INSTRUCTIONS = `
 Nesta consulta, retorne o objeto JSON definido pelo schema, com version=1 e blocos em ordem.
 O desenvolvimento completo exigido acima vai nos blocos kind=text, em portugues ASCII.
-Entre os passos, inclua kind=drawing quando a questao pedir ou se beneficiar de circuito,
-grafico, geometria, angulos ou diagrama. Nao substitua contas por desenhos.
+Nao pre-quebre o texto em 21 caracteres: o visor conta simbolos e faz a unica quebra.
+Uma linha por igualdade/grupo matematico; uma linha vazia antes de cada subitem.
+Entre os passos, inclua kind=drawing quando a questao pedir desenho ou quando
+ele for necessario para explicar uma transformacao, referencia ou topologia.
+Nao redesenhe automaticamente o circuito de entrada se o pedido e apenas calcular
+potencias/correntes e as equacoes ja bastam. Nao substitua contas por desenhos.
 Para questoes puramente algebricas, use somente blocos de texto.
 Cada desenho e monocromatico, origem no canto superior esquerdo, x cresce para direita,
 y para baixo. Prefira width=126 para caber de frente; use 192/256 para desenhos maiores.

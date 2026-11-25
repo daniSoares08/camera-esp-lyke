@@ -15,6 +15,8 @@
 #include "answer_json.h"
 #include "answer_frame.h"
 #include <esp_heap_caps.h>
+#include <esp_system.h>
+#include "power_policy.h"
 
 struct AnswerAllocator:ArduinoJson::Allocator {
   void* allocate(size_t n) override{return heap_caps_malloc(n,MALLOC_CAP_SPIRAM|MALLOC_CAP_8BIT);}
@@ -35,8 +37,13 @@ static HardwareSerial stmSerial(2);
 static Preferences config;
 static PhotoQueue photos;
 static bool portal, otaMode, scanActive, connectActive, storageReady;
-// Deliberately RAM-only: OFF lasts until the next ESP boot.
+// OFF lasts until the next ESP boot. The portal now has an inactivity lease;
+// router Wi-Fi remains in STA mode when no configuration portal is needed.
 static bool wifiEnabled = true;
+static PortalLease portalLease;
+static bool captureBusy;
+static uint32_t capturePendingAt;
+static String captureResult;
 static bool connectionFailed;
 static uint32_t rebootAt, connectAt, portalAttemptAt;
 static String sessionToken, activeSsid, lastAnswer, pendingRequestId;
@@ -48,7 +55,9 @@ static String stmRevision;
 static wl_status_t lastWifi = WL_IDLE_STATUS;
 
 static bool local() {
-  return portal && web.client().localIP() == WiFi.softAPIP();
+  bool ok=portal && web.client().localIP() == WiFi.softAPIP();
+  if(ok)portalLease.touch(millis());
+  return ok;
 }
 
 static bool authorized() {
@@ -120,14 +129,14 @@ static void sendAnswerWindow(unsigned x,unsigned y,unsigned sequence) {
 
 static bool startPortal() {
   wifiEnabled = true;
+  portalLease.touch(millis());
   if (portal && (WiFi.getMode() & WIFI_AP) && WiFi.softAPIP() == apAddress) return true;
   portalAttemptAt = millis();
   if (portal) web.stop();
   portal = false;
   if (!WiFi.mode(WIFI_AP_STA) || !WiFi.softAPConfig(apAddress, apAddress, IPAddress(255,255,255,0)) ||
       !WiFi.softAP(apName, "CHANGE_ME_ESP_AP", 1, false, 2)) return false;
-  sessionToken = "";
-  for (unsigned i = 0; i < 4; ++i) sessionToken += String(esp_random(), HEX);
+  if(sessionToken.isEmpty())for (unsigned i = 0; i < 4; ++i) sessionToken += String(esp_random(), HEX);
   web.begin();
   portal = true;
   return true;
@@ -146,12 +155,46 @@ static void cameraStop() {
   digitalWrite(0, LOW);
 }
 
+static bool join(unsigned index);
+static String ssidAt(unsigned index);
+struct CpuBurst {
+  CpuBurst(){setCpuFrequencyMhz(160);}
+  ~CpuBurst(){setCpuFrequencyMhz(80);}
+};
+struct CapturePause {
+  bool enabled,restorePortal;
+  unsigned network;
+  CapturePause():enabled(wifiEnabled),restorePortal(portalLease.wanted),network(config.getUChar("last_net",0)) {
+    for(unsigned i=0;i<MaxNetworks;++i)if(ssidAt(i)==activeSsid){network=i;break;}
+    captureBusy=true;scanActive=connectActive=false;
+    if(portal)web.stop();
+    portal=false;
+    WiFi.mode(WIFI_OFF);
+    // Let the radio supply settle before sensor clocks/autofocus start.
+    delay(80);
+  }
+  ~CapturePause(){
+    cameraStop();
+    // Restore only after camera power-down, including every error return.
+    delay(30);captureBusy=false;
+    if(enabled){
+      if(restorePortal)startPortal();
+      else {WiFi.mode(WIFI_STA);WiFi.setSleep(true);}
+      join(network);
+    }
+    lastWifi=WiFi.status();
+  }
+};
+
 static String takePhoto() {
   if (!keyboardReady) return "Conclua o mapeamento do teclado";
   if (photos.count >= MaxPhotos) return "Fila cheia (3 fotos)";
   if (otaMode) return "Saia da atualizacao";
+  if(scanActive)return "Aguarde a busca Wi-Fi";
   if (ESP.getFreePsram() < 1024 * 1024) return "PSRAM insuficiente";
   sendLine("WORK FOTO");
+  CpuBurst cpu;
+  CapturePause radio;
   cameraBenchSetup();
   if (!ready) {
     cameraStop();
@@ -222,7 +265,9 @@ static bool join(unsigned index) {
   if (index >= MaxNetworks || scanActive || otaMode) return false;
   const String ssid = ssidAt(index);
   if (ssid.isEmpty()) return false;
-  if (!startPortal()) return false;
+  if(!wifiEnabled)return false;
+  if(!portal&&!WiFi.mode(WIFI_STA))return false;
+  WiFi.setSleep(true);
   WiFi.disconnect(false, false);
   String password = config.getString(netKey("pass", index).c_str(), "");
   WiFi.begin(ssid.c_str(), password.isEmpty() ? nullptr : password.c_str());
@@ -246,9 +291,14 @@ static bool startScan() {
 
 static void wifiTick() {
   // No idle timeout. Retry a failed/lost AP, unless the STM requested OFF.
-  if (wifiEnabled && (!portal || !(WiFi.getMode() & WIFI_AP) || WiFi.softAPIP() != apAddress) &&
+  if (wifiEnabled && portalLease.wanted && (!portal || !(WiFi.getMode() & WIFI_AP) || WiFi.softAPIP() != apAddress) &&
       millis() - portalAttemptAt >= 3000) {
     if (startPortal()) sendStatus();
+  }
+  if(portalLease.expired(millis(),otaMode||ota.receiving||captureBusy||capturePendingAt||scanActive||connectActive)) {
+    web.stop();portal=false;portalLease.close();
+    WiFi.softAPdisconnect(false);WiFi.mode(WIFI_STA);WiFi.setSleep(true);
+    sendStatus();
   }
   wl_status_t status = WiFi.status();
   if (status != lastWifi) {
@@ -323,6 +373,7 @@ static String askAI() {
   if (otaMode || !photos.count) return "Tire 1 a 3 fotos";
   if (WiFi.status() != WL_CONNECTED) return "Conecte o Wi-Fi";
   if (time(nullptr) < 1735689600) return "Aguarde ajuste da hora";
+  CpuBurst cpu;
   if (ESP.getFreePsram() < 512 * 1024 ||
       heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT) < 60 * 1024 ||
       heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT) < 32 * 1024)
@@ -444,6 +495,7 @@ static void runCommand(const String& command) {
     }
     sendLine("LIST_END");
   } else if (command.startsWith("JOIN ") && command.length() == 6 && isDigit(command[5])) {
+    wifiEnabled=true;
     if (!join(command[5] - '0')) sendLine("NOTE REDE INDISPONIVEL");
   } else if (command == "CAPTURE") {
     String error = takePhoto();
@@ -474,6 +526,7 @@ static void runCommand(const String& command) {
   } else if (command == "OFF") {
     if (ota.receiving || ota.complete || rebootAt) { sendLine("NOTE ATUALIZACAO ATIVA"); return; }
     wifiEnabled = false;
+    portalLease.close();
     connectionFailed=false;
     otaMode = false;
     scanActive = connectActive = false;
@@ -489,6 +542,7 @@ static void runCommand(const String& command) {
 
 void setup() {
   Serial.begin(460800);
+  setCpuFrequencyMhz(80);
   pinMode(33, INPUT);
   stmSerial.setRxBufferSize(512);
   stmSerial.begin(115200, SERIAL_8N1, 13, 14);
@@ -518,6 +572,11 @@ void setup() {
 void loop() {
   if (portal) web.handleClient();
   wifiTick();
+  if(capturePendingAt&&int32_t(millis()-capturePendingAt)>=0) {
+    capturePendingAt=0;captureResult=takePhoto();
+    sendLine(captureResult.isEmpty()?"NOTE FOTO GUARDADA":"NOTE "+captureResult);
+    sendStatus();
+  }
   static String input;
   static bool tooLong;
   for (unsigned i = 0; i < 256 && stmSerial.available(); ++i) {
@@ -555,5 +614,5 @@ void loop() {
     } else if (console.length() < 64) console += char(c);
   }
   if (rebootAt && (int32_t)(millis() - rebootAt) >= 0) ESP.restart();
-  delay(2);
+  delay(10);
 }

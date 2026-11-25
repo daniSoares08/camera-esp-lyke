@@ -574,7 +574,7 @@
     ]
   },
   "lyke_current": {
-    "updated": "2026-11-24",
+    "updated": "2026-11-25",
     "timezone": "America/Sao_Paulo",
     "stm32": {
       "chip": "STM32G431CBU6",
@@ -646,9 +646,10 @@
       "uart_communication_confirmed": true
     },
     "pending": [
-      "User visual check: menu, saved answer navigation and Wi-Fi pulse/failure indication",
-      "Real model-generated diagram with LCD/UART/scroll/persistence verification",
-      "Campus 2.4 GHz Visitantes connection; open profile/direct internet confirmed, real association not tested"
+      "User battery charge and stable supply before installing ESP R10 only; STM R12 stays",
+      "Physical camera capture with radio pause and automatic reconnection; LCD symbols and separators",
+      "Measure current/temperature/autonomy; measure BAT+, 5V and 3V3 under load if restart persists",
+      "Visitantes 2.4 GHz was detected/saved, association not confirmed"
     ],
     "stm32_prepared": {
       "revision": "lyke-r12",
@@ -687,15 +688,15 @@
       "instructions": "docs/REVISAO-R12-DESENHOS-E-WIFI.md"
     },
     "esp32_prepared": {
-      "revision": "lyke-r9a",
-      "installed": true,
+      "revision": "lyke-r10",
+      "installed": false,
       "physical_test_pending": true,
-      "manifest": "firmware/esp32cam_integrada/bin/lyke-r9a/manifest.json",
+      "manifest": "firmware/esp32cam_integrada/bin/lyke-r10/manifest.json",
       "compiled_manifest": {
         "target": "ESP32-D0WD-V3 / AI Thinker",
         "chip": "esp32",
         "flash_bytes": 4194304,
-        "revision": "lyke-r9a",
+        "revision": "lyke-r10",
         "optimization": "lto",
         "slot_bytes": 1572864,
         "core": "3.3.6",
@@ -706,8 +707,8 @@
             "sha256": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0"
           },
           "esp32cam_integrada.ino.bin": {
-            "bytes": 1362896,
-            "sha256": "e7ff9868df52367e3f916ace8637cf7f40de18fa87416ade1b91c9f8b69776a8"
+            "bytes": 1368784,
+            "sha256": "4691f63c345eb5158f9b820b9631dd21510d261b085658ec3a76b2a830cb9c1d"
           },
           "esp32cam_integrada.ino.bootloader.bin": {
             "bytes": 25184,
@@ -719,7 +720,9 @@
           }
         }
       },
-      "instructions": "docs/REVISAO-R12-DESENHOS-E-WIFI.md"
+      "instructions": "docs/REVISAO-ESP-R10-ENERGIA-E-RESPOSTAS.md",
+      "user_deferred_reason": "Battery critical; wait and leave ready",
+      "validation": ".build/lyke_esp32/lyke-r10-validation.json"
     },
     "power_measurement_latest": {
       "date": "2026-11-22",
@@ -882,13 +885,22 @@
       "security_advisors": [],
       "docs": "docs/API-E-ARQUIVO.md",
       "credentials_published": false,
-      "function_version": 3,
+      "function_version": 4,
       "optional_graphics": "lyke-graphics-v1",
       "v3_health_and_auth_test": {
         "health_version": "3",
         "unauthenticated_post": 401,
         "paid_api_calls": 0,
         "report": ".private/lyke-cloud/service-v3-smoke.json"
+      },
+      "answer_style": "Concise assessment solution with relevant development, unique text wrapping and symbol tokens",
+      "latest_real_test": {
+        "paid_calls": 1,
+        "archived_photo_reused": true,
+        "new_capture": false,
+        "before_chars": 1666,
+        "after_chars": 1020,
+        "report": ".private/lyke-review-2026-11-25/api-v4-test-result.json"
       }
     },
     "repository": {
@@ -998,23 +1010,60 @@
         },
         "instructions": "firmware/lyke_stm32/PRONTO-PARA-TESTAR-R10.md",
         "processor": "esp32"
+      },
+      {
+        "revision": "lyke-r9a",
+        "installed": true,
+        "physical_test_pending": true,
+        "manifest": "firmware/esp32cam_integrada/bin/lyke-r9a/manifest.json",
+        "compiled_manifest": {
+          "target": "ESP32-D0WD-V3 / AI Thinker",
+          "chip": "esp32",
+          "flash_bytes": 4194304,
+          "revision": "lyke-r9a",
+          "optimization": "lto",
+          "slot_bytes": 1572864,
+          "core": "3.3.6",
+          "profile": "lyke",
+          "files": {
+            "boot_app0.bin": {
+              "bytes": 8192,
+              "sha256": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0"
+            },
+            "esp32cam_integrada.ino.bin": {
+              "bytes": 1362896,
+              "sha256": "e7ff9868df52367e3f916ace8637cf7f40de18fa87416ade1b91c9f8b69776a8"
+            },
+            "esp32cam_integrada.ino.bootloader.bin": {
+              "bytes": 25184,
+              "sha256": "7b606bcb0dc4865b8adea291638f5746abceb0b0f1f727b0b95e27b55f566e16"
+            },
+            "esp32cam_integrada.ino.partitions.bin": {
+              "bytes": 3072,
+              "sha256": "fc22d7750c62b98ebc4a74afc5ae33c47829e8691ad47b67a3b8705b29f9b941"
+            }
+          }
+        },
+        "instructions": "docs/REVISAO-R12-DESENHOS-E-WIFI.md",
+        "processor": "esp32",
+        "historical_date": "2026-11-24"
       }
     ],
     "prepared_release": {
-      "date": "2026-11-24",
-      "installed": true,
+      "date": "2026-11-25",
+      "installed": false,
       "stm_revision": "lyke-r12",
-      "esp_revision": "lyke-r9a",
+      "esp_revision": "lyke-r10",
       "new_wires_required": false,
-      "package": "output/firmware/lyke-r12-final.zip",
-      "manifest": "output/firmware/lyke-r12-final/release.json",
+      "package": "output/firmware/lyke-r12-esp-r10-preparado.zip",
+      "manifest": "output/firmware/lyke-r12-esp-r10-preparado/release.json",
       "native_checks_passed": true,
       "simulated_interruptions": {
         "fixture": 514,
         "compiled_release_sampled": 209
       },
-      "hardware_access_in_this_step": true,
-      "paid_api_calls_in_this_step": 0
+      "hardware_access_in_this_step": false,
+      "paid_api_calls_in_this_step": 1
     },
     "stm32_history": [
       {
@@ -1121,7 +1170,7 @@
       "rendered_and_visually_checked": true,
       "date": "2026-11-24"
     },
-    "project_status": "Installed STM R12 + ESP R9a over Wi-Fi on 2026-11-24; revisions/MAP49/configuration/saved answer verified. Real model diagram and campus Wi-Fi remain untested.",
+    "project_status": "ESP R10 prepared, installation deferred at user request due to critical battery. Still STM R12/ESP R9a. API v4 deployed/tested; photos exported privately.",
     "known_validation_limits": [
       "No deliberate physical power cut during flash",
       "No measured battery runtime or charging-circuit certification",
@@ -1145,6 +1194,43 @@
         ".private/lyke-cloud/device-stm-r12-wifi.json",
         ".private/lyke-cloud/device-r9a-ota.json"
       ]
+    },
+    "wifi_latest": {
+      "date": "2026-11-24",
+      "hotspot_saved_slot": 2,
+      "hotspot_connected": true,
+      "two_reads_apart_seconds": 47,
+      "hotspot_band_ghz": 2.4,
+      "hotspot_channel": 6,
+      "security": "WPA2-Personal",
+      "credentials_published": false,
+      "esp_revision_unchanged": "lyke-r9a",
+      "stm_revision_unchanged": "lyke-r12",
+      "paid_api_calls": 0,
+      "private_report": ".private/lyke-cloud/wifi-hotspot-final-20261124.json",
+      "visitantes_scan_seen_24ghz": true,
+      "visitantes_association_confirmed": false,
+      "reboot_tested": false
+    },
+    "power_report_20261125": {
+      "user_report": "Camera with Wi-Fi restarts; ESP heats gradually; battery lasts around one hour",
+      "resistor_5v_ohms": 330,
+      "resistor_5v_current_ma": 15.151515151515152,
+      "resistor_power_mw": 75.75757575757576,
+      "resistor_purpose": "Keep boost output alive; do not remove without validating minimum load",
+      "divider_ohms": [
+        470000,
+        470000
+      ],
+      "divider_current_ua_at_3840mv": 4.085106382978723,
+      "measured_current": false,
+      "measured_temperature": false,
+      "confirmed_reset_cause": null,
+      "new_policy_authorized": true,
+      "portal_idle_timeout_ms_prepared": 120000,
+      "cpu_idle_mhz_prepared": 80,
+      "cpu_work_mhz_prepared": 160,
+      "camera_radio_pause_prepared": true
     }
   }
 }

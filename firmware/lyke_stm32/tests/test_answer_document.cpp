@@ -5,6 +5,7 @@
 #include <vector>
 #include "../../esp32cam_integrada/lyke/answer_json.h"
 #include "../answer_frame.h"
+#include "../../esp32cam_integrada/lyke/power_policy.h"
 
 static bool bit(const lyke::AnswerRaster& r,unsigned x,unsigned y){return r.pixels[y][x/8]&(0x80u>>(x%8));}
 static void save(const char *folder,const char *name,const lyke::AnswerRaster& r){
@@ -44,6 +45,23 @@ int main(int argc,char **argv){
     assert(doc.height==48&&doc.widthAt(0)==126);
     assert(lyke::AnswerDocument::lines("x=4\n\nTokens entrada: 9179\nTokens saida: 2616",[](unsigned,const char *s){assert(!strcmp(s,"x=4"));})==1);
     assert(lyke::AnswerDocument::lines("Tokens entrada: dados\nEsta linha e conteudo",[](unsigned,const char*){})==2);
+    std::vector<std::string> rows;
+    lyke::AnswerDocument::lines("phi=36.87 deg\npi=3.14159\nsqrt(36^2+27^2)=45 ohm\npilha principal\n\n2b) Corrente",[&](unsigned,const char* s){rows.emplace_back(s);});
+    assert(uint8_t(rows[0][0])==lyke::AC_PHI&&uint8_t(rows[1][0])==lyke::AC_PI);
+    assert(rows.size()==6&&rows[4].empty()&&rows[3]=="pilha principal");
+    assert(uint8_t(rows[2][0])==lyke::AC_ROOT&&rows[2].find("45")!=std::string::npos);
+    rows.clear();lyke::AnswerDocument::lines("|S1|=3.53553*0.0113659",[&](unsigned,const char*s){rows.emplace_back(s);});
+    assert(rows.size()==2&&rows[0]=="|S1|=3.53553"&&rows[1]=="*0.0113659");
+    assert(memcmp(lyke::answerGlyph(lyke::AC_PI),lyke::answerGlyph(lyke::AC_PHI),5));
+    lyke::AnswerDocument::lines("phi_T=29.51 deg",[](unsigned,const char*s){assert(uint8_t(s[0])==lyke::AC_PHI&&!strncmp(s+1,"_T=29.51",8));});
+    doc.plain("phi=36.87 deg\npi=3.14159\nC=1/(2*pi*f*Xc)\nsqrt(36^2+27^2)\nZ=45 angle 36.87 deg\nZ=36+j27 ohm");
+    raster.render(doc,0,0);save(argv[2],"simbolos_resposta",raster);
+    doc.plain("2a) Impedancia\nZ=12+j9 ohm\n|Z|=15 ohm\n\n2b) Corrente\nI=220/15=14.67 A");
+    raster.render(doc,0,0);save(argv[2],"separacao_resposta",raster);
+    PortalLease lease;lease.touch(100);
+    assert(!lease.expired(120099,false)&&lease.expired(120100,false));
+    assert(!lease.expired(999999,true));lease.close();assert(!lease.expired(999999,false));
+    lease.touch(UINT32_MAX-100);assert(!lease.expired(50,false)&&lease.expired(120000,false));
     raster={};raster.command(lyke::DrawCommand{{0,20,60,20,0},lyke::D_SOURCE,""},0);
     assert(bit(raster,26,18)&&!bit(raster,34,18));
     puts("Actual rich-document renderer: circuit/plot/angle, inline text, pan, legacy fallback, bounds and STM wire roundtrip OK");

@@ -1,5 +1,9 @@
 # Firmware Lyke 101078 · STM32G431 e ESP32-CAM clássica
 
+**25/11:** ESP R10 preparada com economia e símbolos no leitor IA; STM R12
+permanece, sem necessidade de nova gravação. Usuário adiou por bateria crítica.
+Leia [energia e respostas](../../docs/REVISAO-ESP-R10-ENERGIA-E-RESPOSTAS.md).
+
 **Instalados em 24/11: STM R12 + ESP R9a**, por Wi-Fi/UART existente. Leia
 [desenhos roláveis e Wi-Fi](../../docs/REVISAO-R12-DESENHOS-E-WIFI.md).
 Os fontes atuais compilam com `sh firmware/lyke_stm32/build.sh lyke-r12`.

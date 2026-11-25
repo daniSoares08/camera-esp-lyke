@@ -14,6 +14,17 @@ test('graphics are opt-in; schema and instructions preserve full mathematics',()
   assert.match(rich.instructions,/Nao substitua contas por desenhos/);
   assert.match(rich.instructions,/384 comandos/);assert.match(rich.instructions,/substituicao numerica/);
 });
+test('rich text keeps a single wrapping owner, paragraph separators and unambiguous math tokens',()=>{
+  const text='2a) Impedancia\nZ=sqrt(36^2+27^2)=45 ohm\n\n2b) Corrente\nphi=36.87°; pi=3.14159; φ != π';
+  const clean=toLCD(text,false);
+  assert.match(clean,/Z=sqrt\(36\^2\+27\^2\)=45 ohm/);
+  assert.match(clean,/\n\n2b\)/);assert.match(clean,/phi=36.87 deg/);assert.match(clean,/phi != pi/);
+  const doc=normalizeDocument({version:1,blocks:[{kind:'text',text}]},s=>toLCD(s,false));
+  assert.equal(doc.blocks[0].kind,'text');assert.equal((doc.blocks[0] as any).text,clean);
+  const request=openAIRequest(validateRequest({photos:[jpeg],display:'lyke-graphics-v1'}));
+  assert.match(request.instructions,/nao invente P\(m,t\)/);
+  assert.match(request.instructions,/Nao pre-quebre/);
+});
 test('circuit, curve and angle normalize to bounded documents and readable legacy text',()=>{
   const doc=normalizeDocument(fixture,toLCD);assert.equal(doc.blocks.length,6);
   const legacy=legacyDocumentText(doc,toLCD);assert.match(legacy,/tau=R\*C/);assert.match(legacy,/FIGURA/);

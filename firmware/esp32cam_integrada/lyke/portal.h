@@ -12,6 +12,7 @@ img{max-width:100%;display:block;margin:.5rem 0}a{color:#205443}p{line-height:1.
 </style></head><body>
 <h1>Calc-Lyke</h1><output id="device">Carregando...</output>
 <section><h2>Wi-Fi</h2>
+<p>Para economizar bateria, feche este portal depois de configurar. Calc-Lyke desliga após dois minutos sem atividade; CONFIGURAR ou ATUALIZAR no menu da calculadora abre a rede novamente. A conexão ao roteador continua disponível.</p>
 <button id="scan">Procurar redes</button> <select id="networks" aria-label="Redes encontradas"></select>
 <form id="network"><label>Nome da rede <input name="ssid" id="ssid" maxlength="32" required></label>
 <label>Senha <input name="password" type="password" maxlength="63"></label>
@@ -79,7 +80,17 @@ async function action(fn){if(updating)return;try{await fn();}catch(e){$('message
 $('refresh').onclick=()=>action(refresh);
 $('ask').onclick=()=>action(async()=>{$('message').textContent='Resolvendo as fotos. Aguarde...';
   $('message').textContent=await(await request('/api/send','')).text();await refresh();});
-$('capture').onclick=()=>action(async()=>{$('message').textContent=await (await request('/api/capture','')).text();await refresh();});
+$('capture').onclick=()=>action(async()=>{
+  $('message').textContent=await(await request('/api/capture','')).text();
+  await new Promise(r=>setTimeout(r,2000));
+  for(let i=0;i<35;i++){
+    try{let info=await(await request('/info')).json();token=info.token;
+      if(!info.capture_pending&&!info.capture_busy){$('message').textContent=info.capture_result||'Foto guardada';await refresh();return;}}
+    catch(e){}
+    await new Promise(r=>setTimeout(r,1000));
+  }
+  throw Error('Reconecte a Calc-Lyke e recarregue a lista de fotos.');
+});
 $('network').onsubmit=e=>{e.preventDefault();action(async()=>{await request('/api/network',new URLSearchParams(new FormData(e.target)));
   e.target.password.value='';$('message').textContent='Rede salva. Aguarde a conexão.';await refresh();});};
 $('join').onclick=()=>action(async()=>{await request('/api/join',new URLSearchParams({id:$('saved').value}));$('message').textContent='Conectando...';});
@@ -149,6 +160,12 @@ static void describeImage(JsonDocument& doc) {
   doc["ota_active"] = otaMode;
   doc["wifi_enabled"] = wifiEnabled;
   doc["portal_active"] = portal;
+  doc["cpu_mhz"] = getCpuFrequencyMhz();
+  doc["reset_reason"] = int(esp_reset_reason());
+  doc["power_policy"] = "sta-idle-portal-120s-camera-radio-pause";
+  doc["capture_pending"] = capturePendingAt!=0;
+  doc["capture_busy"] = captureBusy;
+  doc["capture_result"] = captureResult;
   doc["uptime_ms"] = millis();
 }
 
@@ -174,6 +191,11 @@ static void routeInfo() {
   doc["keyboard_ready"] = keyboardReady;
   doc["stm_revision"] = stmRevision;
   doc["station"] = WiFi.status() == WL_CONNECTED ? WiFi.SSID() : String();
+  if(WiFi.status()==WL_CONNECTED) {
+    doc["station_ip"]=WiFi.localIP().toString();
+    doc["station_rssi"]=WiFi.RSSI();
+    doc["station_channel"]=WiFi.channel();
+  }
   doc["token"] = sessionToken;
   JsonArray gallery = doc["photos"].to<JsonArray>();
   for (unsigned i = 0; i < photos.count; ++i) {
@@ -284,9 +306,10 @@ static void routes() {
   });
   web.on("/api/capture", HTTP_POST, [] {
     if (!authorized()) { reply(403, "Unauthorized"); return; }
-    String result = takePhoto();
-    sendStatus();
-    reply(result.isEmpty() ? 200 : 503, result.isEmpty() ? "Foto guardada" : result);
+    if(otaMode||scanActive||capturePendingAt||captureBusy){reply(409,"Aguarde a operacao atual");return;}
+    if(!keyboardReady||photos.count>=MaxPhotos){reply(409,"Confira teclado e fila de fotos");return;}
+    captureResult="";capturePendingAt=millis()+500;
+    reply(202,"Capturando. O Wi-Fi pausa e retorna automaticamente; aguarde.");
   });
   web.on("/api/send", HTTP_POST, [] {
     if (!authorized()) { reply(403, "Unauthorized"); return; }

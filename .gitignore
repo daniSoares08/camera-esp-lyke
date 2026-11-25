@@ -2,6 +2,7 @@
 .tools/
 .build/
 .private/
+output/privado/
 firmware/esp32cam_integrada/bin/
 __pycache__/
 *.pyc

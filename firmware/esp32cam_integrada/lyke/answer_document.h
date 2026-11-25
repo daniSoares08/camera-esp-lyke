@@ -7,6 +7,31 @@
 #include "answer_pager.h"
 
 namespace lyke {
+enum MathChar { AC_PI=128, AC_PHI, AC_THETA, AC_OMEGA, AC_DEGREE, AC_ANGLE, AC_ROOT, AC_DELTA, AC_MU };
+static bool letter(char c) { return (c>='A'&&c<='Z')||(c>='a'&&c<='z')||c=='_'; }
+// JSON stays ASCII for old clients. Only the rasterizer turns complete tokens
+// into one-cell symbols; phi (phase) and pi (constant) have distinct glyphs.
+static unsigned mathCell(const char *p,const char *begin,const char *end,unsigned& bytes) {
+  static const struct { const char *word; unsigned code; } words[]={
+    {"theta",AC_THETA},{"omega",AC_OMEGA},{"delta",AC_DELTA},{"graus",AC_DEGREE},
+    {"grau",AC_DEGREE},{"sqrt",AC_ROOT},{"phi",AC_PHI},{"ohm",AC_OMEGA},
+    {"angle",AC_ANGLE},{"deg",AC_DEGREE},{"pi",AC_PI},{"mu",AC_MU}};
+  bytes=1;
+  if(p==begin||!letter(p[-1]))for(const auto& word:words) {
+    size_t n=strlen(word.word);
+    if(size_t(end-p)>=n&&!memcmp(p,word.word,n)&&(p+n==end||p[n]=='_'||!letter(p[n]))) {bytes=n;return word.code;}
+  }
+  return uint8_t(*p);
+}
+static const uint8_t* answerGlyph(unsigned code) {
+  static const uint8_t symbols[][5]={
+    {1,0x7f,1,0x3f,0x41}, {0x1c,0x22,0x7f,0x22,0x1c},
+    {0x3e,0x49,0x49,0x49,0x3e}, {0x5e,0x61,0x01,0x61,0x5e},
+    {0x06,0x09,0x09,0x06,0}, {0x40,0x60,0x58,0x46,0x40},
+    {0x10,0x20,0x7f,1,1}, {0x70,0x4c,0x43,0x4c,0x70}, {0x7c,0x20,0x20,0x1c,0x20}};
+  if(code>=AC_PI&&code<=AC_MU)return symbols[code-AC_PI];
+  return font5x7[(code>=32&&code<=126?code:'?')-32];
+}
 enum DrawOp { D_LINE, D_RECT, D_CIRCLE, D_ARC, D_TEXT, D_RESISTOR, D_CAPACITOR, D_SOURCE, D_ARROW };
 struct DrawCommand { int16_t p[5]; uint8_t op; const char *text; };
 struct AnswerBlock { const char *text; uint16_t width,height,first,count; bool drawing; };
@@ -16,13 +41,25 @@ struct AnswerDocument {
   AnswerBlock blocks[32]{}; DrawCommand commands[384]{};
   unsigned count=0,commandCount=0,height=48; uint16_t origin[32]{};
   template<class F> static unsigned lines(const char *text,F emit) {
-    unsigned n=0;const char *p=text?text:"",*limit=p+answer_content_length(p,strlen(p));
+    unsigned n=0;const char *begin=text?text:"",*p=begin,*limit=p+answer_content_length(p,strlen(p));
     while(p<limit) {
-      while(p<limit&&(*p=='\n'||*p=='\r'||*p==' '||*p=='\t'))++p;
+      while(p<limit&&(*p=='\r'||*p==' '||*p=='\t'))++p;
       if(p==limit)break;
-      unsigned used=0,space=0;while(p+used<limit&&p[used]!='\n'&&p[used]!='\r'&&used<21){if(p[used]==' ')space=used;++used;}
-      if(used==21&&p+used<limit&&p[used]!='\n'&&p[used]!='\r'&&p[used]!=' '&&space)used=space;
-      char row[22]{};memcpy(row,p,used);emit(n++,row);p+=used;
+      if(*p=='\n'){emit(n++,"");++p;continue;}
+      char row[22]{};const char *at=p,*space=nullptr,*op=nullptr;
+      unsigned used=0,spaceCells=0,opCells=0;
+      while(at<limit&&*at!='\n'&&*at!='\r'&&used<21) {
+        if(*at==' '){space=at;spaceCells=used;}
+        if(used&&strchr("=+*/",*at)){op=at;opCells=used;}
+        unsigned bytes;row[used++]=char(mathCell(at,begin,limit,bytes));at+=bytes;
+      }
+      if(used==21&&at<limit&&*at!='\n'&&*at!='\r'&&*at!=' ') {
+        if(space&&spaceCells){at=space;used=spaceCells;}
+        else if(op&&opCells){at=op;used=opCells;}
+      }
+      row[used]=0;emit(n++,row);p=at;
+      while(p<limit&&(*p==' '||*p=='\t'||*p=='\r'))++p;
+      if(p<limit&&*p=='\n')++p;
     }
     return n;
   }
@@ -59,8 +96,9 @@ struct AnswerRaster {
     for(;;){dot(a,b);if(a==c&&b==d)break;int ee=2*e;if(ee>=dy){e+=dy;a+=sx;}if(ee<=dx){e+=dx;b+=sy;}}
   }
   void text(int xx,int yy,const char *p) {
-    for(;p&&*p;++p,xx+=6){unsigned c=(uint8_t)*p;if(c<32||c>126)c='?';
-      for(unsigned col=0;col<5;++col)for(unsigned row=0;row<7;++row)if(font5x7[c-32][col]&(1u<<row))dot(xx+col,yy+row);}
+    const char* begin=p?p:"",*end=begin+strlen(begin);
+    while(p&&p<end){unsigned bytes;const uint8_t* glyph=answerGlyph(mathCell(p,begin,end,bytes));p+=bytes;
+      for(unsigned col=0;col<5;++col)for(unsigned row=0;row<7;++row)if(glyph[col]&(1u<<row))dot(xx+col,yy+row);xx+=6;}
   }
   void circle(int xx,int yy,int r) {
     int a=r,b=0,e=1-r;

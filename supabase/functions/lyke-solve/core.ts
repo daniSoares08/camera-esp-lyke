@@ -15,10 +15,15 @@ Se algo essencial estiver ilegivel, diga exatamente o que falta e peca outra fot
 Se houver varias questoes, identifique cada uma e resolva na ordem.
 A resposta sera lida num LCD: 21 caracteres por linha e 6 linhas por pagina.
 Escreva em portugues ASCII, sem acentos, Markdown, LaTeX ou tabelas largas.
-Use linhas curtas, sem linhas em branco, saudacoes, preambulos ou dialogo.
+Use linhas matematicas claras, sem saudacoes, preambulos ou dialogo.
+Separe subitens por uma linha em branco e um titulo curto, por exemplo 2b) Corrente.
+Nao coloque uma linha em branco entre cada transformacao da mesma conta.
 O leitor faz a quebra de linhas e a paginacao; nao crie paginas ou cabecalhos de pagina.
 Nao parta um numero entre linhas; encurte a precisao ou quebre antes de um operador.
 Notacao: * multiplicacao, / fracao, ^ potencia, sqrt(), pi, sin(), cos(), tan().
+pi e a constante 3.14159; phi e o angulo de defasagem, nunca a constante pi.
+Use phi, theta, omega, delta, deg, ohm e angle como tokens ASCII de simbolos.
+Fasores: use 15.2 angle -36.87 deg; nao invente P(m,t), p(r,t) ou legendas proprias.
 Use parenteses suficientes, sinal de igualdade correto e unidades no resultado.
 Prefira fracao exata; quando arredondar, informe a aproximacao.
 Para cada questao e subitem, mostre a formula, a substituicao numerica,
@@ -33,11 +38,22 @@ indicados, em blocos de texto estreitos, mostrando como cada valor foi obtido.
 Use titulos curtos por questao/caso. Transcreva apenas os dados necessarios.
 Identifique o resultado junto da conta, sem repetir os mesmos dados ou um gabarito
 ja apresentado; reutilize grandezas definidas para evitar texto redundante.
-Confira resultados e mostre uma verificacao matematica curta e concreta.
+Calcule somente as grandezas solicitadas. Se o item pede reatancia capacitiva,
+encerre em Xc; nao acrescente capacitancia C como um item extra.
+Confira os resultados antes de responder. Mostre uma verificacao so quando
+ela acrescentar informacao; nao repita conferencia, dados e resultado a cada etapa.
 Informe contradicoes entre texto e desenho; explicite a convencao adotada,
 ou peca esclarecimento se nao houver como resolver de forma responsavel.
-Nao imponha limite artificial de palavras: use o espaco necessario para completar
-os itens, eliminando comentarios redundantes em vez de eliminar contas.
+Seja conciso como numa avaliacao: formula, substituicao e resultado com as
+transformacoes relevantes. Nao decomponha aritmetica elementar como 36^2+27^2
+em 1296+729 e depois 2025; escreva sqrt(36^2+27^2)=45 ohm.
+Use 3 a 4 algarismos significativos e angulos com ate duas casas, salvo exigencia.
+Identifique cada igualdade com a grandeza: prefira I=220/15=14.67 A a linhas
+soltas como 220/15=44/3 ou uma palavra Resultado separada do proprio valor.
+Nao repita a mesma resposta em retangular e polar salvo quando solicitado/util.
+Nao descreva em palavras uma equacao que ja esta escrita.
+Se dados essenciais faltarem, diga quais e peca nova foto; nao preencha a tela
+com uma longa solucao simbolica de um enunciado que nao pode ser resolvido.
 Mostre o desenvolvimento matematico verificavel, nao raciocinio interno privado.
 Termine cada item com seu resultado claramente identificado.`;
 
@@ -90,20 +106,21 @@ export async function sha256(value: string | Uint8Array): Promise<string> {
   return Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export function toLCD(input: string): string {
+export function toLCD(input: string, wrap = true): string {
   const replacements: Record<string, string> = {
     'π': 'pi', '×': '*', '·': '*', '÷': '/', '−': '-', '–': '-', '—': '-',
     '≤': '<=', '≥': '>=', '≠': '!=', '≈': '~=', '±': '+/-', '→': '->',
-    '²': '^2', '³': '^3', '°': ' graus', '√': 'sqrt', '∞': 'infinito',
+    '²': '^2', '³': '^3', '°': ' deg', '√': 'sqrt', '∞': 'infinito',
+    'φ':'phi', 'ϕ':'phi', 'θ':'theta', 'ω':'omega', 'Ω':'ohm', 'Δ':'delta', 'μ':'mu', '∠':' angle ',
   };
-  const plain = input.replace(/[π×·÷−–—≤≥≠≈±→²³°√∞]/g, c => replacements[c])
+  const plain = input.replace(/[π×·÷−–—≤≥≠≈±→²³°√∞φϕθωΩΔμ∠]/g, c => replacements[c])
     .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
     .replace(/\r/g, '').replace(/[^\x20-\x7e\n]/g, '?')
     .replace(/^#{1,6}\s*/gm, '').replace(/```(?:[A-Za-z]*)/g, '').trim();
   const lines: string[] = [];
   for (let line of plain.split('\n')) {
     line = line.replace(/[ \t]+/g, ' ').trim();
-    while (line.length > 21) {
+    while (wrap && line.length > 21) {
       let cut = line.lastIndexOf(' ', 21);
       // Keep numeric literals intact in compact expressions such as
       // |S|=3.53553*0.0113659. Continue before an operator rather than at a digit.
@@ -114,9 +131,9 @@ export function toLCD(input: string): string {
       lines.push(line.slice(0, cut));
       line = line.slice(cut).trimStart();
     }
-    if (line) lines.push(line);
+    if (line || (!wrap && lines.length && lines[lines.length-1])) lines.push(line);
   }
-  const result = lines.join('\n');
+  const result = lines.join('\n').trim();
   if (result.length > 12000) throw new RequestError(502, 'answer_too_long', 'Resposta longa demais. Envie uma questao por vez.');
   return result;
 }
@@ -128,7 +145,7 @@ export function openAIRequest(valid: Validated) {
     instructions: INSTRUCTIONS + (valid.graphics ? GRAPHIC_INSTRUCTIONS : ''),
     ...(valid.graphics ? { text: { format: { type: 'json_schema', name: 'lyke_answer', strict: true, schema: GRAPHIC_SCHEMA } } } : {}),
     input: [{ role: 'user', content: [
-      { type: 'input_text', text: 'Resolva todos os itens das imagens na ordem. Mostre formula, substituicao numerica, desenvolvimento das contas e resultado. Use o formato de uma resolucao completa de avaliacao, sem dialogo, sem linhas em branco e sem omitir etapas para caber no LCD.' },
+      { type: 'input_text', text: 'Resolva os itens na ordem, como numa avaliacao: formula, substituicao, transformacoes necessarias e resultado. Sem dialogo, repeticoes ou conferencias a cada conta. Separe subitens por titulo curto e uma linha em branco; nao omita o desenvolvimento relevante.' },
       ...valid.photos.map(p => ({ type: 'input_image', detail: 'high', image_url: p.dataUrl })),
     ] }],
   };

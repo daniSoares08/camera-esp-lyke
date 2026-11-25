@@ -7,9 +7,10 @@ export type Environment = {
 };
 const jsonHeaders = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
 const reply = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: jsonHeaders });
+const richText = (text:string) => toLCD(text,false);
 
 function completed(row: Record<string, any>, graphics = false) {
-  const document = graphics ? storedDocument(row.answer_text,toLCD) : undefined;
+  const document = graphics ? storedDocument(row.answer_text,richText) : undefined;
   return {
     id: row.id, object: 'response', status: 'completed', model: row.model,
     output: [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text: row.answer_lcd }] }],
@@ -36,7 +37,7 @@ export function createHandler(env: Environment, transport: typeof fetch = fetch)
     let activeId = '';
     let finished = false;
     try {
-      if (req.method === 'GET') return reply({ service: 'lyke-solve', model: MODEL, version: '3', graphics: 'lyke-graphics-v1', private_storage: true });
+      if (req.method === 'GET') return reply({ service: 'lyke-solve', model: MODEL, version: '4', graphics: 'lyke-graphics-v1', private_storage: true });
       if (req.method !== 'POST') return reply({ error: { code: 'method_not_allowed', message: 'Use POST.' } }, 405);
       if (!env.tokenHash || !env.openaiKey || !env.serviceKey) throw new RequestError(503, 'not_configured', 'Servico ainda nao configurado.');
       const auth = req.headers.get('Authorization') || '';
@@ -105,7 +106,7 @@ export function createHandler(env: Environment, transport: typeof fetch = fetch)
       if (!answer.trim()) throw new RequestError(502, 'empty_answer', 'A IA nao retornou texto.');
       let answerLCD: string;
       if (valid.graphics) {
-        try { answerLCD = legacyDocumentText(normalizeDocument(JSON.parse(answer),toLCD),toLCD); }
+        try { answerLCD = legacyDocumentText(normalizeDocument(JSON.parse(answer),richText),toLCD); }
         catch { throw new RequestError(502,'invalid_drawing','A IA retornou um desenho invalido. As fotos foram guardadas.'); }
       } else answerLCD = toLCD(answer);
       const row = {

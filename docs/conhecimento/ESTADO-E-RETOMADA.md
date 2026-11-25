@@ -1,6 +1,65 @@
-# Estado e retomada — 24/11/2026
+# Estado e retomada — 25/11/2026
 
 ## Próxima retomada
+
+### Preparada ESP R10; API v4 publicada — 25/11/2026
+
+Usuário relatou resposta prolixa, phi/pi e quebra confusa; reinício ao capturar
+com Wi-Fi, autonomia de pouco mais de uma hora e calor na carcaça. Confirmou
+330 Ω entre +5 V/GND para impedir auto-off do conversor. Autorizou priorizar
+autonomia, mudando a preferência de Calc-Lyke sempre visível: abrir no boot/menu,
+ficar em STA/economia no uso normal. A câmera pausa rádio e restaura depois.
+
+- **Instalados ainda STM R12 + ESP R9a. ESP R10 preparada, não gravada.**
+  Usuário primeiro pediu 10 minutos de carga; depois informou que a bateria
+  continua crítica e pediu deixar pronto. Nenhuma gravação/captura executada.
+  Duas tentativas de acesso ao portal não responderam. Não continuar tentando
+  gravar sem ele informar carga/alimentação estável. Não precisa trocar o STM.
+- API v4 publicada: respostas de avaliação completas e concisas, menos
+  conferências, fasor `angle` em vez de `P(m,t)`, sem itens extras; uma quebra
+  só para documentos gráficos, com separação dos subitens. Histórico preservado.
+- ESP R10: π e φ distintos no leitor IA, outros glifos e contagem por célula;
+  CPU 80 MHz em repouso e 160 MHz em captura/HTTPS; portal fecha após 120 s
+  sem HTTP, modo STA com modem-sleep; rádio desligado só durante foto e
+  restaurado após câmera desligar. Qualidade/resolução/autofoco inalterados.
+- Compilação e testes focados aprovados, 17 testes locais da API. Uma consulta
+  real com foto existente: 1.020 vs 1.666 caracteres, ângulo corrigido a 29,51°.
+  A saída de teste ainda calculou C extra; instrução final reforçada depois.
+- Recuperadas cinco consultas/11 JPEGs da sessão de 24/11 19h51–21h24,
+  com respostas, ZIP privado `output/privado/Fotos-testes-Lyke-24-11-2026.zip`.
+  Não misturar esta data local com 25/11 UTC das duas últimas consultas.
+- 330 Ω em 5 V: 15,15 mA/75,76 mW; divisor 2×470 kΩ: 4,09 µA em 3,84 V.
+  Queda de alimentação no pico é hipótese forte, não aferida. Capacidade real,
+  corrente, aquecimento por componente e autonomia continuam sem medição.
+- Guia técnico em `docs/REVISAO-ESP-R10-ENERGIA-E-RESPOSTAS.md`; pacote privado
+  `output/firmware/lyke-r12-esp-r10-preparado.zip`. Relatórios locais em
+  `.private/lyke-review-2026-11-25/`. O manual 3.0 ainda corresponde à R9a;
+  o guia complementa a próxima revisão, não é prova de instalação física.
+
+### Wi-Fi do celular configurado e conectado — 24/11/2026
+
+Usuário pediu verificar Visitantes e salvar seu roteador de celular; depois
+priorizou explicitamente a conexão ao celular. Senha não vai em documentação
+nem nos fontes. Perfil privado e relatório em
+`.private/lyke-cloud/wifi-hotspot-final-20261124.json`.
+
+- Windows mostrou Visitantes em 5 GHz/canal 36, aberta; o ESP também
+  encontrou o mesmo SSID na busca 2,4 GHz. Portanto não concluir que toda
+  a rede Visitantes seja apenas 5 GHz. Rede aberta salva no ESP, mas
+  associação não confirmada; ensaio interrompido pela prioridade do celular.
+- Roteador do celular confirmado em 2,4 GHz/canal 6, WPA2. Senha fornecida
+  conferiu com o perfil Windows, sem revelar/exportar o segredo.
+- Perfil salvo no slot 2 da NVS; conectado no ESP R9a em duas leituras
+  separadas por aproximadamente 47 segundos. STM R12, MAP49 e prontidão
+  mantidos. Modo OTA encerrado. Nenhuma consulta paga ou captura nova.
+- Firmware permanece R9a. R9b de diagnóstico foi compilada; upload
+  interrompido, runtime permaneceu R9a. Alterações experimentais nos fontes
+  descartadas após a conexão funcionar, sem necessidade de nova gravação.
+  Não instalar o diretório bin/lyke-r9b como se fosse uma revisão concluída.
+- A última rede conectada com sucesso é salva pelo firmware para tentar no
+  próximo boot. Não foi realizado reinício físico nesta configuração.
+- Usuário informou internet cabeada e pediu não gastar trabalho restaurando
+  o Wi-Fi do PC. Priorizar a calculadora.
 
 ### Instalados STM R12 + ESP Lyke R9a — 24/11/2026
 

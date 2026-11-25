@@ -9,6 +9,11 @@ preservadas. Janela 126×48 mantida. API v3 com texto e desenhos opcionais;
 somente OpenAI integrada/testada. Figuras geradas pelo modelo ainda aguardam
 teste real no aparelho.
 
+**25/11:** [ESP R10 preparada, energia e respostas](docs/REVISAO-ESP-R10-ENERGIA-E-RESPOSTAS.md).
+API v4 publicada; o usuário adiou gravação por bateria crítica. A R10 adiciona
+símbolos no leitor IA e economia com portal sob demanda e pausa de rádio na foto.
+Instalados continuam STM R12/ESP R9a; o manual 3.0 corresponde a esse conjunto.
+
 ## Começar
 
 Instalada em 24/11/2026 a [revisão R12/R9a com desenhos e novo aviso Wi-Fi](docs/REVISAO-R12-DESENHOS-E-WIFI.md).
@@ -35,7 +40,9 @@ O modelo principal é **GPT-6.1 Terra**, com raciocínio alto, conferência das 
 texto ASCII e linhas de até 21 caracteres. O modo econômico usa GPT-6 Luna.
 O catálogo consultado oferece Terra como 6.1, não como 6.2.
 
-O Wi-Fi de atualização não expira. Desligar pelo STM vale até reiniciar o ESP.
+Na R9a instalada, o Wi-Fi de atualização não expira. Na R10 preparada, o portal
+abre no boot/menu e encerra após dois minutos sem atividade. Desligar pelo STM
+continua disponível.
 O leitor dedica sua janela ao texto e aos desenhos da resposta. Cima/baixo rolam
 16 pixels; esquerda/direita movem 24 pixels em figura larga ou 48 verticais em texto.
 Fora do leitor, o cabeçalho mantém bateria e três posições de fotos. O Wi-Fi pisca
@@ -52,7 +59,7 @@ As ferramentas locais ficam em `.tools/` e `.venv/`; elas não são publicadas n
 Crie `.private/ap-password.txt` com a senha WPA2 do portal (8–63 caracteres ASCII) e execute:
 
 ```powershell
-.\.venv\Scripts\python.exe firmware/esp32cam_integrada/build.py --profile lyke --revision lyke-r9a
+.\.venv\Scripts\python.exe firmware/esp32cam_integrada/build.py --profile lyke --revision lyke-r10
 ```
 
 STM32 no WSL, com GCC ARM e Newlib Nano:
@@ -67,7 +74,7 @@ Teste da API sem consumir créditos, com Node **24**:
 node --test supabase/tests/cloud.test.ts supabase/tests/graphics.test.ts
 ```
 
-Os comandos compilam a revisão instalada R12/R9a. Os limites de validação estão no guia da revisão.
+Os comandos compilam STM R12 + ESP R10 preparada; os limites de validação estão no guia da revisão.
 Os testes nativos e a geração do manual estão documentados em
 `firmware/lyke_stm32/BATERIA-R11.md` e `scripts/manual_lyke/README.md`.
 A instalação inicial do carregador V2 exige USB uma vez; com a base instalada,

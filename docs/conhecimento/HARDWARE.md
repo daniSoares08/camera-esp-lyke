@@ -1,5 +1,12 @@
 # Hardware e pinagens
 
+**25/11/2026:** usuário confirmou resistor **330 Ω entre +5 V e GND da saída
+do conversor**, para manter sua saída ligada. Consumo calculado 15,15 mA
+(75,76 mW); não remover sem testar a carga mínima do módulo. Divisor do STM
+continua 2×470 kΩ (~4,09 µA em 3,84 V). Relatados reinícios câmera+Wi-Fi,
+calor e bateria curta; causa elétrica ainda não medida. ESP R10 só preparada,
+com rádio pausado durante a foto; usuário adiou gravação por bateria crítica.
+
 **24/11/2026:** STM R12 + ESP R9a instalados pelo Wi-Fi/UART existente.
 Sem mudança de componentes, alimentação ou pinagem; 49 teclas mapeadas
 e revisões conferidas. A correção física do divisor abaixo permanece válida.

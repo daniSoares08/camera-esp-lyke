@@ -2,6 +2,13 @@
 
 ## Produto
 
+- Em 25/11, usuário priorizou autonomia e **revogou o portal permanente**:
+  Calc-Lyke pode abrir no boot e via CONFIGURAR/ATUALIZAR, desligando no uso
+  normal; cliente do roteador continua em economia. Pediu respostas completas
+  com menos detalhamento aritmético, separação clara e símbolos no leitor IA.
+  Confirmou 330 Ω como carga de manutenção do boost. Pediu aguardar carga
+  e deixar pronto, sem instalar enquanto a bateria seguir crítica.
+
 - Ainda em 24/11, usuário ligou e autorizou a instalação. STM R12 e ESP
   R9a instalados por Wi-Fi/UART, revisões/MAP49 conferidos; configurações
   e resposta preservadas. R9a oculta rodapé legado de tokens no leitor.
