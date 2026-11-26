@@ -1,5 +1,48 @@
 # Gerar o manual do comprador
 
+## Edição 4.0 finalizada em 26/11/2026
+
+STM R14/ESP R12 finais instalados; revisões, MAP49, resposta, padrão 60 min e
+ciclo SHIFT+AC/MODE conferidos. Sono físico confirmado pelo usuário e retorno
+ESP deep-sleep/ext0. Ensaio Wi-Fi 20 min dispensado pelo usuário; cobertura nativa.
+Manual final em output/pdf e docs/manual, 36 páginas renderizadas e conferidas,
+PDF/MD/imagens sincronizados. ZIP portátil em output/pdf. Somente OpenAI testada.
+
+Para regenerar a edição entregue, use `--verified-installation`. Sem essa opção,
+o gerador produz prévia separada e identificada em output/pdf-previa-r14.
+Para nova revisão, confira instalação/funcionalidade antes de usar a opção.
+O histórico abaixo preserva a preparação anterior à instalação final.
+
+## Histórico de preparação
+
+## Edição 4.0 preparada em 25/11/2026
+
+Fontes STM R14 + ESP R12: sono por SHIFT+AC, automático após 60 minutos sem
+botão, ajuste de 1 a 1440 minutos, tentativas Wi-Fi limitadas a 20 minutos
+desconectado, pausa de rádio na câmera e símbolos no leitor IA.
+**Instalação final pendente de recuperação física após ensaio de diagnóstico.**
+Não substituir a entrega pública por uma alegação de instalação concluída.
+
+O comando normal agora gera uma **prévia identificada na capa e nos rodapés**
+em `output/pdf-previa-r14/`, preservando o manual entregue 3.0 em `docs/manual/`.
+São 36 páginas, imagens, MD integral e ZIP portátil. Os frames vêm dos testes
+nativos R14. Guias oficiais de conta/chave/cobrança OpenAI e Claude e preços
+OpenAI foram reconferidos em 25/11; demais referências mantêm a consulta anterior.
+
+Depois de instalar/conferir R14/R12 finais, verificar ausência de instrumentação
+e concluir os ensaios possíveis:
+
+```powershell
+.venv\Scripts\python.exe scripts/manual_lyke/gerar_manual.py --verified-installation
+```
+
+Somente esse comando escreve em `output/pdf/`; depois renderize e confira de
+novo, sincronize PDF/MD/imagens com `docs/manual/` e publique o snapshot sem
+credenciais. A opção é uma declaração de evidência conferida, não faz flash
+nem comprova por si só a instalação. Estado em `docs/REVISAO-R14-TEMPORIZADORES.md`.
+
+## Histórico da entrega anterior
+
 Edição 3.0, 24/11/2026: STM R12 + ESP R9a instalados por Wi-Fi.
 Inclui aviso Wi-Fi, texto e desenhos roláveis. As figuras são exemplos
 determinísticos do renderizador; geração real pelo modelo ainda não foi

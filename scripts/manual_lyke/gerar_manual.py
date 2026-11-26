@@ -1,7 +1,7 @@
 """Manual do comprador. Gera PDF, Markdown, figuras e pacote portátil.
 
 Execute na raiz: .venv\\Scripts\\python.exe scripts/manual_lyke/gerar_manual.py
-Fontes funcionais: STM32 R12 + ESP Lyke R9a. Nenhuma credencial é lida.
+Fontes funcionais: STM32 R14 + ESP Lyke R12. Nenhuma credencial é lida.
 """
 from pathlib import Path
 import re, json, shutil, zipfile, math, html, argparse
@@ -16,17 +16,20 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / 'output/pdf'
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--unit-photo',type=Path,help='Foto da unidade fornecida pelo proprietário')
+parser.add_argument('--verified-installation',action='store_true',help='Somente após conferir instalação final R14/R12 no aparelho')
+args=parser.parse_args()
+OUT = ROOT / ('output/pdf' if args.verified_installation else 'output/pdf-previa-r14')
 ASSETS = OUT / 'manual-assets'
-OUT.mkdir(parents=True, exist_ok=True)
-ASSETS.mkdir(exist_ok=True)
+OUT.mkdir(parents=True, exist_ok=True);ASSETS.mkdir(exist_ok=True)
 (ROOT/'tmp/pdfs/manual-lyke').mkdir(parents=True, exist_ok=True)
 reference=ASSETS/'lyke-original-referencia.jpg'
 if not reference.exists():
-    urllib.request.urlretrieve('https://lyke.com.br/arquivos/produtos/imagens_adicionais/101078_01-4198.jpg',reference)
-parser=argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--unit-photo',type=Path,help='Foto da unidade fornecida pelo proprietário')
-args=parser.parse_args()
+    cached=ROOT/'docs/manual/manual-assets/lyke-original-referencia.jpg'
+    if cached.exists():shutil.copyfile(cached,reference)
+    else:urllib.request.urlretrieve('https://lyke.com.br/arquivos/produtos/imagens_adicionais/101078_01-4198.jpg',reference)
+INSTALL_STATUS='STM R14 e ESP R12 instaladas e conferidas em 26/11/2026.' if args.verified_installation else 'PRÉVIA: instalação final e teste de despertar pendentes.'
 unit_photo=ASSETS/'unidade-lyke.png'
 if args.unit_photo:shutil.copyfile(args.unit_photo,unit_photo)
 elif not unit_photo.exists() and (ROOT/'docs/manual/manual-assets/unidade-lyke.png').exists():
@@ -148,7 +151,7 @@ def calculator_figure():
     d.rounded_rectangle((x0+12,y0+15,x1+12,y1+15),75,fill='#D3DEDF')
     d.rounded_rectangle((x0,y0,x1,y1),75,fill='#20292E',outline='#0C151A',width=5)
     d.text((477,69),'Lyke',font=font(40,True),fill=WHITE)
-    d.text((778,79),'MANUAL R12 / R9a',font=font(19),fill='#C6DADB')
+    d.text((778,79),'MANUAL R14 / R12',font=font(19),fill='#C6DADB')
     d.rounded_rectangle((474,139,1026,390),20,fill='#111D22')
     sc=lcd(['','2+3*4','14','','',''])
     im.paste(sc.resize((520,195),Image.Resampling.NEAREST),(490,165))
@@ -199,7 +202,7 @@ def S(label,lines,inverse=(),photos=0,wifi=False,flags='',battery=3,header=True)
     return dict(label=label,lines=lines,inverse=inverse,photos=photos,wifi=wifi,flags=flags,battery=battery,header=header)
 
 def native(label,stem):
-    return dict(label=label,frame=ROOT/'.build/lyke_stm32/lyke-r12/previews'/f'{stem}.pbm')
+    return dict(label=label,frame=ROOT/'.build/lyke_stm32/lyke-r14/previews'/f'{stem}.pbm')
 
 def battery_figure():
     im=Image.new('RGB',(1500,440),PALE);d=ImageDraw.Draw(im)
@@ -208,7 +211,7 @@ def battery_figure():
                                     ('baixa','Baixa: ! piscando'),('sem_leitura','Falha de leitura: ?')]):
         x=40+(n%2)*740;y=80+(n//2)*170
         d.text((x,y),label,font=font(27,True),fill=INK)
-        raw=Image.open(ROOT/f'.build/lyke_stm32/lyke-r12/previews/bateria_{stem}.pbm').convert('L').crop((88,0,128,8))
+        raw=Image.open(ROOT/f'.build/lyke_stm32/lyke-r14/previews/bateria_{stem}.pbm').convert('L').crop((88,0,128,8))
         sc=Image.new('RGB',raw.size,'#CFD8B8');sc.paste('#233A2C',mask=Image.eval(raw,lambda v:255-v))
         im.paste(sc.resize((600,120),Image.Resampling.NEAREST),(x,y+40))
     target=ASSETS/'bateria-indicador.png';im.save(target);return target
@@ -222,7 +225,7 @@ page('Sua calculadora, do primeiro toque à IA','MANUAL DO COMPRADOR',calc,
      'Ilustração didática da Lyke modificada. Não é fotografia da unidade montada.',[
  p('Guia de uso da calculadora Lyke 101078 modificada, com cálculo científico offline, câmera, Wi-Fi, resolução por IA e arquivo privado de fotos.'),
  note('Comece sem configurar nada','Para fazer contas, basta ligar o aparelho e usar o teclado. Para resolver fotos com IA, siga o início rápido e a conexão ao Wi-Fi.'),
- p('Edição 3.0 - 24/11/2026. Compatibilidade: STM32 Lyke R12 + ESP32-CAM Lyke R9a. As telas deste guia são simulações baseadas no firmware.'),
+ p(INSTALL_STATUS),p('Edição 4.0 - 26/11/2026. Compatibilidade: STM32 Lyke R14 + ESP32-CAM Lyke R12. As telas deste guia são simulações baseadas no firmware.'),
  p('<b>Integração testada: OpenAI, usada pelos modelos do ChatGPT.</b> Claude aparece como alternativa de preparação da conta; ainda não foi integrado nem testado nesta calculadora.')])
 
 page('Escolha o que você quer fazer','COMO USAR ESTE GUIA',flow('rotas','Três caminhos para começar',[
@@ -250,13 +253,13 @@ page('Primeiros minutos: conta e foto','02 | INÍCIO RÁPIDO',screens('inicio',S
  'Simulações. A conta local funciona sem internet; a resolução por IA exige o serviço configurado.',[
  h('Faça a primeira conta'),steps('Ligue pela chave física. Se a tela apenas foi apagada por SHIFT, AC, pressione MODE para despertar.','Pressione AC. Digite 2 + 3 x 4 e depois =. O resultado esperado é 14.','Para uma nova conta, digite um número. Para continuar usando o resultado, pressione um operador.'),
  h('Resolva a primeira questão com foto'),steps('Conecte a calculadora a uma rede de internet 2,4 GHz pelo portal do celular: páginas 15 e 16. O fornecedor precisa ter configurado o serviço de IA.','Na tela de contas, aponte a câmera ao enunciado. Pressione SHIFT, direita. Aguarde a captura terminar e um quadradinho ficar cheio.','Abra MODE, selecione ENVIAR FOTOS IA com as setas e pressione =. Confirme com = novamente.','Aguarde a IA. Para consultar, use MODE > ULTIMA RESPOSTA > =. Avance com direita/baixo; volte com esquerda/cima. AC retorna às contas.'),
- note('Antes de desligar','Envie ou baixe as fotos que deseja guardar. As capturas ainda na fila ficam somente na memória temporária e se perdem ao cortar a energia.')])
+ note('Antes de dormir ou desligar','Envie ou baixe as fotos que deseja guardar. As capturas na fila ficam na memória temporária e se perdem também no sono profundo, manual ou automático.')])
 
 page('Navegação, tela e atalhos','03 | CONTROLES',screens('controles',S('Menu com seleção invertida',['','MENU','PROCURAR WIFI','WIFI SALVO','CONFIG. CELULAR',''],(1,2)),S('Indicadores no cabeçalho',['','3+7','10','','',''],photos=2,wifi=True,flags='SAH')),
  'Simulações: o cabeçalho pode mostrar Wi-Fi, S, A, H e até três fotos.',[
- table(['Ação','Como fazer'],('Abrir / fechar o menu','MODE abre. AC ou MODE volta à calculadora.'),('Escolher uma opção','Setas percorrem a lista; = abre ou confirma.'),('Capturar rapidamente','Na tela de contas: SHIFT, direita.'),('Apagar a entrada atual','AC. Isso não remove as fotos.'),('Apagar a tela e desligar o Wi-Fi','SHIFT, AC. MODE desperta a tela; não corta a energia.'),('Zerar memórias locais','SHIFT, MODE. Limpa também estatística, pilha, histórico e Ans.')),
- h('Entenda os pequenos sinais'),p('A bateria à esquerda das fotos mostra de zero a quatro barras. ! pisca quando está baixa; ? indica falha na medição. <b>S</b>: SHIFT está armado; <b>A</b>: ALPHA; <b>H</b>: função hiperbólica. Os três quadrados representam fotos: vazios sem captura, preenchidos após a captura, com indicação piscante durante a operação. Ao conectar à rede externa, o sinal Wi-Fi pisca três vezes e desaparece. Na falha, alterna Wi-Fi e X até reconectar ou desligar o Wi-Fi. Calc-Lyke disponível não significa internet conectada.'),
- note('SHIFT, AC não é desligamento elétrico','Essa combinação apaga a tela e manda o ESP desligar o Wi-Fi. Para desligar todo o aparelho, use a chave física. Ao reiniciar o ESP, Calc-Lyke volta a ficar disponível.')])
+ table(['Ação','Como fazer'],('Abrir / fechar o menu','MODE abre. AC ou MODE volta à calculadora.'),('Escolher uma opção','Setas percorrem a lista; = abre ou confirma.'),('Capturar rapidamente','Na tela de contas: SHIFT, direita.'),('Apagar a entrada atual','AC. Isso não remove as fotos.'),('Entrar em sono profundo','SHIFT, AC, inclusive em menus/resposta. MODE desperta.'),('Zerar memórias locais','SHIFT, MODE. Limpa também estatística, pilha, histórico e Ans.')),
+ h('Entenda os pequenos sinais'),p('A bateria à esquerda das fotos mostra de zero a quatro barras. ! pisca quando está baixa; ? indica falha na medição. <b>S</b>: SHIFT está armado; <b>A</b>: ALPHA; <b>H</b>: função hiperbólica. Os três quadrados representam fotos: vazios sem captura, preenchidos após a captura, com indicação piscante durante a operação. Ao conectar à rede externa, o sinal Wi-Fi pisca três vezes e desaparece. Na falha, alterna Wi-Fi e X até reconectar, desligar ou pausar as tentativas após 20 minutos. Calc-Lyke disponível não significa internet conectada.'),
+ note('Sono e chave física','SHIFT, AC coloca os dois processadores em sono, com tela, câmera e rádio parados. MODE desperta; ON não funciona nesta unidade. A alimentação continua presente: o conversor e o resistor de manutenção ainda consomem. A chave física corta a alimentação conforme a montagem.')])
 
 page('Contas comuns e correção','04 | CÁLCULO OFFLINE',screens('editar',S('Prioridade das operações',['','2+3*4','14','','','']),S('Use parênteses para agrupar',['','(2+3)*4','20','','',''])),
  'Simulações do modo algébrico. Use ponto para decimais e x para multiplicar.',[
@@ -265,11 +268,11 @@ page('Contas comuns e correção','04 | CÁLCULO OFFLINE',screens('editar',S('Pr
  table(['Exemplo digitado','Resultado'],('1 . 5 + 2 . 2 5 =','3.75'),('( (-) 2 ) ^ 2 =','4'),('(-) 2 ^ 2 =','-4: o sinal fica fora da potência')),
  note('Limites de entrada','A expressão comporta até 95 elementos internos; funções contam como um elemento. Se aparecer EXPRESSAO CHEIA, divida o cálculo. Se faltar um fechamento, use ) antes de =.')])
 
-page('Ângulo e formato dos números','05 | PREFERÊNCIAS',screens('ajustes',S('Mude com as setas e =',['','MODO CIENTIFICO','ANGULO  DEG','FORMATO NORM 6','ENTRADA ALGEBRICA',''],(1,2)),S('Exemplo com duas casas',['','MODO CIENTIFICO','ANGULO  DEG','FORMATO FIX 2','ENTRADA ALGEBRICA',''],(1,3))),
+page('Ângulo, formato e sono automático','05 | PREFERÊNCIAS',screens('ajustes',S('Mude com as setas e =',['','MODO CIENTIFICO','ANGULO  DEG','FORMATO NORM 6','ENTRADA ALGEBRICA','SONO 60 MIN'],(1,2)),native('Sono: digite os minutos','tela_sono_config')),
  'Simulações do menu MODO CIENTIFICO. Saia com AC ou MODE para salvar.',[
- steps('Abra MODE > MODO CIENTIFICO > =. Use cima/baixo para escolher ANGULO, FORMATO ou ENTRADA.','Na linha ANGULO, esquerda/direita ou = alterna DEG, RAD e GRA. DEG usa graus; RAD usa radianos; GRA usa grados (400 em uma volta).','Na linha FORMATO, alterne NORM, FIX, SCI e ENG. Ainda nessa linha, pressione um número de 0 a 9 para ajustar a precisão.','Na linha ENTRADA, escolha ALGEBRICA para o uso comum ou RPN para pilha. Saia com AC ou MODE para gravar as preferências.'),
+ steps('Abra MODE > MODO CIENTIFICO > =. Cima/baixo escolhe ANGULO, FORMATO, ENTRADA ou SONO.','ANGULO: esquerda/direita ou = alterna DEG (graus), RAD (radianos) e GRA (400 grados por volta).','FORMATO: alterne NORM, FIX, SCI ou ENG. Um algarismo de 0 a 9 muda a precisão. ENTRADA escolhe ALGEBRICA ou RPN.','SONO: digite de 1 a 1440 minutos; a primeira tecla numérica substitui o valor anterior. Esquerda/direita ajusta um minuto; DEL apaga o último dígito. = salva e sai; AC ou MODE também salva. O padrão é 60 minutos.'),
  table(['Formato','O que muda'],('NORM','Exibição geral: decimal ou científica conforme a ordem de grandeza.'),('FIX 2, por exemplo','Mostra duas casas decimais, quando o valor cabe nesse formato.'),('SCI 2, por exemplo','Notação científica com duas casas na mantissa: 1.23E+4.'),('ENG','Expoente múltiplo de 3: 12.345E+3. A tecla ENG alterna ENG/NORM.')),
- p('O atalho SHIFT, Ans alterna o ângulo. Para garantir que essa mudança sobreviva a um desligamento, entre em MODO CIENTIFICO e saia salvando. O formato arredonda a apresentação; não transforma a calculadora em um sistema de precisão exata.')])
+ p('O sono conta o tempo sem nenhum contato físico do teclado, inclusive tecla mantida pressionada. Mensagens da rede e leitura do portal não renovam esse tempo. Captura, envio e atualização em andamento adiam a entrada em sono. SHIFT, Ans alterna o ângulo; salve nas preferências para mantê-lo após cortar energia.')])
 
 page('Potências, raízes e logaritmos','06 | FUNÇÕES CIENTÍFICAS',screens('potencias',native('Raiz sobre toda a expressão','tela_raiz'),native('Expoente elevado','tela_potencia')),
  'Telas do código do LCD: raiz desenhada com barra e expoente elevado. Feche o argumento com ) antes de calcular.',[
@@ -290,7 +293,7 @@ page('Frações, porcentagem e graus','08 | FORMATOS E COMBINAÇÕES',screens('f
  h('Porcentagem sem surpresa'),p('Para calcular 10% de 200: <b>200 x 10, SHIFT, =, =</b> resulta em 20. Para acrescentar 10%: <b>200 x (1 + 10, SHIFT, =, ), =</b> resulta em 220. A expressão 200 + 10% resulta em 200.1; não há acréscimo comercial automático.'),
  note('A fração é uma forma de exibir o número','O resultado é calculado numericamente. A exibição tenta encontrar uma fração com denominador até 9999; nem todo decimal aparecerá como fração. Em nCr/nPr, use n e r inteiros, com 0 <= r <= n; há limites de faixa.')])
 
-page('Memórias, constantes e aleatórios','09 | REUTILIZE VALORES',screens('memorias',S('Guardar o valor em A',['','12','12','','STO: VARIAVEL','']),S('Escolher uma constante',['','CONSTANTES','PI','EULER','C  LUZ',''],(1,2))),
+page('Memórias, constantes e aleatórios','09 | REUTILIZE VALORES',screens('memorias',S('Guardar o valor em A',['','12','12','','STO: VARIAVEL','']),S('Escolher uma constante',['','CONSTANTES','PI','EULER','C  LUZ',''],(1,2)),native('Símbolos no leitor da IA','simbolos_resposta')),
  'Simulações. RCL recupera; SHIFT, RCL prepara o armazenamento na variável escolhida.',[
  steps('Para guardar 12 em A: digite 12, pressione SHIFT, RCL e depois a tecla (-), associada a A.','Para recuperar A: pressione RCL, (-), =. Para usar A numa expressão, pressione ALPHA, (-).','M+ soma o valor atual à memória M. SHIFT, M+ subtrai. Para ler M, use RCL, M+, =.'),
  table(['Variável','Tecla depois de ALPHA, RCL ou STO'],('A / B / C','(-) / DMS / hyp'),('D / E / F','sin / cos / tan'),('X / Y / M',') / , / M+'),('Δ / θ / Ω','^ / log / EXP')),
@@ -323,7 +326,7 @@ page('Entenda as duas conexões Wi-Fi','13 | INTERNET E CELULAR',flow('duas-rede
  'O celular configura pelo portal; quem precisa de internet para enviar as fotos é a calculadora.'),
  'Diagrama conceitual. Calc-Lyke é uma rede local de configuração, não um plano de internet.',[
  table(['Conexão','Finalidade'],('Celular > Calc-Lyke','Abrir o painel em http://192.168.8.1, configurar e baixar fotos.'),('Calculadora > roteador ou hotspot','Acessar o servidor e a OpenAI. Use Wi-Fi 2,4 GHz.'),('Ícone no LCD','Indica que a calculadora está conectada à rede externa.')),
- steps('Ligue a calculadora. Em R9a, Calc-Lyke abre automaticamente ao iniciar o ESP e fica disponível até você desligar o Wi-Fi pelo menu.','No celular, abra Ajustes/Configurações > Wi-Fi, escolha Calc-Lyke e informe a senha entregue pelo fornecedor.','Se aparecer Sem internet, escolha permanecer conectado. Abra o navegador e digite exatamente http://192.168.8.1, incluindo http://.','Se o celular sair dessa rede sozinho, desative temporariamente a troca automática para dados móveis ou outra rede. Tente novamente.'),
+ steps('Calc-Lyke abre no boot e em MODE > CONFIG. CELULAR ou ATUALIZAR FIRMWARE. Fecha após dois minutos sem acesso HTTP. Reabra pelo menu quando precisar.','No celular, abra Ajustes/Configurações > Wi-Fi, escolha Calc-Lyke e informe a senha entregue pelo fornecedor.','Se aparecer Sem internet, escolha permanecer conectado. Abra http://192.168.8.1, incluindo http://. Uma página aberta consulta o aparelho e mantém o portal ativo; feche-a ao terminar para economizar.','Sem conexão externa por 20 minutos contínuos, as tentativas param. Use WIFI SALVO, PROCURAR WIFI ou CONFIG. CELULAR para tentar de novo; reiniciar também renova o prazo. Uma conexão ativa não é interrompida por esse limite.'),
  note('Hotspot do celular','Para usar o mesmo celular como roteador e configurador, siga as possibilidades do sistema dele. É mais simples fazer o primeiro cadastro com outro celular/computador conectado a Calc-Lyke, enquanto o primeiro fornece o hotspot 2,4 GHz.')])
 
 page('Cadastre sua rede de internet','14 | PORTAL DO CELULAR',panel('portal-wifi','Calc-Lyke | Wi-Fi','Simulação do portal local: http://192.168.8.1',[
@@ -339,7 +342,7 @@ page('Fotografe um enunciado legível','15 | CÂMERA',flow('capturar','Prepare a
  'Fluxo ilustrativo. A orientação da lente depende da montagem fornecida.',[
  steps('Ilumine a folha sem reflexo e limpe a lente com cuidado. Posicione a calculadora para que a câmera veja o enunciado completo, incluindo unidades, tabelas e figura.','Na tela de cálculo, pressione SHIFT e depois direita. Também pode usar MODE > TIRAR FOTO > = ou Tirar foto no portal.','Aguarde CAPTURANDO FOTO terminar. Um quadradinho preenchido indica uma foto guardada. Não repita a tecla enquanto ESP OCUPADO aparecer.','Se precisar, capture uma segunda e uma terceira foto. Use-as como partes da mesma questão: enunciado, figura e detalhes. Não há obrigação de usar três.','Confira as imagens em VER FOTOS NO WIFI. Remova uma captura ruim antes de enviar. Evite texto muito pequeno, movimento, sombra e página cortada.'),
  h('Ajustes pelo celular'),p('Na seção Fotos do portal, Espelhar e Inverter na vertical corrigem a orientação; Autofoco habilita o recurso do módulo compatível. Toque em Salvar câmera e refaça a captura para avaliar. Não há prévia de vídeo ao vivo no uso normal; a câmera é acionada para a foto e depois pausada.'),
- note('Capacidade e duração','São até três JPEGs na fila, com limite de 512 KiB por foto e 1,5 MiB no conjunto. Elas ficam na RAM: desligar ou reiniciar apaga as fotos ainda não enviadas.')])
+ note('Rádio e memória temporária','Durante a foto, o rádio é pausado automaticamente e restaurado depois de desligar a câmera. Se necessário, reconecte o celular a Calc-Lyke. Qualidade, resolução e autofoco são mantidos. Até três JPEGs, 512 KiB por foto e 1,5 MiB no total; sono profundo ou reinício apaga a fila.')])
 
 page('Veja, baixe ou descarte fotos','16 | GALERIA LOCAL',panel('portal-fotos','Calc-Lyke | Fotos','Conecte o celular a Calc-Lyke e abra http://192.168.8.1',[
  ('Tirar foto','Faz mais uma captura, até 3'),('Recarregar lista','Atualiza a galeria temporária'),('Abrir foto 1','Abre o JPEG original no navegador'),('Espelhar / Inverter na vertical','Ajuste a orientação e salve'),('Autofoco / Salvar câmera','Use conforme o módulo instalado')],
@@ -351,7 +354,7 @@ page('Veja, baixe ou descarte fotos','16 | GALERIA LOCAL',panel('portal-fotos','
 page('Envie à IA e leia a resposta','17 | RESOLUÇÃO',screens('resposta',S('Texto com desenvolvimento',['2*x+3=11','2*x=11-3','2*x=8','x=8/2','x=4','2*4+3=11'],header=False),native('Circuito: lado esquerdo','circuito_esquerda'),native('Circuito: lado direito','circuito_direita')),
  'Simulações do renderizador: texto e dois recortes de um circuito largo. Não são desenhos gerados pelo modelo em um teste físico.',[
  steps('Confira conexão externa, serviço de IA e uma a três fotos da mesma questão. Abra MODE > ENVIAR FOTOS IA > =.','Leia a quantidade e confirme com =. AC cancela antes de enviar. A tela indica AGUARDANDO IA; mantenha a energia e aguarde.','Abra MODE > ULTIMA RESPOSTA > =. Cima/baixo rolam 16 pixels. Em figura larga, esquerda/direita movem 24 pixels para os lados; em texto ou figura estreita, recuam/avançam 48 pixels. AC ou MODE retorna ao cálculo.','A última resposta fica salva no ESP. No portal, Abrir última resposta mostra texto e descrições das figuras; os desenhos aparecem no LCD.'),
- p('A janela continua com 126x48 pixels, sem cabeçalho ou ícones. Texto e desenhos 2D de circuitos, gráficos ou ângulos podem aparecer entre os passos. O serviço exige fórmula, substituição, desenvolvimento e resultado; a figura não substitui as contas. No texto, x^2 é quadrado, sqrt(...) é raiz e * é multiplicação.'),
+ p('A janela mantém 126x48 pixels, sem cabeçalho nem ícones. A resposta deve trazer fórmula, substituição, desenvolvimento essencial e resultado, com separação dos subitens. Figuras 2D podem acompanhar as contas. No leitor, pi aparece como π e phi como φ: são símbolos diferentes; π vale aproximadamente 3,14159 e φ costuma representar um ângulo. O texto simples do portal pode usar nomes como pi, sqrt(...) e angle.'),
  note('Se a IA pedir outra foto','Confira se faltou parte do enunciado ou se a imagem ficou ilegível. Remova/refaça a captura e envie novamente. Compare a transcrição dos dados com o papel: a IA pode errar leitura, unidade ou cálculo. Uma nova consulta pode gerar custo.')])
 
 page('Onde suas fotos ficam guardadas','18 | ARQUIVO E PRIVACIDADE',flow('arquivo','Da foto temporária ao arquivo privado',[
@@ -370,7 +373,7 @@ page('API: entenda antes de configurar','19 | CONTA E SERVIÇO',flow('chaves','T
  h('Escolha seu caminho'),p('<b>Serviço já entregue pelo fornecedor:</b> você usa o endereço e a credencial recebidos. Não precisa criar um Supabase nem pagar a API diretamente, salvo o combinado na compra. Pule para a conexão da página 24.'),
  p('<b>Quero usar minha própria conta OpenAI:</b> crie a conta e a chave nas páginas seguintes. Você ou o fornecedor também precisa administrar uma instância do servidor compatível. Criar a chave e comprar crédito não substitui essa instalação.'),
  note('ChatGPT e API são produtos com cobrança própria','Estar logado no ChatGPT não cria uma chave de API. Confira a organização e o saldo na plataforma de API. Eventuais benefícios de créditos vinculados a planos exigem as condições e a vinculação oferecidas pela plataforma. [S1, S2]'),
- p('O serviço desta edição usa OpenAI Responses e armazenamento privado no Supabase. Não existe seletor de provedor no portal R9a. Não cole uma chave sk-... ou sk-ant-... no campo de acesso da calculadora.')])
+ p('O serviço desta edição usa OpenAI Responses e armazenamento privado no Supabase. Não existe seletor de provedor no portal R12. Não cole uma chave sk-... ou sk-ant-... no campo de acesso da calculadora.')])
 
 page('OpenAI: conta e crédito da API','20 | PASSO A PASSO OPENAI - 1/3',panel('openai-conta','OpenAI Platform | conta e cobrança','SIMULAÇÃO DIDÁTICA - nomes e menus podem mudar',[
  ('1. Entrar','platform.openai.com'),('2. Organização / projeto','Selecione onde o serviço será usado'),('3. Billing','Confira crédito de API disponível'),('4. Add payment details / Buy credits','Revise valor e recarga automática'),('5. Usage','Acompanhe o consumo')],
@@ -408,7 +411,7 @@ page('Claude: chave e o que falta ativar','24 | ALTERNATIVA CLAUDE - 2/2',panel(
  ('API keys','platform.claude.com/settings/keys'),('Create key','Escolha nome, validade e conta vinculada'),('Workspace','Use o workspace do seu serviço'),('Chave criada','[CHAVE FICTÍCIA - NÃO UTILIZÁVEL]'),('Destino futuro','Segredo no servidor compatível com Claude')],
  'Não cole uma chave Anthropic no campo Chave de acesso da calculadora.'),
  'Simulação da criação de chave Claude. Somente a integração OpenAI foi testada.',[
- steps('Abra https://platform.claude.com/settings/keys. Clique em Create key. Informe nome e validade; escolha a conta vinculada e o workspace adequado. Para um serviço compartilhado, o administrador pode usar uma conta de serviço. [S5]','Copie o segredo quando ele for mostrado e guarde-o com segurança. A chave completa só aparece na criação; se perder, crie outra. Não a inclua em PDF, GitHub ou capturas de tela. [S5]','Peça ao fornecedor uma versão do servidor que aceite Anthropic Messages, envie os JPEGs ao modelo de visão escolhido e normalize a resposta para o protocolo da calculadora. É uma implementação necessária, não uma configuração disponível nesta R9a. [S9]','Somente depois dessa implementação, instale o segredo no servidor, configure o endereço/credencial de serviço apropriados no aparelho e repita os testes de foto, resposta curta, paginação e arquivo privado.','Considere Claude disponível apenas quando esse teste passar na sua unidade. Até lá, use a integração OpenAI validada.'),
+ steps('Abra https://platform.claude.com/settings/keys. Clique em Create key. Informe nome e validade; escolha a conta vinculada e o workspace adequado. Para um serviço compartilhado, o administrador pode usar uma conta de serviço. [S5]','Copie o segredo quando ele for mostrado e guarde-o com segurança. A chave completa só aparece na criação; se perder, crie outra. Não a inclua em PDF, GitHub ou capturas de tela. [S5]','Peça ao fornecedor uma versão do servidor que aceite Anthropic Messages, envie os JPEGs ao modelo de visão escolhido e normalize a resposta para o protocolo da calculadora. É uma implementação necessária, não uma configuração disponível nesta R12. [S9]','Somente depois dessa implementação, instale o segredo no servidor, configure o endereço/credencial de serviço apropriados no aparelho e repita os testes de foto, resposta curta, paginação e arquivo privado.','Considere Claude disponível apenas quando esse teste passar na sua unidade. Até lá, use a integração OpenAI validada.'),
  note('Trocar apenas a chave não funciona','As APIs têm formatos diferentes. Não substitua OPENAI_API_KEY por uma chave sk-ant-... e não altere só o nome do modelo. A preferência por Claude exige o adaptador e sua validação, que não foram feitos nesta edição.')])
 
 page('Modelos, custos e uso econômico','25 | CUIDE DO CONSUMO',flow('custos','Uma boa foto evita repetir uma consulta',[
@@ -422,10 +425,9 @@ page('Modelos, custos e uso econômico','25 | CUIDE DO CONSUMO',flow('custos','U
 
 page('Desligar, despertar e preservar dados','26 | ENERGIA E MEMÓRIA',battery_figure(),
  'Simulações do código real: o ícone fica antes dos três quadrados de fotos, na mesma janela visível.',[
- table(['Ação / dado','O que acontece'],('MODE > DESLIGAR WIFI','Desliga o Wi-Fi do ESP nesta sessão. O cálculo local continua.'),('SHIFT, AC','Limpa a entrada, apaga a tela e pede Wi-Fi desligado. MODE desperta a tela.'),('Reabrir o portal','MODE > CONFIG. CELULAR (ou VER FOTOS NO WIFI) solicita o portal novamente.'),('Reiniciar / chave física','Ao reiniciar o ESP, Calc-Lyke volta a abrir automaticamente.'),('Bateria no cabeçalho','Quatro níveis aproximados; ! pisca abaixo de cerca de 3,45 V. ? indica leitura inválida.'),('MODE > BATERIA','Mostra a tensão aproximada; = mede de novo. A leitura automática é renovada a cada 30 segundos.')),
- h('O que permanece ao desligar'),p('Permanecem o mapeamento de teclas, as preferências salvas, o programa salvo, as redes cadastradas, a configuração do serviço e a última resposta gravada no ESP. O arquivo do servidor também permanece conforme a política do serviço.'),
- h('O que se perde'),p('Perdem-se a entrada atual, Ans, memórias A-F/X/Y/M/Δ/θ/Ω, histórico, estatística, pilha RPN e fotos ainda na fila temporária. Antes de cortar energia, conclua o envio ou baixe as imagens e pare qualquer atualização em andamento.'),
- note('Alimentação e recarga','Use apenas o conector, a fonte e o procedimento entregues para sua unidade. As barras estimam a carga pela tensão; não são uma porcentagem exata nem indicam carregamento. A montagem de referência usa uma célula e divisor de 470 kΩ + 470 kΩ corrigido e conferido pelo proprietário. Para recarregar, siga a orientação específica da unidade; não use o ícone para decidir qual entrada alimentar.')])
+ table(['Ação / dado','O que acontece'],('MODE > DESLIGAR WIFI','Desliga o rádio nesta sessão. O cálculo local continua.'),('SHIFT, AC','ESP entra em deep-sleep; STM em STOP1. MODE desperta ambos.'),('Sono automático','Padrão: 60 minutos sem botão. Ajuste em MODO CIENTIFICO > SONO, de 1 a 1440 minutos.'),('Durante o sono','Tela, câmera, rádio, ADC e varredura periódica parados. Só MODE desperta no firmware final.'),('Bateria no cabeçalho','Quatro níveis aproximados; ! baixa; ? leitura inválida. Não indica carregamento.'),('MODE > BATERIA','Tensão aproximada; = mede novamente. Medição a cada 30 s enquanto acordada.')),
+ h('Dados e fotos'),p('O sono limpa a entrada atual e mantém as demais memórias do STM em RAM e as configurações gravadas, mas apaga as fotos temporárias do ESP. A última resposta salva e o arquivo do servidor permanecem. Cortar energia também perde Ans, variáveis, histórico, estatística e pilha RPN; preferências, programa salvo e mapa ficam.'),
+ note('A alimentação continua presente','Sono não corta bateria. A unidade usa célula reaproveitada de controle PS4, de capacidade real não medida; referência original: 1000 mAh. O divisor de dois 470 kΩ consome pouco. O resistor de 330 Ω em 5 V e o conversor continuam consumindo até a alteração física prevista. Use o método de recarga entregue para a unidade.')])
 
 page('Atualize somente com o arquivo correto','27 | MANUTENÇÃO PELO WI-FI',panel('atualizar','Calc-Lyke | Atualizar firmware','SIMULAÇÃO - arquivos devem ser fornecidos para sua unidade',[
  ('STM32','lyke-stm32-ota.bin'),('Atualizar STM32','Atualização por Wi-Fi validada nesta unidade'),('ESP32-CAM','esp32cam_integrada.ino.bin'),('Atualizar ESP32-CAM','OTA já utilizada e testada nesta montagem'),('Após reiniciar','Reconecte a Calc-Lyke e confira a revisão')],
@@ -442,7 +444,7 @@ page('Se algo não funcionar','28 | SOLUÇÃO DE PROBLEMAS',screens('erros',S('F
 
 page('Todos os itens do menu','29 | CONSULTA RÁPIDA',screens('menu-indice',S('Entre com MODE e =',['','MENU','PROCURAR WIFI','WIFI SALVO','CONFIG. CELULAR',''],(1,2)),S('Setas mudam a seleção',['','MENU','PROGRAMA','AJUDA E TECLAS','',''],(1,3))),
  'Simulações. A seleção percorre as opções e retorna ao início ao passar do fim.',[
- table(['Item do menu','Função'],('PROCURAR WIFI','Lista redes externas; cadastro de senha pelo celular.'),('WIFI SALVO','Escolhe uma rede já cadastrada e solicita a conexão.'),('CONFIG. CELULAR','Abre/reabre o portal local Calc-Lyke.'),('TIRAR FOTO','Captura um JPEG para a fila temporária.'),('ENVIAR FOTOS IA','Abre confirmação; = envia 1 a 3 fotos.'),('ULTIMA RESPOSTA','Abre o texto salvo com paginação pelas setas.'),('VER FOTOS NO WIFI','Orienta acesso ao portal e à galeria local.'),('REMOVER ULT. FOTO','Descarta a foto mais recente da fila.'),('LIMPAR FOTOS','Descarta todas as fotos da fila.'),('ATUALIZAR FIRMWARE','Abre o acesso ao portal de atualização.'),('DESLIGAR WIFI','Desliga o rádio na sessão atual; reboot reativa AP.'),('BATERIA','Consulta tensão aproximada em PA0.'),('MODO CIENTIFICO','Ângulo, formato/precisão e entrada ALG/RPN.'),('ESTATISTICA','Médias, desvios, somas e regressão.'),('CONSTANTES','Insere uma das seis constantes.'),('PROGRAMA','Grava, executa ou apaga uma sequência de teclas.'),('AJUDA E TECLAS','Mostra lembretes de operação em três páginas.'))])
+ table(['Item do menu','Função'],('PROCURAR WIFI','Lista redes externas; cadastro de senha pelo celular.'),('WIFI SALVO','Escolhe uma rede já cadastrada e solicita a conexão.'),('CONFIG. CELULAR','Abre/reabre o portal local Calc-Lyke.'),('TIRAR FOTO','Captura um JPEG para a fila temporária.'),('ENVIAR FOTOS IA','Abre confirmação; = envia 1 a 3 fotos.'),('ULTIMA RESPOSTA','Abre o texto salvo com paginação pelas setas.'),('VER FOTOS NO WIFI','Orienta acesso ao portal e à galeria local.'),('REMOVER ULT. FOTO','Descarta a foto mais recente da fila.'),('LIMPAR FOTOS','Descarta todas as fotos da fila.'),('ATUALIZAR FIRMWARE','Abre o acesso ao portal de atualização.'),('DESLIGAR WIFI','Desliga o rádio na sessão atual; reboot reativa AP.'),('BATERIA','Consulta tensão aproximada em PA0.'),('MODO CIENTIFICO','Ângulo, formato/precisão, ALG/RPN e SONO em minutos.'),('ESTATISTICA','Médias, desvios, somas e regressão.'),('CONSTANTES','Insere uma das seis constantes.'),('PROGRAMA','Grava, executa ou apaga uma sequência de teclas.'),('AJUDA E TECLAS','Mostra lembretes de operação em três páginas.'))])
 
 page('Teclas: funções científicas','30 | REFERÊNCIA COMPLETA - 1/2',screens('atalhos-cientificos',S('S indica SHIFT armado',['','25','','','',''],flags='S'),S('H indica função hiperbólica',['','','','','',''],flags='  H')),
  'Simulações. Pressione e solte SHIFT antes da tecla; hyp permanece armado até a função trigonométrica.',[
@@ -451,28 +453,28 @@ page('Teclas: funções científicas','30 | REFERÊNCIA COMPLETA - 1/2',screens(
 
 page('Teclas: edição, memória e controle','31 | REFERÊNCIA COMPLETA - 2/2',screens('atalhos-controle',S('Uma foto pronta na fila',['','','','','',''],photos=1),S('Memórias zeradas',['','','','','MEMORIAS LIMPAS',''])),
  'Simulações. Limpar memórias e apagar fotos são comandos diferentes.',[
- table(['Tecla','Função principal / secundária'],('0 a 9','Algarismos. SHIFT, 0: Rnd(. SHIFT, 1: SOMA X. SHIFT, 2: MEDIA X. SHIFT nos demais: mesmo algarismo.'),('Ponto .','Decimal. SHIFT, ponto: Ran# pseudoaleatório.'),('+ / - / x / /','Operações aritméticas; SHIFT mantém a operação.'),('( e )','Parênteses; SHIFT mantém o símbolo.'),('Vírgula ,','Separa valores. SHIFT, vírgula: registra dado/par estatístico.'),('RCL','Recupera variável. SHIFT, RCL: STO (guardar). Depois escolha a tecla da variável.'),('M+','Soma valor à memória M. SHIFT, M+: subtrai de M.'),('ENG','Alterna ENG/NORM, com ou sem SHIFT.'),('=','Calcula; em RPN, empilha/ENTER. SHIFT, =: %.'),('DEL','Apaga elemento; após resultado, recupera conta. SHIFT, DEL: inserir/sobrescrever.'),('AC','Limpa entrada; em menus, volta. SHIFT, AC: tela apagada e Wi-Fi OFF.'),('MODE','Abre menu; sai de subpágina. SHIFT, MODE: zera memórias locais.'),('REPLAY esquerda/direita','Move cursor. SHIFT, direita, na conta: captura foto.'),('REPLAY cima/baixo','Histórico de expressões. Em menus e respostas, navega.'),('SHIFT / ALPHA','Arma/desarma modificador para próxima tecla; um cancela o outro.'),('ON','Sem função nesta unidade. Ligue pela chave física.')),
+ table(['Tecla','Função principal / secundária'],('0 a 9','Algarismos. SHIFT, 0: Rnd(. SHIFT, 1: SOMA X. SHIFT, 2: MEDIA X. SHIFT nos demais: mesmo algarismo.'),('Ponto .','Decimal. SHIFT, ponto: Ran# pseudoaleatório.'),('+ / - / x / /','Operações aritméticas; SHIFT mantém a operação.'),('( e )','Parênteses; SHIFT mantém o símbolo.'),('Vírgula ,','Separa valores. SHIFT, vírgula: registra dado/par estatístico.'),('RCL','Recupera variável. SHIFT, RCL: STO (guardar). Depois escolha a tecla da variável.'),('M+','Soma valor à memória M. SHIFT, M+: subtrai de M.'),('ENG','Alterna ENG/NORM, com ou sem SHIFT.'),('=','Calcula; em RPN, empilha/ENTER. SHIFT, =: %.'),('DEL','Apaga elemento; após resultado, recupera conta. SHIFT, DEL: inserir/sobrescrever.'),('AC','Limpa entrada; em menus, volta. SHIFT, AC: sono profundo; MODE desperta.'),('MODE','Abre menu; sai de subpágina. SHIFT, MODE: zera memórias locais.'),('REPLAY esquerda/direita','Move cursor. SHIFT, direita, na conta: captura foto.'),('REPLAY cima/baixo','Histórico de expressões. Em menus e respostas, navega.'),('SHIFT / ALPHA','Arma/desarma modificador para próxima tecla; um cancela o outro.'),('ON','Sem função nesta unidade. Ligue pela chave física.')),
  note('Atalhos valem na tela de cálculo','Dentro dos menus, as teclas seguem as regras de navegação. Para usar SHIFT, direita ou outra função de cálculo, volte primeiro com AC.')])
 
 page('Aprenda com uma IA usando o .md','32 | MATERIAL PARA CONTINUAR',flow('aprender','O manual também acompanha você em texto',[
  ('Abra o .md','No editor ou aplicativo de IA'),('Diga sua dúvida','Descreva tela e objetivo'),('Peça uma ação','Uma etapa por vez'),('Confira','Compare com o aparelho')],
  'O Markdown contém o mesmo conteúdo do PDF e usa a pasta manual-assets para as imagens.'),
  'Fluxo de aprendizado. Nunca envie chaves, senhas ou dados de pagamento para obter ajuda.',[
- h('Copie este pedido para começar'),note('Prompt de aprendizagem','Estou usando a Lyke modificada com STM32 R12 e ESP R9a. Use o manual anexado como referência. Sou iniciante: explique uma ação por vez, diga exatamente qual tecla pressionar e o que devo ver. Diferencie captura, envio à IA e arquivo. Se a função não existir nesta versão, diga isso. Minha dúvida é: [descreva].'),
+ h('Copie este pedido para começar'),note('Prompt de aprendizagem','Estou usando a Lyke modificada com STM32 R14 e ESP R12. Use o manual anexado como referência. Sou iniciante: explique uma ação por vez, diga exatamente qual tecla pressionar e o que devo ver. Diferencie captura, envio à IA e arquivo. Se a função não existir nesta versão, diga isso. Minha dúvida é: [descreva].'),
  h('O que anexar'),p('Anexe Manual-Lyke.md ao chat e, se houver suporte a imagens, uma foto da tela ou a figura pertinente do pacote. Explique em que passo parou e transcreva a mensagem. Para manter as figuras ao abrir o Markdown localmente, deixe manual-assets na mesma pasta do .md; o ZIP já tem essa estrutura.'),
  table(['Termo','Significado simples'],('Firmware','Programa instalado dentro da calculadora.'),('API','Forma de o servidor conversar com o provedor de IA.'),('Portal / AP','Página local e rede Calc-Lyke que permitem configurar.'),('Servidor / serviço','Sistema na internet que chama a IA e guarda o arquivo.'),('RAM / arquivo privado','Memória temporária do aparelho / armazenamento com acesso controlado.'),('Token / credencial','Segredo que identifica o acesso do aparelho ao serviço.')),
  p('Para suporte, informe revisão, mensagem, quantidade de fotos, status de rede e sequência de teclas. Não publique o segredo do aparelho ou da OpenAI. A IA ajuda a entender o manual; a confirmação do resultado deve vir da tela e dos testes da sua unidade.')])
 
 page('Compatibilidade e entrega da unidade','33 | O QUE FOI VALIDADO',flow('validacao','Versão documentada nesta edição',[
- ('STM32','Lyke R12 - teclado e LCD'),('ESP32-CAM','Lyke R9a - câmera e Wi-Fi'),('OpenAI','Resposta real aceita'),('Arquivo','JPEG recuperado e conferido')]),
- 'Estado do projeto em 24/11/2026. Esquema, implementação e teste físico são coisas diferentes.',[
- table(['Situação','Evidência ou limite'],('Testado: OpenAI e arquivo','Consulta de visão com equação sintética 2*x+3=11 retornou x=4; reenvio em cache conferido.'),('Testado: envio pelo ESP','Captura real da bancada enviada pelo próprio ESP, arquivada e respondida pela IA; JPEG recuperado com hash idêntico.'),('Testado: AP e OTA do ESP','Portal automático, desligamento por comando, retorno após reinício e atualização ESP por Wi-Fi.'),('Testado: atualização e LCD','STM R12 e ESP R9a instalados pelo Wi-Fi; revisões e mapa de 49 teclas conferidos. Raiz/frações confirmadas anteriormente pelo usuário.'),('Bateria e resolução completa','Dois resistores de 470 kΩ corrigidos pelo proprietário; leitura normal. API v2 conferida com três fotos de questão real e desenvolvimento completo.'),('Limites de validação','Figuras: testes locais do renderizador aprovados; geração real pelo modelo ainda não testada no aparelho. Claude não integrado/testado.')),
+ ('STM32','Lyke R14 - teclado e LCD'),('ESP32-CAM','Lyke R12 - câmera e Wi-Fi'),('OpenAI','Resposta real aceita'),('Arquivo','JPEG recuperado e conferido')]),
+ 'Estado de 26/11/2026. '+INSTALL_STATUS,[
+ table(['Situação','Evidência ou limite'],('Testado: OpenAI e arquivo','Consulta real, recuperação dos JPEGs e respostas, cache e desenvolvimento com três fotos conferidos em revisões anteriores.'),('Testado: captura e economia','Na unidade, JPEG 2560x1920 com pausa/restauração do rádio, sem reiniciar o ESP. Qualidade/autofoco mantidos.'),('Testado no computador','32 verificações: menu/tempo salvo, inatividade física, sono/protocolo, STOP, Wi-Fi desconectado/conectado e regressões.'),('Firmware final no aparelho',INSTALL_STATUS+' Mapa de 49 teclas, configurações e última resposta preservados.'),('Sono físico testado','SHIFT, AC apagou a tela. Tecla numérica não despertou; somente MODE despertou e o menu funcionou. ESP confirmou retorno de deep-sleep/ext0.'),('Limites','Temporizadores validados localmente. Corrente, temperatura e autonomia não medidas. Leitura completa das figuras requer conferência do usuário. Claude não integrado/testado.')),
  h('Checklist para receber a calculadora pronta'),steps('Peça a demonstração de ligar/desligar, fazer 2+3x4 e ler a tela na sua unidade.','Confira senha do AP, orientação da câmera, alimentação/recarga e uma foto legível de questão real.','Peça uma resolução completa no LCD e o procedimento de recuperar/excluir fotos do serviço.','Confirme quem paga a API, os limites, contato de suporte e arquivos corretos de atualização.'),
  p('Este manual não é o manual original de fábrica da Lyke. A carcaça foi adaptada e a eletrônica é do projeto CAMERA_ESP. A ilustração da frente e as telas são simulações; há também uma foto real da unidade, enviada pelo proprietário, na página de fontes.')])
 
 page('Fontes, imagens e versão','34 | REFERÊNCIAS',unit_photo if unit_photo.exists() else reference,
  'Foto real da unidade modificada durante o ajuste da bateria, anterior ao ícone R11. As demais telas são simulações; o produto comercial original está em [S12].' if unit_photo.exists() else 'Foto do produto comercial original [S12], não da unidade modificada.',[
- p('Links oficiais consultados em 23/11/2026. As telas de portais deste manual são desenhos explicativos: menus e condições comerciais podem mudar. As instruções de operação local foram conferidas nos fontes R12/R9a.'),
+ p('Guias de conta, chave e cobrança OpenAI/Claude e preços OpenAI reconferidos em 25/11/2026; demais referências consultadas em 23/11/2026. As telas de portais deste manual são desenhos explicativos: menus e condições comerciais podem mudar. As instruções de operação local foram conferidas nos fontes R14/R12.'),
  table(['Referência','Documento oficial'],
  ('S1','<link href="https://help.openai.com/en/articles/9039756-managing-billing-for-chatgpt-and-the-api-platform" color="#087F81">OpenAI: cobrança ChatGPT e plataforma API</link>'),
  ('S2','<link href="https://developers.openai.com/api/docs/guides/api-keys" color="#087F81">OpenAI: chaves de API e contas de serviço</link>'),
@@ -500,7 +502,7 @@ def markdown_text(s):
     return html.unescape(s)
 
 md=['# Manual do comprador - Calculadora Lyke modificada','',
-    '> Edição 3.0, 24/11/2026. STM32 R12 + ESP32-CAM R9a. Somente OpenAI testada. Claude ainda não integrado/testado.','',
+    '> Edição 4.0, 26/11/2026. STM32 R14 + ESP32-CAM R12. Somente OpenAI testada. Claude ainda não integrado/testado.','', '> '+INSTALL_STATUS,'',
     'Este Markdown contém o conteúdo integral do PDF, com as mesmas figuras. Mantenha `manual-assets/` junto deste arquivo para exibir imagens. O ZIP inclui a pasta.','',
     '## Índice','']
 for i,pg in enumerate(PAGES,1):md.append(f'- [{i:02}. {pg["title"]}](#pagina-{i:02})')
@@ -517,13 +519,13 @@ for i,pg in enumerate(PAGES,1):
             md += ['| '+' | '.join(block[1])+' |','| '+' | '.join(['---']*len(block[1]))+' |']
             md += ['| '+' | '.join(markdown_text(c).replace('|','\\|') for c in row)+' |' for row in block[2]]+['']
 md += ['## Contexto estruturado para uma IA de apoio','',
-    '```yaml','produto: Lyke 101078 modificada','data_manual: 2026-11-24','stm32: lyke-r12','esp: lyke-r9a',
+    '```yaml','produto: Lyke 101078 modificada','data_manual: 2026-11-26','stm32: lyke-r14','esp: lyke-r12',
     'esp_chip: ESP32 clássico AI Thinker, 4 MB flash e 4 MB PSRAM','nao_confundir: GOOUUU ESP32-S3 + DevKit (montagem diferente)',
     'teclas: 49; ON não mapeada','lcd: janela 126x48; 21 colunas x 6 linhas úteis; resposta em 6 linhas sem ícones',
-    'ap: Calc-Lyke','portal: http://192.168.8.1','wifi_boot: AP sempre abre; OFF só na sessão',
+    'ap: Calc-Lyke','portal: http://192.168.8.1','wifi_boot: AP abre no boot/menu; fecha após 120 s sem HTTP; OFF só na sessão','sono: SHIFT e AC; automático em 60 min sem tecla; MODE desperta','sono_menu: MODE > MODO CIENTIFICO > SONO; 1-1440 min; = salva','wifi_limite: pausa tentativas após 20 min contínuos desconectado; conectado nunca expira','captura_radio: pausa automaticamente Wi-Fi e restaura após desligar câmera',
     'captura: SHIFT e depois direita, na tela de cálculo','fotos: 1 a 3 JPEGs em RAM; até 512 KiB cada',
     'envio: MODE > ENVIAR FOTOS IA > confirmar com =','arquivo: só após envio, no serviço privado',
-    'bateria: 0-4 barras aproximadas; ! baixa; ? leitura inválida; medição a cada 30 s','stm_ota: Wi-Fi do ESP + UART existente; base V2 já instalada e testada','api_testada: OpenAI Responses; figuras da API v3 ainda sem teste real no aparelho','leitor: texto e desenhos 2D; cima/baixo 16px; lados 24px em figura larga ou 48px verticais em texto','wifi_indicador: 3 pulsos no sucesso, depois oculto; falha alterna Wi-Fi/X','modelo_principal: gpt-6.1-terra / high','modelo_economico: gpt-6-luna / medium',
+    'bateria: 0-4 barras aproximadas; ! baixa; ? leitura inválida; medição a cada 30 s','stm_ota: Wi-Fi do ESP + UART existente; base V2 já instalada e testada','api_testada: OpenAI Responses v4; símbolos no leitor; geração de figuras requer conferência humana','leitor: texto e desenhos 2D; cima/baixo 16px; lados 24px em figura larga ou 48px verticais em texto','wifi_indicador: 3 pulsos no sucesso, depois oculto; falha alterna Wi-Fi/X até reconectar/desligar/pausar','modelo_principal: gpt-6.1-terra / high','modelo_economico: gpt-6-luna / medium',
     'claude: não integrado e não testado; exige adaptador Anthropic no servidor',
     'segredo_openai: só no servidor, OPENAI_API_KEY','credencial_aparelho: diferente da chave OpenAI',
     'hardware_final: posição de chave, câmera, carregador e bateria depende da unidade',
@@ -532,7 +534,7 @@ md += ['## Contexto estruturado para uma IA de apoio','',
     'Para ajudar o comprador, use primeiro os procedimentos deste manual, peça a mensagem exata e oriente uma etapa por vez. Não peça que publique chaves/senhas. Não trate compra de créditos como solução para toda falha. Não mande abrir, refazer fios ou gravar imagem de outro hardware para um problema de uso.','']
 (OUT/'Manual-Lyke.md').write_text('\n'.join(md),encoding='utf-8')
 shutil.copyfile(ROOT/'firmware/calculadora/common/FONT-LICENSE.txt',ASSETS/'FONT-LICENSE.txt')
-(ASSETS/'LEIA-ME.txt').write_text('Telas e portais: simulações didáticas baseadas nos fontes R12/R9a. Fórmulas gráficas e indicador de bateria usam frames do código C testado no computador.\ncalculadora-guia.png: ilustração lógica da frente, não fotografia.\nunidade-lyke.png: foto da unidade modificada enviada pelo proprietário durante ajuste da bateria, anterior ao ícone R11.\nlyke-original-referencia.jpg e lyke-modelo-referencia.jpg: foto do produto comercial original, fabricante Lyke. Não mostra a calculadora modificada.\nFonte: https://lyke.com.br/produtos/detalhes/calculadora-cientifica-10-2-digitos/\nDownload: 23/11/2026.\nFonte bitmap das telas: Adafruit GFX; licença em FONT-LICENSE.txt.\n',encoding='utf-8')
+(ASSETS/'LEIA-ME.txt').write_text('Telas e portais: simulações didáticas baseadas nos fontes R14/R12. Fórmulas gráficas e indicador de bateria usam frames do código C testado no computador.\ncalculadora-guia.png: ilustração lógica da frente, não fotografia.\nunidade-lyke.png: foto da unidade modificada enviada pelo proprietário durante ajuste da bateria, anterior ao ícone R11.\nlyke-original-referencia.jpg e lyke-modelo-referencia.jpg: foto do produto comercial original, fabricante Lyke. Não mostra a calculadora modificada.\nFonte: https://lyke.com.br/produtos/detalhes/calculadora-cientifica-10-2-digitos/\nDownload: 23/11/2026.\nFonte bitmap das telas: Adafruit GFX; licença em FONT-LICENSE.txt.\n',encoding='utf-8')
 
 W,H=A4;M=42;CW=W-2*M
 styles={
@@ -544,7 +546,7 @@ styles={
 }
 pdf_path=OUT/'Manual-Lyke.pdf'
 c=canvas.Canvas(str(pdf_path),pagesize=A4,pageCompression=1)
-c.setTitle('Manual do comprador - Lyke modificada | R12 / R9a')
+c.setTitle('Manual do comprador - Lyke modificada | R14 / R12')
 c.setAuthor('Projeto CAMERA_ESP')
 c.setSubject('Uso, funções, Wi-Fi, fotos, OpenAI e preparação Claude não integrada')
 layout=[]
@@ -616,7 +618,7 @@ for i,pg in enumerate(PAGES,1):
     layout.append(dict(page=i,bottom=round(y,1)))
     c.setStrokeColor(colors.HexColor('#CCDADC'));c.line(M,42,W-M,42)
     c.setFont('Body',8);c.setFillColor(colors.HexColor(MUTED))
-    c.drawString(M,27,'LYKE MODIFICADA | Manual do comprador | R12 / R9a | 24/11/2026')
+    c.drawString(M,27,('LYKE MODIFICADA | Manual do comprador' if args.verified_installation else 'PRÉVIA - instalação final pendente')+' | R14 / R12 | 26/11/2026')
     c.drawRightString(W-M,27,f'{i:02} / {len(PAGES)}')
     c.showPage()
 c.save()

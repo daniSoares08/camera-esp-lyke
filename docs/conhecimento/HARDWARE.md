@@ -1,5 +1,31 @@
 # Hardware e pinagens
 
+## Estado em 26/11/2026: produção instalada, sem alteração física
+
+STM R14 + ESP R12 finais instalados pelo Wi-Fi/UART. Teste do usuário confirmou
+sono em SHIFT+AC e despertar somente por MODE, com menu funcional; ESP
+registrou deep-sleep/ext0 no retorno. MODE usa PB12/PB9 e pulso existente
+PA2→GPIO13; sem timer de despertar na produção. Diagnóstico PA3/10 s removido.
+MAP49, configurações e resposta preservados. Captura com pausa do rádio já
+passou em 25/11. Não houve solda, troca de resistor ou medição de corrente.
+330 Ω na saída de 5 V e divisor 2×470 kΩ permanecem; não confundir sono com
+corte elétrico. Ensaio real Wi-Fi 20 min dispensado pelo usuário; testes nativos
+aprovados. Guia R14 e histórico abaixo.
+
+## Atualização de 25/11: hardware mantido, diagnóstico temporário
+
+Nenhum fio/componente foi alterado. Usuário autorizou gravação com carga estável.
+A dupla **STM R14-test / ESP R12-test** está temporariamente instalada. Produção
+R14/R12 preparada, ainda não aprovada no aparelho. Captura com pausa de rádio
+passou; sono completo do STM não confirmado e AP ficou inacessível. Para
+retomar, ciclo pela chave física e ATUALIZAR FIRMWARE; ver guia R14.
+Apenas no diagnóstico, PA3 substitui MODE como sense de STOP e ESP usa timer.
+A produção continua usando **PB12/PB9, somente MODE**, PA2→GPIO13 para despertar
+ESP. Não copiar a pinagem de teste como montagem definitiva. Resistor 330 Ω
+continua na saída 5 V e divisor continua 2×470 kΩ. Corrente/temperatura não medidas.
+
+## Histórico anterior ao ensaio
+
 **Sono preparado em 25/11, sem alteração de fios:** MODE é PB12/T02 ↔
 PB9/T16 no mapa atual. Na STM R13 preparada, PB12 fica com pull-up/EXTI12
 e PB9 baixo; demais trilhas em analógico sem pulls. STM STOP1 suspende

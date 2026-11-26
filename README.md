@@ -3,23 +3,24 @@
 Firmware, API e esquema da calculadora com **STM32G431CBU6 + ESP32-CAM clássica AI Thinker**.
 [Repositório público no GitHub](https://github.com/daniSoares08/camera-esp-lyke).
 
-Estado verificado em **24/11/2026**: STM32 `lyke-r12`, ESP `lyke-r9a`, 49 teclas mapeadas.
-Atualização pelo Wi-Fi/UART existente concluída, configurações e última resposta
-preservadas. Janela 126×48 mantida. API v3 com texto e desenhos opcionais;
-somente OpenAI integrada/testada. Figuras geradas pelo modelo ainda aguardam
-teste real no aparelho.
+**Concluído em 26/11/2026: STM R14 + ESP R12 finais instalados** por Wi-Fi/UART,
+com 49 teclas, configurações e última resposta preservadas. Sono em SHIFT+AC
+e despertar somente por MODE confirmados pelo usuário e pelo retorno do ESP.
 
-**25/11:** [STM R13 + ESP R11 preparados: SHIFT+AC e sono profundo](docs/REVISAO-R13-SONO-PROFUNDO.md).
-Usuário adiou gravação por bateria crítica. O conjunto inclui energia, símbolos
-e captura da preparação ESP R10. Agora os DOIS precisam atualizar, ESP primeiro.
-Instalados continuam STM R12/ESP R9a; o manual 3.0 corresponde a esse conjunto.
-API v4 já publicada.
+Sono automático após **60 minutos sem botão**, configurável de **1 a 1440 min**
+em MODE > MODO CIENTIFICO > SONO. Tentativas Wi-Fi param após **20 minutos
+continuamente desconectado**; conectado não é interrompido. 32 verificações
+nativas aprovadas; ensaio real cronometrado dispensado pelo proprietário.
+[Validação, funcionamento e limites](docs/REVISAO-R14-TEMPORIZADORES.md).
+
+Manual final **edição 4.0, 36 páginas**, em PDF e Markdown. API v4 publicada;
+somente OpenAI integrada/testada. Consumo e temperatura ainda não medidos.
 
 ## Começar
 
-Instalada em 24/11/2026 a [revisão R12/R9a com desenhos e novo aviso Wi-Fi](docs/REVISAO-R12-DESENHOS-E-WIFI.md).
-API v3 publicada, com suporte opcional a figuras e compatibilidade textual.
-Manual do comprador edição 3.0 em PDF e Markdown.
+[Guia da revisão R14/R12](docs/REVISAO-R14-TEMPORIZADORES.md), com operação,
+validação e limites. A API v4 mantém texto e desenhos opcionais. O manual 4.0
+explica uso, energia, Wi-Fi, fotos, configuração da API e atualização.
 
 - [Estado e continuidade](docs/conhecimento/ESTADO-E-RETOMADA.md)
 - [Manual ilustrado do comprador em PDF](docs/manual/Manual-Lyke.pdf)
@@ -60,13 +61,13 @@ As ferramentas locais ficam em `.tools/` e `.venv/`; elas não são publicadas n
 Crie `.private/ap-password.txt` com a senha WPA2 do portal (8–63 caracteres ASCII) e execute:
 
 ```powershell
-.\.venv\Scripts\python.exe firmware/esp32cam_integrada/build.py --profile lyke --revision lyke-r11
+.\.venv\Scripts\python.exe firmware/esp32cam_integrada/build.py --profile lyke --revision lyke-r12
 ```
 
 STM32 no WSL, com GCC ARM e Newlib Nano:
 
 ```sh
-sh firmware/lyke_stm32/build.sh lyke-r13
+sh firmware/lyke_stm32/build.sh lyke-r14
 ```
 
 Teste da API sem consumir créditos, com Node **24**:
@@ -75,7 +76,7 @@ Teste da API sem consumir créditos, com Node **24**:
 node --test supabase/tests/cloud.test.ts supabase/tests/graphics.test.ts
 ```
 
-Os comandos compilam STM R13 + ESP R11 preparados; os limites de validação estão no guia da revisão.
+Os comandos compilam STM R14 + ESP R12 instalados; os limites de validação estão no guia da revisão.
 Os testes nativos e a geração do manual estão documentados em
 `firmware/lyke_stm32/BATERIA-R11.md` e `scripts/manual_lyke/README.md`.
 A instalação inicial do carregador V2 exige USB uma vez; com a base instalada,

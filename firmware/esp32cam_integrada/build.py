@@ -23,9 +23,12 @@ def main():
     p.add_argument('--revision', required=True)
     p.add_argument('--optimization', choices=['baseline', 'lto'], default='lto')
     p.add_argument('--profile', choices=['bench', 'lyke'], default='bench')
+    p.add_argument('--sleep-selftest',action='store_true',help='Temporary instrumented build; requires -test revision')
     p.add_argument('--ap-password-file', type=Path, default=ROOT/'.private/ap-password.txt',
                    help='Local-only WPA2 password; never published with source')
     args = p.parse_args()
+    if args.sleep_selftest and (args.profile!='lyke' or not args.revision.endswith('-test')):
+        p.error('Sleep selftest requires Lyke profile and -test revision')
     if not args.revision.isascii() or len(args.revision) > 31 or not all(c.isalnum() or c in '-_.' for c in args.revision):
         p.error('revision must be 1-31 ASCII letters/numbers/dashes')
     sdk = Path(os.environ['LOCALAPPDATA'])/'Arduino15/packages/esp32/hardware/esp32/3.3.6'
@@ -78,11 +81,14 @@ def main():
         json_library = Path(os.environ['USERPROFILE'])/'Documents/Arduino/libraries/ArduinoJson'
         if json_library.is_dir():
             cmd += ['--library', json_library]
+    cpp_flags=[]
+    if args.sleep_selftest:cpp_flags.append('-DLYKE_SLEEP_SELFTEST')
     if args.optimization == 'lto':
         # Keep the core C panic/backtrace wrapper out of LTO: its Xtensa
         # relocations are incompatible with whole-core LTO in this SDK.
-        for key in ('compiler.cpp.extra_flags', 'compiler.c.elf.extra_flags'):
-            cmd += ['--build-property', key+'=-flto']
+        cpp_flags.append('-flto')
+        cmd += ['--build-property','compiler.c.elf.extra_flags=-flto']
+    if cpp_flags:cmd += ['--build-property','compiler.cpp.extra_flags='+' '.join(cpp_flags)]
     run(*cmd, stage)
     # Arduino's prebuilt IDF descriptor has a generic project/version. Patch the
     # ELF descriptor and regenerate the entire image/checksum, rather than
@@ -111,7 +117,7 @@ def main():
     shutil.copy2(build/(NAME+'.ino.map'), out/(NAME+'.ino.map'))
     manifest = {'target': 'ESP32-D0WD-V3 / AI Thinker', 'chip': 'esp32', 'flash_bytes': 4194304,
                 'revision': args.revision, 'optimization': args.optimization, 'slot_bytes': SLOT,
-                'core': '3.3.6', 'profile': args.profile, 'files': {}}
+                'core': '3.3.6', 'profile': args.profile, 'sleep_selftest':args.sleep_selftest,'files': {}}
     for f in out.glob('*.bin'):
         data = f.read_bytes()
         manifest['files'][f.name] = {'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}

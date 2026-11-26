@@ -1,5 +1,19 @@
 # Teclado original de 19 trilhas — 15/11/2026
 
+## Estado em 26/11/2026: R14 final instalada e MODE confirmado
+
+MAP49 e prontidão conferidos após OTA final STM R14/ESP R12. Usuário testou
+SHIFT+AC, tecla numérica sem despertar e somente MODE despertando com menu
+funcional. Produção usa PB12/PB9 em STOP1 e PA2→GPIO13 para acordar o ESP.
+Versões temporárias com PA3 foram removidas; sem alteração de fios/mapa.
+
+## Estado de 25/11: R14 preparada, diagnóstico instalado
+
+MAP49 conferido na dupla R14-test/R12-test, sem alterar o mapa. Os fontes finais
+R14 usam MODE PB12/PB9 para sair de STOP1. A versão temporária de ensaio usa
+PA3 e não foi aprovada no ciclo completo; restaurar produção assim que o portal
+for recuperado com ciclo pela chave. Ver [R14](../REVISAO-R14-TEMPORIZADORES.md).
+
 O usuário informou 19 trilhas entre o teclado original da nova calculadora
 e a placa. O mapa concluído de 49 contatos foi extraído da flash do STM32
 em [teclado-lyke.csv](teclado-lyke.csv); ON foi dispensada.

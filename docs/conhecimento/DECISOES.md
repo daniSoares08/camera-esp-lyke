@@ -1,5 +1,32 @@
 # Preferências e decisões do usuário
 
+## Confirmação final e dispensa de ensaio em 26/11
+
+- Usuário informou estabilidade e autorizou nova tentativa. Instalados finais
+  STM R14 + ESP R12; removidos testes temporários. Sono automático padrão 60 min,
+  faixa 1–1440 salva; Wi-Fi limita a 20 min sem conexão, sem atuar conectado.
+- Usuário confirmou fisicamente SHIFT+AC e despertar só com MODE, menu funcional.
+- Dispensou explicitamente o teste real cronometrado de Wi-Fi: “não precisamos
+  desse teste, acho que com o shift AC funcional, está OK”. Ensaio interrompido,
+  rede original restaurada. Não exigir novo ensaio nem inventar aprovação física
+  dos 20 min/60 min; a cobertura desses tempos é nativa/simulada.
+- Prosseguir com documentos e GitHub, como autorizado no pedido original.
+  Não publicar fotos, credenciais ou binários privados. Nenhum componente mudou.
+
+## Pedido e execução mais recentes, 25/11
+
+- Usuário informou alimentação estável e autorizou instalar, revogando a espera
+  por carga. Pediu sono após uma hora sem nenhum botão, configurável em minutos;
+  adotados padrão 60 e faixa 1–1440, salvo nas preferências.
+- Pediu parar tentativas após 20 minutos sem Wi-Fi, sem ajuste e sem interferir
+  quando conectado. Ações manuais de rede/boot renovam a janela.
+- Autorizou testes e atualização de documentos/GitHub **ao concluir e aprovar**.
+  Não anunciar nem publicar instalação final enquanto o ensaio está pendente.
+- Instalada dupla temporária R14-test/R12-test; foto sem reset aprovada. Ciclo de
+  sono STM não confirmado e portal inacessível. Necessária recuperação física;
+  não interpretar o silêncio da rede como sucesso do sono. Finais R14/R12 prontas.
+  Detalhes e retomada em `REVISAO-R14-TEMPORIZADORES.md`.
+
 ## Produto
 
 - Ainda em 25/11, usuário autorizou implementar sono profundo em SHIFT+AC,

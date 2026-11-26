@@ -56,7 +56,8 @@ async function refresh(){
     ' · Fotos: '+info.photos.length+'/3'+
     '\nPSRAM livre: '+Math.round(info.free_psram/1024)+' KiB';
   $('capture').disabled=!info.keyboard_ready;
-  $('connected').textContent=info.station?'Conectado a '+info.station:'Sem conexão à rede externa';
+  $('connected').textContent=info.station?'Conectado a '+info.station:info.wifi_retry_paused?
+    'Tentativas pausadas após 20 minutos sem conexão. Escolha uma rede e toque em Conectar.':'Sem conexão à rede externa';
   if(!settingsLoaded){
     $('ai').economy.checked=info.economy;
     $('ai').api.placeholder=info.key_set?'Acesso salvo':'Nenhum acesso salvo';
@@ -164,7 +165,16 @@ static void describeImage(JsonDocument& doc) {
   doc["reset_reason"] = int(esp_reset_reason());
   doc["wake_reason"] = int(esp_sleep_get_wakeup_cause());
   doc["deep_sleep_supported"] = true;
+#ifdef LYKE_SLEEP_SELFTEST
+  doc["sleep_selftest"] = true;
+#endif
   doc["power_policy"] = "sta-idle-portal-120s-camera-radio-pause";
+  doc["wifi_retry_paused"] = radioWatchdog.paused;
+  doc["wifi_disconnected_ms"] = radioWatchdog.watching?uint32_t(millis()-radioWatchdog.since):0;
+  doc["wifi_retry_limit_ms"] = OfflineRadioWatchdog::limitMs;
+  doc["wifi_mode"] = unsigned(WiFi.getMode());
+  doc["stm_sleep_minutes"] = stmIdleMinutes;
+  doc["stm_inactive_ms"] = stmIdleMs;
   doc["capture_pending"] = capturePendingAt!=0;
   doc["capture_busy"] = captureBusy;
   doc["capture_result"] = captureResult;
@@ -244,6 +254,14 @@ static void routes() {
     web.send_P(200, "text/html; charset=utf-8", page);
   });
   web.on("/info", HTTP_GET, routeInfo);
+#ifdef LYKE_SLEEP_SELFTEST
+  web.on("/api/selftest/esp-sleep",HTTP_POST,[]{
+    if(!authorized()){reply(403,"Unauthorized");return;}
+    if(otaMode||captureBusy||capturePendingAt){reply(409,"Busy");return;}
+    stmSerial.println("TEST PULSE");testEspSleepAt=millis()+400;
+    reply(202,"One-shot diagnostic: STM pulse with timer fallback");
+  });
+#endif
   web.on("/foto", HTTP_GET, photoRoute);
   web.on("/photo", HTTP_GET, photoRoute);
   web.on("/resposta", HTTP_GET, [] {
@@ -270,12 +288,14 @@ static void routes() {
     if (!storeNetwork(web.arg("ssid"), web.arg("password"), index)) {
       reply(400, "Nome/senha invalidos, armazenamento indisponivel ou lista cheia"); return;
     }
+    radioWatchdog.resume(millis());WiFi.setAutoReconnect(true);
     bool started = join(index);
     reply(started ? 200 : 409, started ? "Conectando" : "Rede salva; conexao indisponivel");
   });
   web.on("/api/join", HTTP_POST, [] {
     if (!authorized()) { reply(403, "Unauthorized"); return; }
     String index = web.arg("id");
+    radioWatchdog.resume(millis());WiFi.setAutoReconnect(true);
     bool ok = index.length() == 1 && isDigit(index[0]) && join(index[0] - '0');
     reply(ok ? 200 : 409, ok ? "Conectando" : "Rede indisponivel");
   });

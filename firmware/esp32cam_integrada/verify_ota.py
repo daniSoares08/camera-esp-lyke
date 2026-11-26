@@ -69,12 +69,16 @@ def connect(ssid):
     result=subprocess.run(['netsh','wlan','connect','name='+ssid],capture_output=True)
     if result.returncode:raise RuntimeError('Windows refused ESP Wi-Fi connection')
     deadline=time.monotonic()+35
+    requested=time.monotonic()
     while time.monotonic()<deadline:
         try:
             code,raw=http('/info',timeout=2)
             info=json.loads(raw)
             if code==200 and info.get('project')==PROJECT:return info
         except (OSError,ValueError,HTTPException):pass
+        if time.monotonic()-requested>=5:
+            subprocess.run(['netsh','wlan','connect','name='+ssid],capture_output=True)
+            requested=time.monotonic()
         time.sleep(1)
     raise TimeoutError('ESP AP not reachable over the selected Wi-Fi interface')
 

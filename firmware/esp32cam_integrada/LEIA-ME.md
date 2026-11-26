@@ -1,5 +1,19 @@
 # ESP32-CAM clássica: câmera, fila de fotos e atualização Wi-Fi
 
+**26/11: STM R14 + ESP R12 finais instalados por Wi-Fi/UART.** MAP49,
+configurações, valor 60 min e resposta preservados. Usuário confirmou sono
+SHIFT+AC e despertar somente por MODE, com menu funcional. Versões de teste
+removidas. 32 testes nativos aprovados; ensaio real Wi-Fi 20 min dispensado
+pelo usuário. [Guia e limites](../../docs/REVISAO-R14-TEMPORIZADORES.md).
+
+## Histórico anterior à instalação final
+
+**Perfil Lyke R12 preparado:** limite de 20 min contínuos sem conexão, portal
+120 s sem HTTP, captura com rádio pausado, CPU 80/160 MHz e deep-sleep.
+Instalação final pendente; dupla de diagnóstico R12-test/R14-test temporária.
+Não confundir com o perfil de bancada descrito abaixo.
+[Estado e ensaio R14](../../docs/REVISAO-R14-TEMPORIZADORES.md).
+
 Alvo exclusivo: **ESP32-D0WD-V3 / perfil AI Thinker, flash 4 MiB,
 PSRAM 4 MiB**. Não usar estes arquivos na GOOUUU ESP32-S3 nem no DevKit
 da calculadora antiga. O fonte e os binários de câmera r6 originais ficam

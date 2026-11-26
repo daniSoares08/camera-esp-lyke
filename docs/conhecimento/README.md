@@ -1,5 +1,44 @@
 # Base de conhecimento — CAMERA_ESP
 
+## Estado atual confirmado em 26/11/2026
+
+**STM R14 + ESP R12 finais instalados por Wi-Fi/UART**, sem USB/fios novos.
+Revisões, digest ESP, MAP49/prontidão, preferências (60 min) e última resposta
+preservada conferidos. Versões temporárias removidas; endpoint de teste ausente.
+Usuário confirmou SHIFT+AC, tecla numérica sem despertar, só MODE despertando
+com menu funcional. Portal confirmou ESP deep-sleep/ext0 no retorno.
+
+Sono automático: 60 min sem contato físico do teclado, configurável em
+MODE > MODO CIENTIFICO > SONO de 1 a 1440 min. Wi-Fi: pausa tentativas após
+20 min contínuos sem conexão; conectado não é interrompido. 32 testes nativos
+aprovados. Ensaio real de 20 min cancelado a pedido do usuário, sem alegar aprovação;
+rede externa original restaurada/conectada. Consumo/temperatura não medidos.
+
+Manual final 4.0 (36 páginas), PDF/MD em `docs/manual/` e `output/pdf/`.
+Guia [R14](../REVISAO-R14-TEMPORIZADORES.md); provas privadas em
+`.private/lyke-final-2026-11-26/`. Credenciais, fotos e binários não vão ao GitHub.
+O histórico abaixo registra a preparação/ensaio anterior e não o estado atual.
+
+## Estado mais recente: ensaio R14/R12 em 25/11
+
+Usuário informou carga estável e autorizou gravar. A espera anterior pela
+bateria foi revogada. **Instalada temporariamente STM R14-test + ESP R12-test**
+pelo Wi-Fi, MAP49/configurações/resposta conferidos. Captura real 2560x1920 com
+pausa/restauração do rádio passou, sem reset. **A dupla final R14/R12 ainda
+não foi instalada/aprovada.** Sono automático padrão 60 min, menu 1–1440 min;
+Wi-Fi pausa tentativas após 20 min contínuos desconectado, nunca quando conectado.
+32 verificações nativas aprovadas e binários finais preparados.
+
+O ensaio registrou ESP deep-sleep/ext0, mas não confirmou STOP1/retorno do STM.
+Depois Calc-Lyke deixou de responder. Instrumentação corrigida nos fontes,
+ainda não gravada. É necessário **ciclo pela chave física e abrir ATUALIZAR
+FIRMWARE** para recuperar e substituir as versões de teste. Instalar STM final
+primeiro nesta dupla temporária; depois ESP final. Não usar o diagnóstico como
+versão entregue. Guia: [R14 e pendências](../REVISAO-R14-TEMPORIZADORES.md).
+Prévia manual 4.0 em `output/pdf-previa-r14/`; publicação final/GitHub pendentes.
+
+## Histórico anterior ao ensaio
+
 Atualização: **25/11/2026**, America/Sao_Paulo. Raiz atual:
 `C:\Projects\CAMERA_ESP`. Esta é a memória local do projeto para continuar em
 outro chat; não é uma garantia de memória automática fora desta pasta.

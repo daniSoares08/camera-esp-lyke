@@ -1,7 +1,12 @@
 #pragma once
 
 static volatile uint32_t mode_wake_mask;
-void EXTI15_10_IRQHandler(void) { EXTI->PR1=mode_wake_mask; }
+void EXTI15_10_IRQHandler(void) {
+    EXTI->PR1=mode_wake_mask;
+#ifdef LYKE_SLEEP_SELFTEST
+    sleep_control.wake_requested=true;
+#endif
+}
 void EXTI9_5_IRQHandler(void) __attribute__((alias("EXTI15_10_IRQHandler")));
 void EXTI0_IRQHandler(void) __attribute__((alias("EXTI15_10_IRQHandler")));
 void EXTI1_IRQHandler(void) __attribute__((alias("EXTI15_10_IRQHandler")));
@@ -26,7 +31,12 @@ static void esp_wake_pulse(void)
 
 static void stop_until_mode(Pair pair)
 {
-    const Pin sense=tracks[pair.first],drive=tracks[pair.second],tx={GPIOA,2,"PA2"},rx={GPIOA,3,"PA3"};
+    const Pin drive=tracks[pair.second],tx={GPIOA,2,"PA2"},rx={GPIOA,3,"PA3"};
+#ifdef LYKE_SLEEP_SELFTEST
+    const Pin sense={GPIOA,3,"PA3"};(void)pair;
+#else
+    const Pin sense=tracks[pair.first];
+#endif
     const IRQn_Type irq=sense.bit<5?(IRQn_Type)(EXTI0_IRQn+sense.bit):sense.bit<10?EXTI9_5_IRQn:EXTI15_10_IRQn;
     uint32_t enabled[8],tick=SysTick->CTRL,debug=DBGMCU->CR;
     uint32_t imr1=EXTI->IMR1,emr1=EXTI->EMR1,imr2=EXTI->IMR2,emr2=EXTI->EMR2;

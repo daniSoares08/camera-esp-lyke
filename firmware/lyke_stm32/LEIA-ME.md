@@ -1,5 +1,22 @@
 # Firmware Lyke 101078 · STM32G431 e ESP32-CAM clássica
 
+**26/11: STM R14 + ESP R12 finais instalados por Wi-Fi/UART.** MAP49,
+configurações, valor 60 min e resposta preservados. Usuário confirmou sono
+SHIFT+AC e despertar somente por MODE, com menu funcional. Versões de teste
+removidas. 32 testes nativos aprovados; ensaio real Wi-Fi 20 min dispensado
+pelo usuário. [Guia e limites](../../docs/REVISAO-R14-TEMPORIZADORES.md).
+
+## Histórico anterior à instalação final
+
+**25/11: fontes finais STM R14 + ESP R12 preparados.** Sono automático 60 min,
+configurável de 1 a 1440 min em MODO CIENTIFICO > SONO; Wi-Fi limita tentativas
+a 20 min desconectado. Dupla temporária R14-test/R12-test instalada; portal
+inacessível após ensaio, instalação final pendente de recuperação física.
+Leia [R14 e retomada](../../docs/REVISAO-R14-TEMPORIZADORES.md).
+Compilar: `sh firmware/lyke_stm32/build.sh lyke-r14`. 32 verificações nativas.
+
+## Histórico anterior ao ensaio R14
+
 **25/11:** preparados STM R13 + ESP R11 para SHIFT+AC → sono e MODE →
 despertar, sem fios adicionais. Ambos precisam atualizar, primeiro o ESP.
 Nenhuma gravação: espera pela bateria crítica continua. Inclui os ajustes

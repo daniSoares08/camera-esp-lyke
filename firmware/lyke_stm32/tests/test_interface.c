@@ -91,6 +91,19 @@ int main(int argc,char **argv)
     PRESS(KEY_MODE);assert(sleep_control.wake_requested);
     assert(!interface_message("SLEEP READY 1")&&!strcmp(sent,"SLEEP GO 1"));
     assert(!interface_message("SLEEPING 1")&&sleep_control.phase==SLEEP_ARMED);
+    sleep_control.phase=SLEEP_RUN;blanked=false;view=SETTINGS;settings_item=3;idle_edit=false;
+    PRESS(KEY_D1,KEY_D2,KEY_D0);assert(idle_minutes==120);interface_draw();save(folder,"tela_sono_config");
+    PRESS(KEY_EQ);assert(view==CALCULATOR&&(preferences.packed>>9)==120);
+    preferences.revision=1;idle_minutes=1;load_settings();assert(idle_minutes==120);
+    preferences.packed&=511;load_settings();assert(idle_minutes==60);
+    view=SETTINGS;settings_item=3;idle_edit=false;PRESS(KEY_D1,KEY_D4,KEY_D4,KEY_D0,KEY_D9);assert(idle_minutes==1440);
+    PRESS(KEY_RIGHT);assert(idle_minutes==1);PRESS(KEY_LEFT);assert(idle_minutes==1440);
+    view=CALCULATOR;idle_minutes=1;inactivity=(InactivityTimer){.key_at=1000};
+    answer_wait=portal_pending=scan_busy=wifi_saved_busy=false;
+    ticks=60999;interface_tick();assert(sleep_control.phase==SLEEP_RUN);
+    uint32_t key_at=inactivity.key_at;interface_message("STATE 0 0 0 1");assert(inactivity.key_at==key_at);
+    ticks=61000;api_busy=true;interface_tick();assert(sleep_control.phase==SLEEP_RUN);
+    api_busy=false;interface_tick();assert(sleep_control.phase==SLEEP_QUERY&&!strcmp(sent,"SLEEP? 2"));
     puts("Actual interface: keyboard, math/answers, status and MODE-only coordinated shutdown OK");
     return 0;
 }

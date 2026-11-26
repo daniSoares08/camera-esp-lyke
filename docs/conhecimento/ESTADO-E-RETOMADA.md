@@ -1,4 +1,66 @@
-# Estado e retomada — 25/11/2026
+# Estado e retomada — 26/11/2026
+
+## Estado final em 26/11/2026
+
+Usuário voltou a informar estabilidade e autorizou tentar novamente. Recuperado
+Calc-Lyke, identidade ESP32 clássico/4 MiB conferida, instalado STM R14 final
+primeiro (remove inatividade temporária de 1 min), depois ESP R12 final.
+
+- SHA/digest e revisões conferidos; MAP49 e prontidão, valor padrão 60 min,
+  configuração e última resposta preservados. Endpoint de teste retorna 404.
+- Usuário confirmou SHIFT+AC, espera 10 s, tecla numérica sem despertar e
+  somente MODE despertando com menu funcional. Portal registrou reset de
+  deep-sleep/ext0 no ESP, STM R14 e 49 teclas. Ciclo final aprovado.
+- Sono automático 60 min, configurável 1–1440 em MODO CIENTIFICO > SONO.
+  Contatos/tecla mantida renovam; rede/HTTP não renovam. Configuração/tempo
+  validados nativamente, sem esperar uma hora real. Rotina de sono é a mesma.
+- Limite Wi-Fi 20 min contínuos desconectado, não configurável, nunca atua
+  conectado. Ensaio real iniciado e **cancelado pelo usuário**, que aceitou o
+  teste SHIFT+AC/MODE. Não alegar 20 min físicos aprovados. 32 testes nativos
+  passaram, incluindo conexão longa simulada. Rede original restaurada/conectada.
+- Nenhum fio/USB ou componente alterado; sem consulta paga. Resistor 330 Ω
+  permanece; corrente, temperatura e autonomia ainda não medidos.
+- Provas em `.private/lyke-final-2026-11-26/`,
+  `.private/lyke-cloud/device-stm-r14-wifi.json` e `device-r12-ota.json`.
+  Pacote privado final R14/ESP R12; manual final 4.0 em docs/manual e output/pdf.
+  Guia [R14](../REVISAO-R14-TEMPORIZADORES.md). Versões de teste já removidas.
+
+## Histórico de preparação e ensaio (resolvido)
+
+## Retomada prioritária: remover versões temporárias de teste
+
+**25/11: usuário autorizou gravar com alimentação estável**, revogando a espera
+anterior. Finais STM R14 + ESP R12 compiladas; 32 verificações locais passaram.
+O novo sono automático usa 60 min sem tecla, configurável entre 1 e 1440 min
+em MODE > MODO CIENTIFICO > SONO. O rádio deixa de procurar após 20 min
+continuamente sem conexão. Link conectado nunca é encerrado por esse prazo.
+
+- Instaladas por Wi-Fi/UART: **ESP R12-test, depois STM R14-test**. MAP49 e
+  revisões confirmados. Resposta/NVS preservados. Foto de ensaio 2560x1920,
+  102.640 bytes, rádio pausado e restaurado, sem reinício.
+- A versão de teste força **um minuto de sono somente em RAM**, sem salvar.
+  STM usa temporariamente PA3 como entrada de despertar; ESP tem timer 10 s.
+  A finalidade era ensaiar STOP1 sem depender de botão físico. Não entregar assim.
+- O monitor registrou ESP `reset_reason=8` / `wake_reason=2`, mas STM continuou
+  em `stm_sleep_minutes=1`, sem marcador 240 de retorno; ciclo STM não aprovado.
+  Depois perdeu acesso ao AP. Não diagnosticar bateria/sono/portal fechado só
+  pela ausência de rede. Nenhum USB/porta serial estava presente para recuperação.
+- Encontrada interferência da instrumentação: GPIO14 passava a RTC antes do
+  aviso SLEEPING. Corrigida ordem no fonte e mantido AP aberto no diagnóstico;
+  não foi possível gravar essa correção. Produção não tem esses atalhos de teste.
+- **Ação física necessária:** desligar/ligar pela chave, abrir MODE > ATUALIZAR
+  FIRMWARE. Pressionar só MODE pode não sair de STOP no diagnóstico atual.
+  Assim que o AP voltar, instalar **STM R14 final primeiro** (remove prazo 1 min),
+  depois ESP R12 final. Na migração de firmware antigo a ordem normal é ESP/STM.
+- Validar hashes/revisões, MAP49, preferência 60 min e ausência de endpoint/timer
+  de teste. Ainda faltam ciclo completo de sono, botão MODE físico e relógio
+  real de 20 min Wi-Fi. Não declarar instalação final concluída.
+- Binários finais privados preparados; foto e relatórios em
+  `.private/lyke-auto-2026-11-25/`. Sem chamadas pagas à API nesta etapa.
+  Guia [R14](../REVISAO-R14-TEMPORIZADORES.md). Manual 4.0 em prévia local;
+  manual público/GitHub aguardam conclusão conforme pedido do usuário.
+
+## Histórico anterior à autorização e ao ensaio
 
 ## Próxima retomada
 

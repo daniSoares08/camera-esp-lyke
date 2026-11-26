@@ -24,6 +24,9 @@ static bool incoming_overflow;
 static uint8_t rx_ring[512];
 static volatile unsigned rx_read, rx_write;
 static volatile bool rx_overflow;
+#ifdef LYKE_SLEEP_SELFTEST
+static uint32_t test_pulse_at;
+#endif
 static const Pair skipped_on = { TRACK_COUNT, TRACK_COUNT };
 
 // The LCD needs only strings and unsigned decimal fields.
@@ -262,6 +265,9 @@ static bool service_serial(void)
             continue;
         }
         incoming[incoming_length] = 0;
+#ifdef LYKE_SLEEP_SELFTEST
+        if(!strcmp(incoming,"TEST PULSE"))test_pulse_at=ticks+1500;
+#endif
         if (!incoming_overflow && strcmp(incoming, "LYKE-BOOT-V1") == 0) {
             enter_loader();
         }
@@ -305,6 +311,9 @@ int main(void)
     load_map();
     advance_over_on();
     load_settings();
+#ifdef LYKE_SLEEP_SELFTEST
+    idle_minutes=1;
+#endif
     serial_send("LYKE APP V1");
     serial_send("STM32 " LYKE_REVISION);
     report_map();
@@ -312,8 +321,12 @@ int main(void)
     Contact pending = { MULTIPLE, 0, 0 }, stable = pending;
     previous = pending;
     uint32_t changed_at = ticks, last_scan = ticks;
+    idle_touch(&inactivity,ticks);
     for (;;) {
         bool redraw = service_serial();
+#ifdef LYKE_SLEEP_SELFTEST
+        if(test_pulse_at&&(int32_t)(ticks-test_pulse_at)>=0){test_pulse_at=0;esp_wake_pulse();}
+#endif
         if(sleep_control.phase==SLEEP_ARMED||sleep_control.phase==SLEEP_FAILED) {
             bool slept=sleep_control.phase==SLEEP_ARMED;
             if(slept)stop_until_mode(keymap[KEY_MODE]);
@@ -323,6 +336,10 @@ int main(void)
             if(slept){wifi=portal_ready=portal_pending=photo_busy=api_busy=scan_busy=wifi_saved_busy=answer_wait=false;note[0]=0;}
             else notice("SONO NAO CONFIRMADO");
             pending=stable=previous=keyboard_scan();changed_at=last_scan=ticks;
+            if(slept)idle_touch(&inactivity,ticks);
+#ifdef LYKE_SLEEP_SELFTEST
+            if(slept)idle_minutes=240;
+#endif
             redraw=true;
         }
         if (battery_poll()) {
@@ -332,6 +349,7 @@ int main(void)
         if (ticks - last_scan >= 4) {
             last_scan = ticks;
             Contact reading = keyboard_scan();
+            if(reading.kind==CONTACT||reading.kind==MULTIPLE)idle_touch(&inactivity,ticks);
             if (!contact_equal(reading, pending)) {
                 pending = reading;
                 changed_at = ticks;

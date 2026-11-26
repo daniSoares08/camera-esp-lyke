@@ -8,7 +8,11 @@
 #include "wifi_indicator.h"
 #include "answer_frame.h"
 #include "sleep_control.h"
+#include "inactivity.h"
 static SleepControl sleep_control;
+static InactivityTimer inactivity;
+static unsigned idle_minutes=IDLE_DEFAULT_MIN;
+static bool idle_edit;
 static WifiIndicator wifi_indicator;
 static AnswerFrame answer_frame;
 static bool graphics_capable;
@@ -89,11 +93,12 @@ static void load_settings(void)
     display_mode = (preferences.packed >> 2) & 3u;
     precision = ((preferences.packed >> 4) & 15u) % 10;
     rpn = (preferences.packed >> 8) & 1u;
+    idle_minutes=idle_minutes_from_packed(preferences.packed);
 }
 
 static void save_settings(const uint8_t *program)
 {
-    uint32_t packed = angle_mode | (display_mode << 2) | (precision << 4) | ((uint32_t)rpn << 8);
+    uint32_t packed = angle_mode | (display_mode << 2) | (precision << 4) | ((uint32_t)rpn << 8) | (idle_minutes<<9);
     if (!persist_preferences(packed, program)) notice("ERRO AO GRAVAR");
 }
 
@@ -454,10 +459,11 @@ static void interface_draw(void)
         break;
     }
     case SETTINGS:
-        line(1, "MODO CIENTIFICO", true);
+        line(1, settings_item==3?"SONO: DIGITE MIN":"MODO CIENTIFICO", true);
         print_text(text, sizeof(text), "ANGULO  %s", angle_names[angle_mode]); line(2, text, settings_item == 0);
         print_text(text, sizeof(text), "FORMATO %s %u", format_names[display_mode], precision); line(3, text, settings_item == 1);
         line(4, rpn ? "ENTRADA RPN" : "ENTRADA ALGEBRICA", settings_item == 2);
+        print_text(text,sizeof(text),"SONO %u MIN",idle_minutes);line(5,text,settings_item==3);
         break;
     case SCAN_LIST: case SAVED_LIST: {
         line(1, view == SCAN_LIST ? "REDES ENCONTRADAS" : "REDES SALVAS", true);
@@ -574,7 +580,7 @@ static void menu_action(void)
     case CLEAR: start_action("CLEAR"); break;
     case WIFI_OFF: start_action("OFF"); break;
     case BATTERY: view = BATTERY_VIEW; voltage = battery_mv(); break;
-    case CALC_SETUP: view = SETTINGS; break;
+    case CALC_SETUP: view = SETTINGS;idle_edit=false; break;
     case STATS: view = STAT_VIEW; break;
     case CONSTANT_MENU: view = CONSTANTS; constant_index = 0; break;
     case PROGRAM_MENU: view = PROGRAM; program_index = 0; break;
@@ -599,10 +605,18 @@ static unsigned change(unsigned current, unsigned count, enum Key key)
     return current;
 }
 
+static int key_digit(enum Key key)
+{
+    if(key>=KEY_D7&&key<=KEY_D9)return key-KEY_D7+7;
+    if(key>=KEY_D4&&key<=KEY_D6)return key-KEY_D4+4;
+    if(key>=KEY_D1&&key<=KEY_D3)return key-KEY_D1+1;
+    return key==KEY_D0?0:-1;
+}
+
 static void navigation(enum Key key)
 {
     if (key == KEY_ON || key == KEY_AC || key == KEY_MODE) {
-        if (view == SETTINGS) save_settings(preferences.program);
+        if (view == SETTINGS) {save_settings(preferences.program);idle_edit=false;}
         view = CALCULATOR;
         return;
     }
@@ -612,20 +626,19 @@ static void navigation(enum Key key)
         if (key == KEY_EQ) menu_action();
         break;
     case SETTINGS:
-        if (key == KEY_UP || key == KEY_DOWN) settings_item = change(settings_item, 3, key);
+        if (key == KEY_UP || key == KEY_DOWN) {settings_item = change(settings_item, 4, key);idle_edit=false;}
+        else if(settings_item==3) {
+            int digit=key_digit(key);
+            if(key==KEY_EQ){save_settings(preferences.program);view=CALCULATOR;idle_edit=false;}
+            else if(key==KEY_LEFT||key==KEY_RIGHT){idle_minutes=change(idle_minutes-1,IDLE_MAX_MIN,key)+1;idle_edit=false;}
+            else if(key==KEY_DEL){idle_minutes=idle_minutes>9?idle_minutes/10:1;idle_edit=true;}
+            else if(digit>=0){unsigned n=(idle_edit?idle_minutes*10:0)+(unsigned)digit;if(n&&n<=IDLE_MAX_MIN){idle_minutes=n;idle_edit=true;}}
+        }
         else if (key == KEY_EQ || key == KEY_RIGHT || key == KEY_LEFT) {
             if (settings_item == 0) angle_mode = change(angle_mode, 3, key == KEY_EQ ? KEY_RIGHT : key);
             else if (settings_item == 1) display_mode = change(display_mode, 4, key == KEY_EQ ? KEY_RIGHT : key);
             else rpn = !rpn;
-        } else if (settings_item == 1 && key == KEY_D0) precision = 0;
-        else if (settings_item == 1) {
-            switch (key) {
-            case KEY_D1: precision=1; break; case KEY_D2: precision=2; break; case KEY_D3: precision=3; break;
-            case KEY_D4: precision=4; break; case KEY_D5: precision=5; break; case KEY_D6: precision=6; break;
-            case KEY_D7: precision=7; break; case KEY_D8: precision=8; break; case KEY_D9: precision=9; break;
-            default: break;
-            }
-        }
+        } else if (settings_item == 1 && key_digit(key)>=0) precision=(unsigned)key_digit(key);
         break;
     case SCAN_LIST: case SAVED_LIST:
         if (net_count) net_index = change(net_index, net_count, key);
@@ -732,6 +745,17 @@ static void stats_add(bool remove)
     view = STAT_VIEW; notice(remove ? "REMOVIDO" : "REGISTRADO");
 }
 
+static bool begin_sleep(void)
+{
+    if(photo_busy||api_busy){notice("AGUARDE A OPERACAO");return false;}
+    if(!sleep_start(&sleep_control,ticks)){notice("ATUALIZE O ESP");return false;}
+    if(view==SETTINGS)save_settings(preferences.program);
+    edit_clear();hyp=false;recording=playing=false;blanked=true;
+    wifi_mark(&wifi_indicator,WIFI_DISABLED,ticks);
+    char command[24];print_text(command,sizeof(command),"SLEEP? %u",(unsigned)sleep_control.sequence);
+    request(command);return true;
+}
+
 static void interface_key(enum Key key)
 {
     if (blanked) {
@@ -740,13 +764,7 @@ static void interface_key(enum Key key)
     }
     if (key==KEY_AC && shift) {
         shift=alpha=false;
-        if(photo_busy||api_busy){notice("AGUARDE A OPERACAO");return;}
-        if(!sleep_start(&sleep_control,ticks)){notice("ATUALIZE O ESP");return;}
-        if(view==SETTINGS)save_settings(preferences.program);
-        edit_clear();hyp=false;recording=playing=false;blanked=true;
-        wifi_mark(&wifi_indicator,WIFI_DISABLED,ticks);
-        char command[24];print_text(command,sizeof(command),"SLEEP? %u",(unsigned)sleep_control.sequence);
-        request(command);return;
+        begin_sleep();return;
     }
     if(key==KEY_SHIFT && view!=CALCULATOR){shift=!shift;alpha=false;return;}
     if (view != CALCULATOR) { shift=alpha=false;navigation(key); return; }
@@ -941,10 +959,16 @@ static bool interface_message(const char *text)
 
 static bool interface_tick(void)
 {
+#ifdef LYKE_SLEEP_SELFTEST
+    if(test_pulse_at)return false;
+#endif
     static uint32_t last_ping, last_blink, last_battery_blink;
     if (mapped < KEY_COUNT) return false;
     if(sleep_control.phase!=SLEEP_RUN){sleep_tick(&sleep_control,ticks);return false;}
     uint32_t now = ticks;
+    if(sleep_control.supported&&!photo_busy&&!api_busy&&!scan_busy&&!wifi_saved_busy&&!answer_wait&&!portal_pending&&idle_due(&inactivity,idle_minutes,now)) {
+        inactivity.attempt_at=now;begin_sleep();return true;
+    }
     if(wifi_animation(&wifi_indicator,now)&&!blanked&&view!=ANSWER_VIEW)return true;
     if (!blanked && view != ANSWER_VIEW && battery_low(&battery) && now-last_battery_blink>=500) {
         last_battery_blink=now;
@@ -957,6 +981,7 @@ static bool interface_tick(void)
     }
     if (!photo_busy && !api_busy && now - last_ping > 4500) {
         serial_send("STATUS");
+        char power[40];print_text(power,sizeof(power),"POWER %u %u",idle_minutes,(unsigned)(now-inactivity.key_at));serial_send(power);
         last_ping = now;
     }
     if (!api_busy && wifi && now - link_state_at > 14000) { wifi = false; wifi_mark(&wifi_indicator,WIFI_FAIL,now);return true; }

@@ -62,6 +62,14 @@ int main(int argc,char **argv){
     assert(!lease.expired(120099,false)&&lease.expired(120100,false));
     assert(!lease.expired(999999,true));lease.close();assert(!lease.expired(999999,false));
     lease.touch(UINT32_MAX-100);assert(!lease.expired(50,false)&&lease.expired(120000,false));
+    OfflineRadioWatchdog watchdog;watchdog.resume(100);
+    assert(!watchdog.tick(1200099,false,false)&&watchdog.tick(1200100,false,false)&&watchdog.paused);
+    assert(!watchdog.tick(1200101,false,false));
+    watchdog.resume(2000000);assert(!watchdog.tick(4000000,true,false)&&!watchdog.paused);
+    assert(!watchdog.tick(90000000,true,false));
+    assert(!watchdog.tick(90000100,false,false));
+    assert(!watchdog.tick(91200100,false,true)&&watchdog.tick(91200101,false,false));
+    watchdog.resume(UINT32_MAX-100);assert(!watchdog.tick(1199898,false,false)&&watchdog.tick(1199899,false,false));
     raster={};raster.command(lyke::DrawCommand{{0,20,60,20,0},lyke::D_SOURCE,""},0);
     assert(bit(raster,26,18)&&!bit(raster,34,18));
     puts("Actual rich-document renderer: circuit/plot/angle, inline text, pan, legacy fallback, bounds and STM wire roundtrip OK");

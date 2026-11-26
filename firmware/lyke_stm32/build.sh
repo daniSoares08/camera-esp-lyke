@@ -4,7 +4,11 @@ set -eu
 here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 root=$(CDPATH='' cd -- "$here/../.." && pwd)
 sdk="$root/.tools/stm32"
-revision=${1:-lyke-r13}
+revision=${1:-lyke-r14}
+selftest=""
+if [ "${2:-}" = "--sleep-selftest" ]; then
+    case "$revision" in *-test) selftest=-DLYKE_SLEEP_SELFTEST ;; *) echo 'Selftest requires -test revision' >&2; exit 1;; esac
+fi
 case "$revision" in
     ''|[!A-Za-z0-9]*|*[!A-Za-z0-9._-]*) echo "Invalid revision" >&2; exit 1 ;;
 esac
@@ -17,7 +21,7 @@ compile() {
     shift 3
     extra_sources=""
     if [ "$name" = boot ]; then extra_sources="$here/vendor/puff.c"; fi
-    arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -std=c11 -Oz -flto -g -ffreestanding "-DLYKE_REVISION=\"$revision\"" \
+    arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -std=c11 -Oz -flto -g -ffreestanding $selftest "-DLYKE_REVISION=\"$revision\"" \
         -ffunction-sections -fdata-sections -Wall -Wextra -Werror \
         -I "$sdk/cmsis-device-g4/Include" -I "$sdk/CMSIS_5/CMSIS/Core/Include" -I "$out" \
         "$here/$name.c" $extra_sources "$sdk/cmsis-device-g4/Source/Templates/gcc/startup_stm32g431xx.s" \

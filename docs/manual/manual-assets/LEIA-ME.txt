@@ -1,4 +1,4 @@
-Telas e portais: simulações didáticas baseadas nos fontes R12/R9a. Fórmulas gráficas e indicador de bateria usam frames do código C testado no computador.
+Telas e portais: simulações didáticas baseadas nos fontes R14/R12. Fórmulas gráficas e indicador de bateria usam frames do código C testado no computador.
 calculadora-guia.png: ilustração lógica da frente, não fotografia.
 unidade-lyke.png: foto da unidade modificada enviada pelo proprietário durante ajuste da bateria, anterior ao ícone R11.
 lyke-original-referencia.jpg e lyke-modelo-referencia.jpg: foto do produto comercial original, fabricante Lyke. Não mostra a calculadora modificada.

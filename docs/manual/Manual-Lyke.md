@@ -1,6 +1,8 @@
 # Manual do comprador - Calculadora Lyke modificada
 
-> Edição 3.0, 24/11/2026. STM32 R12 + ESP32-CAM R9a. Somente OpenAI testada. Claude ainda não integrado/testado.
+> Edição 4.0, 26/11/2026. STM32 R14 + ESP32-CAM R12. Somente OpenAI testada. Claude ainda não integrado/testado.
+
+> STM R14 e ESP R12 instaladas e conferidas em 26/11/2026.
 
 Este Markdown contém o conteúdo integral do PDF, com as mesmas figuras. Mantenha `manual-assets/` junto deste arquivo para exibir imagens. O ZIP inclui a pasta.
 
@@ -12,7 +14,7 @@ Este Markdown contém o conteúdo integral do PDF, com as mesmas figuras. Manten
 - [04. Primeiros minutos: conta e foto](#pagina-04)
 - [05. Navegação, tela e atalhos](#pagina-05)
 - [06. Contas comuns e correção](#pagina-06)
-- [07. Ângulo e formato dos números](#pagina-07)
+- [07. Ângulo, formato e sono automático](#pagina-07)
 - [08. Potências, raízes e logaritmos](#pagina-08)
 - [09. Trigonometria e coordenadas](#pagina-09)
 - [10. Frações, porcentagem e graus](#pagina-10)
@@ -59,7 +61,9 @@ Guia de uso da calculadora Lyke 101078 modificada, com cálculo científico offl
 >
 > Para fazer contas, basta ligar o aparelho e usar o teclado. Para resolver fotos com IA, siga o início rápido e a conexão ao Wi-Fi.
 
-Edição 3.0 - 24/11/2026. Compatibilidade: STM32 Lyke R12 + ESP32-CAM Lyke R9a. As telas deste guia são simulações baseadas no firmware.
+STM R14 e ESP R12 instaladas e conferidas em 26/11/2026.
+
+Edição 4.0 - 26/11/2026. Compatibilidade: STM32 Lyke R14 + ESP32-CAM Lyke R12. As telas deste guia são simulações baseadas no firmware.
 
 **Integração testada: OpenAI, usada pelos modelos do ChatGPT.** Claude aparece como alternativa de preparação da conta; ainda não foi integrado nem testado nesta calculadora.
 
@@ -143,9 +147,9 @@ Simulações. A conta local funciona sem internet; a resolução por IA exige o 
 3. Abra MODE, selecione ENVIAR FOTOS IA com as setas e pressione =. Confirme com = novamente.
 4. Aguarde a IA. Para consultar, use MODE > ULTIMA RESPOSTA > =. Avance com direita/baixo; volte com esquerda/cima. AC retorna às contas.
 
-> **Antes de desligar**
+> **Antes de dormir ou desligar**
 >
-> Envie ou baixe as fotos que deseja guardar. As capturas ainda na fila ficam somente na memória temporária e se perdem ao cortar a energia.
+> Envie ou baixe as fotos que deseja guardar. As capturas na fila ficam na memória temporária e se perdem também no sono profundo, manual ou automático.
 
 
 <a id="pagina-05"></a>
@@ -164,16 +168,16 @@ Simulações: o cabeçalho pode mostrar Wi-Fi, S, A, H e até três fotos.
 | Escolher uma opção | Setas percorrem a lista; = abre ou confirma. |
 | Capturar rapidamente | Na tela de contas: SHIFT, direita. |
 | Apagar a entrada atual | AC. Isso não remove as fotos. |
-| Apagar a tela e desligar o Wi-Fi | SHIFT, AC. MODE desperta a tela; não corta a energia. |
+| Entrar em sono profundo | SHIFT, AC, inclusive em menus/resposta. MODE desperta. |
 | Zerar memórias locais | SHIFT, MODE. Limpa também estatística, pilha, histórico e Ans. |
 
 ### Entenda os pequenos sinais
 
-A bateria à esquerda das fotos mostra de zero a quatro barras. ! pisca quando está baixa; ? indica falha na medição. **S**: SHIFT está armado; **A**: ALPHA; **H**: função hiperbólica. Os três quadrados representam fotos: vazios sem captura, preenchidos após a captura, com indicação piscante durante a operação. Ao conectar à rede externa, o sinal Wi-Fi pisca três vezes e desaparece. Na falha, alterna Wi-Fi e X até reconectar ou desligar o Wi-Fi. Calc-Lyke disponível não significa internet conectada.
+A bateria à esquerda das fotos mostra de zero a quatro barras. ! pisca quando está baixa; ? indica falha na medição. **S**: SHIFT está armado; **A**: ALPHA; **H**: função hiperbólica. Os três quadrados representam fotos: vazios sem captura, preenchidos após a captura, com indicação piscante durante a operação. Ao conectar à rede externa, o sinal Wi-Fi pisca três vezes e desaparece. Na falha, alterna Wi-Fi e X até reconectar, desligar ou pausar as tentativas após 20 minutos. Calc-Lyke disponível não significa internet conectada.
 
-> **SHIFT, AC não é desligamento elétrico**
+> **Sono e chave física**
 >
-> Essa combinação apaga a tela e manda o ESP desligar o Wi-Fi. Para desligar todo o aparelho, use a chave física. Ao reiniciar o ESP, Calc-Lyke volta a ficar disponível.
+> SHIFT, AC coloca os dois processadores em sono, com tela, câmera e rádio parados. MODE desperta; ON não funciona nesta unidade. A alimentação continua presente: o conversor e o resistor de manutenção ainda consomem. A chave física corta a alimentação conforme a montagem.
 
 
 <a id="pagina-06"></a>
@@ -209,18 +213,18 @@ Após 14, pressione x 2 = para obter 28. O firmware usa Ans para continuar a con
 
 <a id="pagina-07"></a>
 
-## 07. Ângulo e formato dos números
+## 07. Ângulo, formato e sono automático
 
 *05 | PREFERÊNCIAS*
 
-![Ângulo e formato dos números](manual-assets/ajustes.png)
+![Ângulo, formato e sono automático](manual-assets/ajustes.png)
 
 Simulações do menu MODO CIENTIFICO. Saia com AC ou MODE para salvar.
 
-1. Abra MODE > MODO CIENTIFICO > =. Use cima/baixo para escolher ANGULO, FORMATO ou ENTRADA.
-2. Na linha ANGULO, esquerda/direita ou = alterna DEG, RAD e GRA. DEG usa graus; RAD usa radianos; GRA usa grados (400 em uma volta).
-3. Na linha FORMATO, alterne NORM, FIX, SCI e ENG. Ainda nessa linha, pressione um número de 0 a 9 para ajustar a precisão.
-4. Na linha ENTRADA, escolha ALGEBRICA para o uso comum ou RPN para pilha. Saia com AC ou MODE para gravar as preferências.
+1. Abra MODE > MODO CIENTIFICO > =. Cima/baixo escolhe ANGULO, FORMATO, ENTRADA ou SONO.
+2. ANGULO: esquerda/direita ou = alterna DEG (graus), RAD (radianos) e GRA (400 grados por volta).
+3. FORMATO: alterne NORM, FIX, SCI ou ENG. Um algarismo de 0 a 9 muda a precisão. ENTRADA escolhe ALGEBRICA ou RPN.
+4. SONO: digite de 1 a 1440 minutos; a primeira tecla numérica substitui o valor anterior. Esquerda/direita ajusta um minuto; DEL apaga o último dígito. = salva e sai; AC ou MODE também salva. O padrão é 60 minutos.
 
 | Formato | O que muda |
 | --- | --- |
@@ -229,7 +233,7 @@ Simulações do menu MODO CIENTIFICO. Saia com AC ou MODE para salvar.
 | SCI 2, por exemplo | Notação científica com duas casas na mantissa: 1.23E+4. |
 | ENG | Expoente múltiplo de 3: 12.345E+3. A tecla ENG alterna ENG/NORM. |
 
-O atalho SHIFT, Ans alterna o ângulo. Para garantir que essa mudança sobreviva a um desligamento, entre em MODO CIENTIFICO e saia salvando. O formato arredonda a apresentação; não transforma a calculadora em um sistema de precisão exata.
+O sono conta o tempo sem nenhum contato físico do teclado, inclusive tecla mantida pressionada. Mensagens da rede e leitura do portal não renovam esse tempo. Captura, envio e atualização em andamento adiam a entrada em sono. SHIFT, Ans alterna o ângulo; salve nas preferências para mantê-lo após cortar energia.
 
 
 <a id="pagina-08"></a>
@@ -439,10 +443,10 @@ Diagrama conceitual. Calc-Lyke é uma rede local de configuração, não um plan
 | Calculadora > roteador ou hotspot | Acessar o servidor e a OpenAI. Use Wi-Fi 2,4 GHz. |
 | Ícone no LCD | Indica que a calculadora está conectada à rede externa. |
 
-1. Ligue a calculadora. Em R9a, Calc-Lyke abre automaticamente ao iniciar o ESP e fica disponível até você desligar o Wi-Fi pelo menu.
+1. Calc-Lyke abre no boot e em MODE > CONFIG. CELULAR ou ATUALIZAR FIRMWARE. Fecha após dois minutos sem acesso HTTP. Reabra pelo menu quando precisar.
 2. No celular, abra Ajustes/Configurações > Wi-Fi, escolha Calc-Lyke e informe a senha entregue pelo fornecedor.
-3. Se aparecer Sem internet, escolha permanecer conectado. Abra o navegador e digite exatamente http://192.168.8.1, incluindo http://.
-4. Se o celular sair dessa rede sozinho, desative temporariamente a troca automática para dados móveis ou outra rede. Tente novamente.
+3. Se aparecer Sem internet, escolha permanecer conectado. Abra http://192.168.8.1, incluindo http://. Uma página aberta consulta o aparelho e mantém o portal ativo; feche-a ao terminar para economizar.
+4. Sem conexão externa por 20 minutos contínuos, as tentativas param. Use WIFI SALVO, PROCURAR WIFI ou CONFIG. CELULAR para tentar de novo; reiniciar também renova o prazo. Uma conexão ativa não é interrompida por esse limite.
 
 > **Hotspot do celular**
 >
@@ -490,9 +494,9 @@ Fluxo ilustrativo. A orientação da lente depende da montagem fornecida.
 
 Na seção Fotos do portal, Espelhar e Inverter na vertical corrigem a orientação; Autofoco habilita o recurso do módulo compatível. Toque em Salvar câmera e refaça a captura para avaliar. Não há prévia de vídeo ao vivo no uso normal; a câmera é acionada para a foto e depois pausada.
 
-> **Capacidade e duração**
+> **Rádio e memória temporária**
 >
-> São até três JPEGs na fila, com limite de 512 KiB por foto e 1,5 MiB no conjunto. Elas ficam na RAM: desligar ou reiniciar apaga as fotos ainda não enviadas.
+> Durante a foto, o rádio é pausado automaticamente e restaurado depois de desligar a câmera. Se necessário, reconecte o celular a Calc-Lyke. Qualidade, resolução e autofoco são mantidos. Até três JPEGs, 512 KiB por foto e 1,5 MiB no total; sono profundo ou reinício apaga a fila.
 
 
 <a id="pagina-18"></a>
@@ -531,7 +535,7 @@ Simulações do renderizador: texto e dois recortes de um circuito largo. Não s
 3. Abra MODE > ULTIMA RESPOSTA > =. Cima/baixo rolam 16 pixels. Em figura larga, esquerda/direita movem 24 pixels para os lados; em texto ou figura estreita, recuam/avançam 48 pixels. AC ou MODE retorna ao cálculo.
 4. A última resposta fica salva no ESP. No portal, Abrir última resposta mostra texto e descrições das figuras; os desenhos aparecem no LCD.
 
-A janela continua com 126x48 pixels, sem cabeçalho ou ícones. Texto e desenhos 2D de circuitos, gráficos ou ângulos podem aparecer entre os passos. O serviço exige fórmula, substituição, desenvolvimento e resultado; a figura não substitui as contas. No texto, x^2 é quadrado, sqrt(...) é raiz e * é multiplicação.
+A janela mantém 126x48 pixels, sem cabeçalho nem ícones. A resposta deve trazer fórmula, substituição, desenvolvimento essencial e resultado, com separação dos subitens. Figuras 2D podem acompanhar as contas. No leitor, pi aparece como π e phi como φ: são símbolos diferentes; π vale aproximadamente 3,14159 e φ costuma representar um ângulo. O texto simples do portal pode usar nomes como pi, sqrt(...) e angle.
 
 > **Se a IA pedir outra foto**
 >
@@ -591,7 +595,7 @@ Diagrama de configuração. Uma conta logada no ChatGPT, sozinha, não configura
 >
 > Estar logado no ChatGPT não cria uma chave de API. Confira a organização e o saldo na plataforma de API. Eventuais benefícios de créditos vinculados a planos exigem as condições e a vinculação oferecidas pela plataforma. [S1, S2]
 
-O serviço desta edição usa OpenAI Responses e armazenamento privado no Supabase. Não existe seletor de provedor no portal R9a. Não cole uma chave sk-... ou sk-ant-... no campo de acesso da calculadora.
+O serviço desta edição usa OpenAI Responses e armazenamento privado no Supabase. Não existe seletor de provedor no portal R12. Não cole uma chave sk-... ou sk-ant-... no campo de acesso da calculadora.
 
 
 <a id="pagina-22"></a>
@@ -700,7 +704,7 @@ Simulação da criação de chave Claude. Somente a integração OpenAI foi test
 
 1. Abra https://platform.claude.com/settings/keys. Clique em Create key. Informe nome e validade; escolha a conta vinculada e o workspace adequado. Para um serviço compartilhado, o administrador pode usar uma conta de serviço. [S5]
 2. Copie o segredo quando ele for mostrado e guarde-o com segurança. A chave completa só aparece na criação; se perder, crie outra. Não a inclua em PDF, GitHub ou capturas de tela. [S5]
-3. Peça ao fornecedor uma versão do servidor que aceite Anthropic Messages, envie os JPEGs ao modelo de visão escolhido e normalize a resposta para o protocolo da calculadora. É uma implementação necessária, não uma configuração disponível nesta R9a. [S9]
+3. Peça ao fornecedor uma versão do servidor que aceite Anthropic Messages, envie os JPEGs ao modelo de visão escolhido e normalize a resposta para o protocolo da calculadora. É uma implementação necessária, não uma configuração disponível nesta R12. [S9]
 4. Somente depois dessa implementação, instale o segredo no servidor, configure o endereço/credencial de serviço apropriados no aparelho e repita os testes de foto, resposta curta, paginação e arquivo privado.
 5. Considere Claude disponível apenas quando esse teste passar na sua unidade. Até lá, use a integração OpenAI validada.
 
@@ -749,24 +753,20 @@ Simulações do código real: o ícone fica antes dos três quadrados de fotos, 
 
 | Ação / dado | O que acontece |
 | --- | --- |
-| MODE > DESLIGAR WIFI | Desliga o Wi-Fi do ESP nesta sessão. O cálculo local continua. |
-| SHIFT, AC | Limpa a entrada, apaga a tela e pede Wi-Fi desligado. MODE desperta a tela. |
-| Reabrir o portal | MODE > CONFIG. CELULAR (ou VER FOTOS NO WIFI) solicita o portal novamente. |
-| Reiniciar / chave física | Ao reiniciar o ESP, Calc-Lyke volta a abrir automaticamente. |
-| Bateria no cabeçalho | Quatro níveis aproximados; ! pisca abaixo de cerca de 3,45 V. ? indica leitura inválida. |
-| MODE > BATERIA | Mostra a tensão aproximada; = mede de novo. A leitura automática é renovada a cada 30 segundos. |
+| MODE > DESLIGAR WIFI | Desliga o rádio nesta sessão. O cálculo local continua. |
+| SHIFT, AC | ESP entra em deep-sleep; STM em STOP1. MODE desperta ambos. |
+| Sono automático | Padrão: 60 minutos sem botão. Ajuste em MODO CIENTIFICO > SONO, de 1 a 1440 minutos. |
+| Durante o sono | Tela, câmera, rádio, ADC e varredura periódica parados. Só MODE desperta no firmware final. |
+| Bateria no cabeçalho | Quatro níveis aproximados; ! baixa; ? leitura inválida. Não indica carregamento. |
+| MODE > BATERIA | Tensão aproximada; = mede novamente. Medição a cada 30 s enquanto acordada. |
 
-### O que permanece ao desligar
+### Dados e fotos
 
-Permanecem o mapeamento de teclas, as preferências salvas, o programa salvo, as redes cadastradas, a configuração do serviço e a última resposta gravada no ESP. O arquivo do servidor também permanece conforme a política do serviço.
+O sono limpa a entrada atual e mantém as demais memórias do STM em RAM e as configurações gravadas, mas apaga as fotos temporárias do ESP. A última resposta salva e o arquivo do servidor permanecem. Cortar energia também perde Ans, variáveis, histórico, estatística e pilha RPN; preferências, programa salvo e mapa ficam.
 
-### O que se perde
-
-Perdem-se a entrada atual, Ans, memórias A-F/X/Y/M/Δ/θ/Ω, histórico, estatística, pilha RPN e fotos ainda na fila temporária. Antes de cortar energia, conclua o envio ou baixe as imagens e pare qualquer atualização em andamento.
-
-> **Alimentação e recarga**
+> **A alimentação continua presente**
 >
-> Use apenas o conector, a fonte e o procedimento entregues para sua unidade. As barras estimam a carga pela tensão; não são uma porcentagem exata nem indicam carregamento. A montagem de referência usa uma célula e divisor de 470 kΩ + 470 kΩ corrigido e conferido pelo proprietário. Para recarregar, siga a orientação específica da unidade; não use o ícone para decidir qual entrada alimentar.
+> Sono não corta bateria. A unidade usa célula reaproveitada de controle PS4, de capacidade real não medida; referência original: 1000 mAh. O divisor de dois 470 kΩ consome pouco. O resistor de 330 Ω em 5 V e o conversor continuam consumindo até a alteração física prevista. Use o método de recarga entregue para a unidade.
 
 
 <a id="pagina-29"></a>
@@ -844,7 +844,7 @@ Simulações. A seleção percorre as opções e retorna ao início ao passar do
 | ATUALIZAR FIRMWARE | Abre o acesso ao portal de atualização. |
 | DESLIGAR WIFI | Desliga o rádio na sessão atual; reboot reativa AP. |
 | BATERIA | Consulta tensão aproximada em PA0. |
-| MODO CIENTIFICO | Ângulo, formato/precisão e entrada ALG/RPN. |
+| MODO CIENTIFICO | Ângulo, formato/precisão, ALG/RPN e SONO em minutos. |
 | ESTATISTICA | Médias, desvios, somas e regressão. |
 | CONSTANTES | Insere uma das seis constantes. |
 | PROGRAMA | Grava, executa ou apaga uma sequência de teclas. |
@@ -905,7 +905,7 @@ Simulações. Limpar memórias e apagar fotos são comandos diferentes.
 | ENG | Alterna ENG/NORM, com ou sem SHIFT. |
 | = | Calcula; em RPN, empilha/ENTER. SHIFT, =: %. |
 | DEL | Apaga elemento; após resultado, recupera conta. SHIFT, DEL: inserir/sobrescrever. |
-| AC | Limpa entrada; em menus, volta. SHIFT, AC: tela apagada e Wi-Fi OFF. |
+| AC | Limpa entrada; em menus, volta. SHIFT, AC: sono profundo; MODE desperta. |
 | MODE | Abre menu; sai de subpágina. SHIFT, MODE: zera memórias locais. |
 | REPLAY esquerda/direita | Move cursor. SHIFT, direita, na conta: captura foto. |
 | REPLAY cima/baixo | Histórico de expressões. Em menus e respostas, navega. |
@@ -931,7 +931,7 @@ Fluxo de aprendizado. Nunca envie chaves, senhas ou dados de pagamento para obte
 
 > **Prompt de aprendizagem**
 >
-> Estou usando a Lyke modificada com STM32 R12 e ESP R9a. Use o manual anexado como referência. Sou iniciante: explique uma ação por vez, diga exatamente qual tecla pressionar e o que devo ver. Diferencie captura, envio à IA e arquivo. Se a função não existir nesta versão, diga isso. Minha dúvida é: [descreva].
+> Estou usando a Lyke modificada com STM32 R14 e ESP R12. Use o manual anexado como referência. Sou iniciante: explique uma ação por vez, diga exatamente qual tecla pressionar e o que devo ver. Diferencie captura, envio à IA e arquivo. Se a função não existir nesta versão, diga isso. Minha dúvida é: [descreva].
 
 ### O que anexar
 
@@ -957,16 +957,16 @@ Para suporte, informe revisão, mensagem, quantidade de fotos, status de rede e 
 
 ![Compatibilidade e entrega da unidade](manual-assets/validacao.png)
 
-Estado do projeto em 24/11/2026. Esquema, implementação e teste físico são coisas diferentes.
+Estado de 26/11/2026. STM R14 e ESP R12 instaladas e conferidas em 26/11/2026.
 
 | Situação | Evidência ou limite |
 | --- | --- |
-| Testado: OpenAI e arquivo | Consulta de visão com equação sintética 2*x+3=11 retornou x=4; reenvio em cache conferido. |
-| Testado: envio pelo ESP | Captura real da bancada enviada pelo próprio ESP, arquivada e respondida pela IA; JPEG recuperado com hash idêntico. |
-| Testado: AP e OTA do ESP | Portal automático, desligamento por comando, retorno após reinício e atualização ESP por Wi-Fi. |
-| Testado: atualização e LCD | STM R12 e ESP R9a instalados pelo Wi-Fi; revisões e mapa de 49 teclas conferidos. Raiz/frações confirmadas anteriormente pelo usuário. |
-| Bateria e resolução completa | Dois resistores de 470 kΩ corrigidos pelo proprietário; leitura normal. API v2 conferida com três fotos de questão real e desenvolvimento completo. |
-| Limites de validação | Figuras: testes locais do renderizador aprovados; geração real pelo modelo ainda não testada no aparelho. Claude não integrado/testado. |
+| Testado: OpenAI e arquivo | Consulta real, recuperação dos JPEGs e respostas, cache e desenvolvimento com três fotos conferidos em revisões anteriores. |
+| Testado: captura e economia | Na unidade, JPEG 2560x1920 com pausa/restauração do rádio, sem reiniciar o ESP. Qualidade/autofoco mantidos. |
+| Testado no computador | 32 verificações: menu/tempo salvo, inatividade física, sono/protocolo, STOP, Wi-Fi desconectado/conectado e regressões. |
+| Firmware final no aparelho | STM R14 e ESP R12 instaladas e conferidas em 26/11/2026. Mapa de 49 teclas, configurações e última resposta preservados. |
+| Sono físico testado | SHIFT, AC apagou a tela. Tecla numérica não despertou; somente MODE despertou e o menu funcionou. ESP confirmou retorno de deep-sleep/ext0. |
+| Limites | Temporizadores validados localmente. Corrente, temperatura e autonomia não medidas. Leitura completa das figuras requer conferência do usuário. Claude não integrado/testado. |
 
 ### Checklist para receber a calculadora pronta
 
@@ -988,7 +988,7 @@ Este manual não é o manual original de fábrica da Lyke. A carcaça foi adapta
 
 Foto real da unidade modificada durante o ajuste da bateria, anterior ao ícone R11. As demais telas são simulações; o produto comercial original está em [S12].
 
-Links oficiais consultados em 23/11/2026. As telas de portais deste manual são desenhos explicativos: menus e condições comerciais podem mudar. As instruções de operação local foram conferidas nos fontes R12/R9a.
+Guias de conta, chave e cobrança OpenAI/Claude e preços OpenAI reconferidos em 25/11/2026; demais referências consultadas em 23/11/2026. As telas de portais deste manual são desenhos explicativos: menus e condições comerciais podem mudar. As instruções de operação local foram conferidas nos fontes R14/R12.
 
 | Referência | Documento oficial |
 | --- | --- |
@@ -1011,25 +1011,29 @@ Fontes locais: firmware/lyke_stm32/interface.h e scientific.h; firmware/esp32cam
 
 ```yaml
 produto: Lyke 101078 modificada
-data_manual: 2026-11-24
-stm32: lyke-r12
-esp: lyke-r9a
+data_manual: 2026-11-26
+stm32: lyke-r14
+esp: lyke-r12
 esp_chip: ESP32 clássico AI Thinker, 4 MB flash e 4 MB PSRAM
 nao_confundir: GOOUUU ESP32-S3 + DevKit (montagem diferente)
 teclas: 49; ON não mapeada
 lcd: janela 126x48; 21 colunas x 6 linhas úteis; resposta em 6 linhas sem ícones
 ap: Calc-Lyke
 portal: http://192.168.8.1
-wifi_boot: AP sempre abre; OFF só na sessão
+wifi_boot: AP abre no boot/menu; fecha após 120 s sem HTTP; OFF só na sessão
+sono: SHIFT e AC; automático em 60 min sem tecla; MODE desperta
+sono_menu: MODE > MODO CIENTIFICO > SONO; 1-1440 min; = salva
+wifi_limite: pausa tentativas após 20 min contínuos desconectado; conectado nunca expira
+captura_radio: pausa automaticamente Wi-Fi e restaura após desligar câmera
 captura: SHIFT e depois direita, na tela de cálculo
 fotos: 1 a 3 JPEGs em RAM; até 512 KiB cada
 envio: MODE > ENVIAR FOTOS IA > confirmar com =
 arquivo: só após envio, no serviço privado
 bateria: 0-4 barras aproximadas; ! baixa; ? leitura inválida; medição a cada 30 s
 stm_ota: Wi-Fi do ESP + UART existente; base V2 já instalada e testada
-api_testada: OpenAI Responses; figuras da API v3 ainda sem teste real no aparelho
+api_testada: OpenAI Responses v4; símbolos no leitor; geração de figuras requer conferência humana
 leitor: texto e desenhos 2D; cima/baixo 16px; lados 24px em figura larga ou 48px verticais em texto
-wifi_indicador: 3 pulsos no sucesso, depois oculto; falha alterna Wi-Fi/X
+wifi_indicador: 3 pulsos no sucesso, depois oculto; falha alterna Wi-Fi/X até reconectar/desligar/pausar
 modelo_principal: gpt-6.1-terra / high
 modelo_economico: gpt-6-luna / medium
 claude: não integrado e não testado; exige adaptador Anthropic no servidor

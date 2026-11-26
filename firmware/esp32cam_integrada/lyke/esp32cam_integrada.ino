@@ -44,9 +44,15 @@ static bool portal, otaMode, scanActive, connectActive, storageReady;
 // router Wi-Fi remains in STA mode when no configuration portal is needed.
 static bool wifiEnabled = true;
 static PortalLease portalLease;
+static OfflineRadioWatchdog radioWatchdog;
+static unsigned stmIdleMinutes;
+static uint32_t stmIdleMs;
 static bool captureBusy;
 static uint32_t capturePendingAt;
 static String captureResult;
+#ifdef LYKE_SLEEP_SELFTEST
+static uint32_t testEspSleepAt;
+#endif
 static SleepPeer sleepPeer;
 static bool connectionFailed;
 static uint32_t rebootAt, connectAt, portalAttemptAt;
@@ -93,7 +99,7 @@ static String printable(const String& text, size_t limit) {
 static void sendStatus() {
   stmSerial.printf("STATE %u %u %u %u\n", WiFi.status() == WL_CONNECTED, photos.count,
               portal, !lastAnswer.isEmpty());
-  sendLine(String("LINK ")+(!wifiEnabled?"OFF":connectActive?"JOIN":WiFi.status()==WL_CONNECTED?"OK":connectionFailed?"FAIL":"IDLE"));
+  sendLine(String("LINK ")+(!wifiEnabled||radioWatchdog.paused?"OFF":connectActive?"JOIN":WiFi.status()==WL_CONNECTED?"OK":connectionFailed?"FAIL":"IDLE"));
   sendLine("CAPS G1");
   sendLine("CAPS S1");
 }
@@ -139,7 +145,7 @@ static bool startPortal() {
   portalAttemptAt = millis();
   if (portal) web.stop();
   portal = false;
-  if (!WiFi.mode(WIFI_AP_STA) || !WiFi.softAPConfig(apAddress, apAddress, IPAddress(255,255,255,0)) ||
+  if (!WiFi.mode(radioWatchdog.paused?WIFI_AP:WIFI_AP_STA) || !WiFi.softAPConfig(apAddress, apAddress, IPAddress(255,255,255,0)) ||
       !WiFi.softAP(apName, "CHANGE_ME_ESP_AP", 1, false, 2)) return false;
   if(sessionToken.isEmpty())for (unsigned i = 0; i < 4; ++i) sessionToken += String(esp_random(), HEX);
   web.begin();
@@ -184,8 +190,8 @@ struct CapturePause {
     delay(30);captureBusy=false;
     if(enabled){
       if(restorePortal)startPortal();
-      else {WiFi.mode(WIFI_STA);WiFi.setSleep(true);}
-      join(network);
+      else if(!radioWatchdog.paused){WiFi.mode(WIFI_STA);WiFi.setSleep(true);}
+      if(!radioWatchdog.paused)join(network);
     }
     lastWifi=WiFi.status();
   }
@@ -270,7 +276,7 @@ static bool join(unsigned index) {
   if (index >= MaxNetworks || scanActive || otaMode) return false;
   const String ssid = ssidAt(index);
   if (ssid.isEmpty()) return false;
-  if(!wifiEnabled)return false;
+  if(!wifiEnabled||radioWatchdog.paused)return false;
   if(!portal&&!WiFi.mode(WIFI_STA))return false;
   WiFi.setSleep(true);
   WiFi.disconnect(false, false);
@@ -287,6 +293,7 @@ static bool join(unsigned index) {
 
 static bool startScan() {
   if (scanActive || connectActive || otaMode) return false;
+  radioWatchdog.resume(millis());WiFi.setAutoReconnect(true);
   if (!startPortal()) return false;
   WiFi.scanDelete();
   scannedCount = 0;
@@ -295,17 +302,26 @@ static bool startScan() {
 }
 
 static void wifiTick() {
-  // No idle timeout. Retry a failed/lost AP, unless the STM requested OFF.
+  // The portal lease and router-disconnection deadline have independent roles.
   if (wifiEnabled && portalLease.wanted && (!portal || !(WiFi.getMode() & WIFI_AP) || WiFi.softAPIP() != apAddress) &&
       millis() - portalAttemptAt >= 3000) {
     if (startPortal()) sendStatus();
   }
   if(portalLease.expired(millis(),otaMode||ota.receiving||captureBusy||capturePendingAt||scanActive||connectActive)) {
     web.stop();portal=false;portalLease.close();
-    WiFi.softAPdisconnect(false);WiFi.mode(WIFI_STA);WiFi.setSleep(true);
+    WiFi.softAPdisconnect(false);WiFi.mode(radioWatchdog.paused?WIFI_OFF:WIFI_STA);WiFi.setSleep(true);
     sendStatus();
   }
   wl_status_t status = WiFi.status();
+  if(wifiEnabled&&radioWatchdog.tick(millis(),status==WL_CONNECTED,
+       otaMode||ota.receiving||ota.complete||rebootAt||captureBusy||capturePendingAt)) {
+    if(WiFi.status()==WL_CONNECTED){radioWatchdog.resume(millis());radioWatchdog.tick(millis(),true,false);}
+    else {
+      scanActive=connectActive=false;WiFi.scanDelete();WiFi.setAutoReconnect(false);
+      WiFi.disconnect(false,false);WiFi.mode(portal?WIFI_AP:WIFI_OFF);
+      connectionFailed=false;sendStatus();
+    }
+  }
   if (status != lastWifi) {
     if(lastWifi==WL_CONNECTED&&status!=WL_CONNECTED&&wifiEnabled&&!connectActive)connectionFailed=true;
     lastWifi = status;
@@ -490,6 +506,10 @@ static bool enterDeepSleep(uint16_t sequence) {
   error|=rtc_gpio_set_direction(GPIO_NUM_13,RTC_GPIO_MODE_INPUT_ONLY);
   error|=rtc_gpio_pullup_en(GPIO_NUM_13);
   error|=rtc_gpio_pulldown_dis(GPIO_NUM_13);
+#ifdef LYKE_SLEEP_SELFTEST
+  // Diagnostic-only return path: RTC timer wakes ESP; UART TX then wakes STM.
+  error|=esp_sleep_enable_timer_wakeup(10u*1000000u);
+#endif
   if(error!=ESP_OK){
     rtc_gpio_hold_dis(GPIO_NUM_32);rtc_gpio_deinit(GPIO_NUM_32);rtc_gpio_deinit(GPIO_NUM_13);
     cameraStop();return false;
@@ -499,6 +519,12 @@ static bool enterDeepSleep(uint16_t sequence) {
   WiFi.mode(WIFI_OFF);
   stmSerial.printf("SLEEPING %u\n",sequence);stmSerial.flush();
   stmSerial.end();Serial.flush();
+#ifdef LYKE_SLEEP_SELFTEST
+  // Keep UART connected until SLEEPING is fully transmitted to the STM.
+  rtc_gpio_init(GPIO_NUM_14);
+  rtc_gpio_set_direction(GPIO_NUM_14,RTC_GPIO_MODE_OUTPUT_ONLY);
+  rtc_gpio_set_level(GPIO_NUM_14,1);rtc_gpio_hold_en(GPIO_NUM_14);
+#endif
   // Only camera PWDN is held. Never hold GPIO0 LOW: it is a boot strap.
   esp_deep_sleep_start();
   return false;
@@ -521,11 +547,15 @@ static void runCommand(const String& command) {
     if(sscanf(command.c_str(),"READG %u %u %u %c",&x,&y,&sequence,&extra)==3)sendAnswerWindow(x,y,sequence);
   } else if (command.startsWith("STM32 ")) {
     stmRevision = printable(command.substring(6), 31);
+  } else if(command.startsWith("POWER ")) {
+    unsigned minutes,age;char extra;
+    if(sscanf(command.c_str(),"POWER %u %u %c",&minutes,&age,&extra)==2&&minutes>=1&&minutes<=1440){stmIdleMinutes=minutes;stmIdleMs=age;}
   } else if (command.startsWith("MAP ")) {
     mappedKeys = constrain(command.substring(4).toInt(), 0L, 50L);
     int separator = command.indexOf(' ', 4);
     keyboardReady = separator < 0 ? mappedKeys == 50 : command.substring(separator + 1) == "1";
   } else if (command == "PORTAL") {
+    radioWatchdog.resume(millis());WiFi.setAutoReconnect(true);
     sendLine(startPortal() ? "PORTAL OK" : "NOTE FALHA NO AP");
     sendStatus();
   } else if (command == "SCAN") {
@@ -538,6 +568,7 @@ static void runCommand(const String& command) {
     sendLine("LIST_END");
   } else if (command.startsWith("JOIN ") && command.length() == 6 && isDigit(command[5])) {
     wifiEnabled=true;
+    radioWatchdog.resume(millis());WiFi.setAutoReconnect(true);
     if (!join(command[5] - '0')) sendLine("NOTE REDE INDISPONIVEL");
   } else if (command == "CAPTURE") {
     String error = takePhoto();
@@ -588,12 +619,14 @@ void setup() {
   // Release RTC mux/hold left by deep sleep before UART or camera uses the pads.
   digitalWrite(32,HIGH);pinMode(32,OUTPUT);
   rtc_gpio_hold_dis(GPIO_NUM_32);rtc_gpio_deinit(GPIO_NUM_32);rtc_gpio_deinit(GPIO_NUM_13);
+  rtc_gpio_hold_dis(GPIO_NUM_14);rtc_gpio_deinit(GPIO_NUM_14);
   cameraStop();
   pinMode(33, INPUT);
   stmSerial.setRxBufferSize(512);
   stmSerial.begin(115200, SERIAL_8N1, 13, 14);
   WiFi.persistent(false);
   WiFi.setAutoReconnect(true);
+  radioWatchdog.resume(millis());
   config.begin("lyke", false);
   storageReady = LittleFS.begin(false, "/littlefs", 6, "spiffs");
   if (storageReady) {
@@ -616,8 +649,15 @@ void setup() {
 }
 
 void loop() {
+#ifdef LYKE_SLEEP_SELFTEST
+  // Keep remote recovery available while an instrumented test build is awake.
+  if(portal)portalLease.touch(millis());
+#endif
   if (portal) web.handleClient();
   wifiTick();
+#ifdef LYKE_SLEEP_SELFTEST
+  if(testEspSleepAt&&int32_t(millis()-testEspSleepAt)>=0){testEspSleepAt=0;enterDeepSleep(65535);}
+#endif
   if(capturePendingAt&&int32_t(millis()-capturePendingAt)>=0) {
     capturePendingAt=0;captureResult=takePhoto();
     sendLine(captureResult.isEmpty()?"NOTE FOTO GUARDADA":"NOTE "+captureResult);
